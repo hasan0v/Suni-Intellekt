@@ -1,198 +1,66 @@
-# 🎓 SÜNİ İNTELLEKT - AI-Powered Learning Management System# Süni İntellekt - Learning Management System
+# 🎓 SÜNİ İNTELLEKT - Learning Management System
 
-
-
-An intelligent, modern Learning Management System built with Next.js 15, Supabase, and AI-enhanced features. This platform provides adaptive learning experiences with real-time analytics, collaborative tools, and comprehensive course management.This is a modern Learning Management System built with [Next.js](https://nextjs.org) and [Supabase](https://supabase.com).
-
-
-
-![License](https://img.shields.io/badge/license-MIT-blue.svg)## Features
+A modern, professional Learning Management System built with Next.js 15 and Supabase. This platform provides comprehensive course management, task assignments, attendance tracking, and grading features for educational institutions.
 
 ![Next.js](https://img.shields.io/badge/Next.js-15.4.2-black)
+![React](https://img.shields.io/badge/React-19.1.0-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
+![Supabase](https://img.shields.io/badge/Supabase-2.52.0-green)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-blue)
 
-![React](https://img.shields.io/badge/React-19.1.0-blue)- 📚 Course and module management
+## 🌟 Features
 
-![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)- 👥 User roles (Admin, Student)
+### 🎯 Core Features
+- **Course Management**: Complete CRUD operations for courses, modules, and topics
+- **Task System**: Assignment creation, submission, and grading
+- **Attendance Tracking**: Mark and monitor student attendance (present/absent/excused)
+- **Class Management**: Organize students into classes and assign courses
+- **Grading System**: Evaluate assignments with grades and feedback
+- **User Roles**: Admin and Student role-based access control
+- **Real-time Chat**: Collaborative communication system
+- **File Management**: Upload and share course materials (videos, PDFs, notebooks)
+- **Email Notifications**: Automated email system with Resend
+- **Rich Text Editor**: Tiptap-based content editor with multimedia support
+- **YouTube Integration**: Embed and manage video content
+- **Jupyter Notebook Support**: View and share interactive notebooks
 
-![Supabase](https://img.shields.io/badge/Supabase-2.52.0-green)- 📝 Task assignments and submissions
-
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.x-blue)- 💬 Real-time chat system
-
-- 📊 Progress tracking and grading
-
-## 🌟 Features- 📧 Email notifications
-
-- 🎥 YouTube video integration
-
-### 🎯 Core Learning Features
-
-- **Adaptive Content Engine**: AI-powered content recommendations based on learning patterns## Getting Started
-
-- **Interactive Rich Text Editor**: Tiptap-based editor with multimedia support
-
-- **Real-time Chat System**: Collaborative learning with instant messagingFirst, run the development server:
-
-- **Task Management**: Comprehensive assignment system with file uploads
-
-- **Grading & Feedback**: Structured evaluation system with detailed feedback```bash
-
-- **Progress Tracking**: Visual progress indicators and achievement trackingnpm run dev
-
-- **Jupyter Notebook Support**: Integrated notebook viewer for data science courses# or
-
-yarn dev
-
-### 🔐 Authentication & Security# or
-
-- **Supabase Authentication**: Secure user registration and loginpnpm dev
-
-- **Role-based Access Control**: Student and Admin role management# or
-
-- **Row Level Security (RLS)**: Database-level security policiesbun dev
-
-- **Profile Management**: User profiles with customizable settings```
-
-- **Password Reset**: Secure password recovery with email templates
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-### 👨‍💼 Administrative Tools
-
-- **Course Management**: Complete CRUD operations for coursesYou can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-- **Module & Topic Organization**: Hierarchical content structure
-
-- **User Management**: Student account administrationThis project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-- **Analytics Dashboard**: Performance metrics and engagement data
-
-- **Grading Queue**: Streamlined assignment review process## Environment Variables
-
-- **Email Template Management**: Customizable notification templates
-
-Create a `.env.local` file with your Supabase configuration:
-
-### 🎨 User Experience
-
-- **Responsive Design**: Mobile-first approach with Tailwind CSS```
-
-- **Dark/Light Mode Support**: Adaptive themingNEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-
-- **Interactive Animations**: Framer Motion for smooth transitionsNEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-
-- **File Management**: Cloudflare R2 integration for media storage```
-
-- **Real-time Updates**: Live notifications and updates
-
-## Learn More
+### 🎨 UI/UX
+- **Samsung Design Language**: Professional blue theme (#1428A0)
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Glass-card Components**: Modern, clean interface
+- **Smooth Animations**: Framer Motion transitions
+- **Dark Mode Ready**: Adaptive theming support
 
 ## 🏗️ Technology Stack
 
-To learn more about Next.js, take a look at the following resources:
-
 ### Frontend
-
-- **Framework**: Next.js 15.4.2 (App Router)- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-
-- **Language**: TypeScript 5.x- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
+- **Framework**: Next.js 15.4.2 (App Router)
+- **Language**: TypeScript 5.x
 - **UI Library**: React 19.1.0
-
-- **Styling**: Tailwind CSS 4.xYou can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
+- **Styling**: Tailwind CSS 4.x
 - **Animations**: Framer Motion 12.x
-
-- **Icons**: Lucide React## Deploy on Vercel
-
 - **Rich Text**: Tiptap 3.x
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
 ### Backend & Database
-
-- **Database**: Supabase (PostgreSQL)Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
+- **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **Real-time**: Supabase Realtime
-- **File Storage**: Cloudflare R2 (configured)
-- **Email Service**: Resend
+- **File Storage**: Supabase Storage
+- **Email Service**: Resend API
 
 ### Development Tools
 - **Linting**: ESLint 9.x
 - **Type Checking**: TypeScript strict mode
 - **Package Manager**: npm
-- **Deployment**: Vercel-ready configuration
-
-## 📁 Project Structure
-
-```
-lms-app/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── (auth)/            # Authentication routes
-│   │   │   ├── signin/        # Login page
-│   │   │   ├── signup/        # Registration page
-│   │   │   ├── forgot-password/
-│   │   │   └── reset-password/
-│   │   ├── dashboard/         # Protected dashboard area
-│   │   │   ├── admin/         # Admin-only routes
-│   │   │   │   ├── courses/   # Course management
-│   │   │   │   ├── tasks/     # Task management
-│   │   │   │   └── users/     # User management
-│   │   │   ├── courses/       # Student course access
-│   │   │   ├── tasks/         # Student task view
-│   │   │   ├── grades/        # Grade reports
-│   │   │   ├── chat/          # Real-time chat
-│   │   │   ├── grading/       # Admin grading interface
-│   │   │   └── profile/       # User profile
-│   │   ├── api/               # API routes
-│   │   │   ├── auth/          # Authentication endpoints
-│   │   │   ├── email/         # Email services
-│   │   │   └── password-reset/
-│   │   ├── globals.css        # Global styles
-│   │   ├── layout.tsx         # Root layout
-│   │   └── page.tsx           # Landing page
-│   ├── components/            # Reusable components
-│   │   ├── admin/             # Admin-specific components
-│   │   ├── landing/           # Landing page components
-│   │   ├── tasks/             # Task-related components
-│   │   ├── ui/                # UI primitives
-│   │   ├── AuthGate.tsx       # Auth protection
-│   │   ├── DashboardLayout.tsx
-│   │   ├── RichTextEditor.tsx
-│   │   ├── NotebookViewer.tsx
-│   │   └── YouTubeVideoPlayer.tsx
-│   ├── contexts/              # React contexts
-│   │   └── AuthContext.tsx    # Authentication state
-│   ├── hooks/                 # Custom hooks
-│   │   └── useSignedUrl.ts    # File upload utilities
-│   ├── lib/                   # Utility libraries
-│   │   ├── supabase.ts        # Database client
-│   │   ├── storage.ts         # File storage
-│   │   ├── tasks.ts           # Task utilities
-│   │   └── email/             # Email services
-│   └── types/                 # TypeScript definitions
-├── database/                  # Database schema & migrations
-│   ├── migrations/            # SQL migration files
-│   │   ├── add_chat_system.sql
-│   │   ├── add_indexes_for_chat_and_topics.sql
-│   │   ├── add_media_links.sql
-│   │   ├── add_storage_support.sql
-│   │   └── fix_storage_rls.sql
-│   └── add_notebook_support.sql
-├── email-templates/           # Email template files
-├── public/                    # Static assets
-└── package.json              # Dependencies & scripts
-```
+- **Deployment**: Vercel
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-
-- Node.js 18+ 
+- Node.js 18+
 - npm or yarn
 - Supabase account
-- Cloudflare R2 account (optional, for file storage)
+- Resend account (for emails)
 
 ### Installation
 
@@ -208,6 +76,7 @@ lms-app/
    ```
 
 3. **Environment Setup**
+   
    Create a `.env.local` file in the root directory:
    ```env
    # Supabase Configuration
@@ -217,24 +86,22 @@ lms-app/
 
    # Email Service (Resend)
    RESEND_API_KEY=your_resend_api_key
+   EMAIL_FROM=noreply@yourdomain.com
 
-   # Cloudflare R2 (Optional)
-   CLOUDFLARE_R2_ACCESS_KEY_ID=your_r2_access_key
-   CLOUDFLARE_R2_SECRET_ACCESS_KEY=your_r2_secret_key
-   CLOUDFLARE_R2_BUCKET_NAME=your_bucket_name
-   CLOUDFLARE_R2_ENDPOINT=your_r2_endpoint
+   # App Configuration
+   NEXT_PUBLIC_APP_URL=http://localhost:3000
    ```
 
 4. **Database Setup**
-   Run the SQL migrations in your Supabase SQL editor:
+   
+   Run the SQL migrations in your Supabase SQL editor in this order:
    ```bash
-   # Run migrations in order:
-   database/add_notebook_support.sql
-   database/migrations/add_chat_system.sql
-   database/migrations/add_indexes_for_chat_and_topics.sql
-   database/migrations/add_media_links.sql
-   database/migrations/add_storage_support.sql
-   database/migrations/fix_storage_rls.sql
+   1. database/add_notebook_support.sql
+   2. database/migrations/add_chat_system.sql
+   3. database/migrations/add_indexes_for_chat_and_topics.sql
+   4. database/migrations/add_media_links.sql
+   5. database/migrations/add_storage_support.sql
+   6. database/migrations/add_attendance_tracking.sql
    ```
 
 5. **Run Development Server**
@@ -244,131 +111,172 @@ lms-app/
 
    Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## 📁 Project Structure
+
+```
+lms-app/
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── auth/              # Authentication pages
+│   │   │   ├── signin/        # Login
+│   │   │   ├── signup/        # Registration
+│   │   │   ├── forgot-password/
+│   │   │   └── reset-password/
+│   │   ├── dashboard/         # Protected dashboard
+│   │   │   ├── admin/         # Admin routes
+│   │   │   │   ├── courses/   # Course management
+│   │   │   │   ├── classes/   # Class management
+│   │   │   │   └── tasks/     # Task management
+│   │   │   ├── courses/       # Student courses
+│   │   │   ├── tasks/         # Student tasks
+│   │   │   ├── grades/        # Grade reports
+│   │   │   ├── attendance/    # Attendance view
+│   │   │   └── chat/          # Chat system
+│   │   └── api/               # API routes
+│   ├── components/            # Reusable components
+│   │   ├── admin/             # Admin components
+│   │   ├── ui/                # UI primitives
+│   │   └── *.tsx              # Shared components
+│   ├── contexts/              # React contexts
+│   ├── lib/                   # Utilities
+│   └── types/                 # TypeScript types
+├── database/                  # SQL migrations
+├── email-templates/           # Email HTML templates
+└── public/                    # Static assets
+```
+
 ## 🗂️ Database Schema
 
 ### Core Tables
 
 | Table | Description |
 |-------|-------------|
-| `user_profiles` | Extended user information beyond Supabase Auth |
-| `courses` | Course definitions and metadata |
-| `modules` | Course sections/chapters |
-| `topics` | Individual lessons within modules |
-| `tasks` | Assignments linked to topics |
-| `submissions` | Student assignment submissions |
-| `chat_messages` | Real-time messaging system |
+| `user_profiles` | User information and roles |
+| `classes` | Class/group definitions |
+| `class_enrollments` | Student-class associations |
+| `courses` | Course definitions |
+| `modules` | Course sections |
+| `topics` | Individual lessons |
+| `tasks` | Assignments |
+| `submissions` | Student submissions |
+| `grades` | Assignment grades |
+| `class_attendance` | Attendance records |
+| `chat_messages` | Real-time messages |
 
-### Key Relationships
+## 🔐 Authentication
 
-```
-courses (1) → (n) modules → (n) topics → (1) tasks
-users (1) → (n) submissions ← (1) tasks
-users (1) → (n) chat_messages
-```
+The system uses Supabase Auth with custom email verification:
 
-## 🛣️ API Routes
+1. User signs up via `/auth/signup`
+2. System sends verification email via Resend
+3. User clicks verification link
+4. Email is marked as verified
+5. User can sign in via `/auth/signin`
 
-### Authentication Routes
-- `POST /api/auth/send-verification` - Send email verification
-- `POST /api/auth/reset-password` - Password reset request
-- `POST /api/auth/update-password` - Update user password
-- `POST /api/auth/verify-reset-token` - Verify reset token
+### User Roles
+- **Admin**: Full system access (course management, grading, attendance)
+- **Student**: Limited access (view courses, submit tasks, view grades)
 
-### Email Routes
-- `POST /api/email/send` - Send custom emails
-- `GET /api/auth/preview-template` - Preview email templates
+## 🎨 Design System
 
-### Utility Routes
-- `POST /api/setup-database` - Database initialization
-- `POST /api/test-email` - Email service testing
-- `POST /api/test-resend` - Resend service testing
+### Colors
+- **Primary**: Samsung Blue (#1428A0)
+- **Secondary**: Samsung Cyan (#00B0CA)
+- **Accent**: Purple, Pink, Teal gradients
+- **Neutral**: Gray scale
 
-## 🎨 UI Components
+### Typography
+- **Headings**: Sharp Sans (Samsung font)
+- **Body**: Sharp Sans
+- **Monospace**: Courier New
 
-### Layout Components
-- `DashboardLayout` - Main dashboard wrapper
-- `AuthGate` - Authentication protection
-- `ProtectedRoute` - Role-based route protection
-
-### Feature Components
-- `RichTextEditor` - Tiptap-based content editor
-- `NotebookViewer` - Jupyter notebook display
-- `YouTubeVideoPlayer` - Embedded video player
-- `FileAttachmentLink` - File download interface
-- `TopicForm` - Topic creation/editing
-- `TaskManager` - Assignment management interface
-
-### UI Primitives
-- Notification System
-- Confirm Dialog
-- Loading States
-- Error Boundaries
-
-## 🔧 Configuration
-
-### Next.js Configuration
-```typescript
-// next.config.ts
-const nextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'dcsshjzqyysqpzhgewtx.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
-      },
-    ],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  output: 'standalone',
-}
-```
-
-### Supabase Configuration
-- Row Level Security (RLS) enabled on all tables
-- Real-time subscriptions for chat and notifications
-- File storage integration with secure upload URLs
-- Authentication policies for student/admin roles
+### Components
+- Glass-card design with backdrop blur
+- Rounded corners (xl, 2xl, 3xl)
+- Shadow hierarchy (sm, md, lg, xl, 2xl)
+- Hover animations and transitions
 
 ## 🚀 Deployment
 
 ### Vercel Deployment
-The project is configured for Vercel deployment:
 
-```json
-{
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "functions": {
-    "src/app/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
-  "regions": ["fra1"]
-}
-```
+1. **Connect Repository**
+   - Import project to Vercel
+   - Connect GitHub repository
 
-### Environment Variables
-Set the following in your deployment platform:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `RESEND_API_KEY`
+2. **Set Environment Variables**
+   - Add all `.env.local` variables in Vercel dashboard
+   - Set `NEXT_PUBLIC_APP_URL` to your production domain
+
+3. **Deploy**
+   - Vercel will automatically build and deploy
+   - Set up custom domain if needed
+
+### Environment Variables Checklist
+- [ ] `NEXT_PUBLIC_SUPABASE_URL`
+- [ ] `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- [ ] `SUPABASE_SERVICE_ROLE_KEY`
+- [ ] `RESEND_API_KEY`
+- [ ] `EMAIL_FROM`
+- [ ] `NEXT_PUBLIC_APP_URL`
+
+## 📚 Usage
+
+### Admin Workflow
+
+1. **Create Classes**
+   - Go to Admin → Classes
+   - Create new class with name and description
+   - Enroll students
+
+2. **Create Courses**
+   - Go to Admin → Courses
+   - Add modules and topics
+   - Upload materials (videos, PDFs, notebooks)
+   - Assign to classes
+
+3. **Create Tasks**
+   - Go to course topic
+   - Add assignment with description and deadline
+   - Set grading criteria
+
+4. **Mark Attendance**
+   - Go to Class → Attendance
+   - Create lesson or select existing
+   - Mark students as present/absent/excused
+
+5. **Grade Assignments**
+   - Go to Grading queue
+   - Review submissions
+   - Assign grades and feedback
+
+### Student Workflow
+
+1. **Enroll in Classes**
+   - Admin enrolls students via admin panel
+
+2. **Access Courses**
+   - View assigned courses in dashboard
+   - Browse modules and topics
+   - Watch videos and read materials
+
+3. **Submit Tasks**
+   - View task assignments
+   - Upload files and write notes
+   - Submit before deadline
+
+4. **Check Grades**
+   - View grades for submitted tasks
+   - Read instructor feedback
+
+5. **View Attendance**
+   - Check attendance records
+   - See attendance percentage by class
 
 ## 🧪 Testing
 
-### Development Scripts
 ```bash
-# Start development server
+# Run development server
 npm run dev
 
 # Build for production
@@ -379,75 +287,39 @@ npm start
 
 # Run linting
 npm run lint
+
+# Type check
+npx tsc --noEmit
 ```
-
-### Testing Flow
-1. Create admin account in Supabase Auth
-2. Set user role to 'admin' in user_profiles table
-3. Test course creation and management
-4. Create test student account
-5. Test student learning flow
-6. Verify grading system
-
-## 📚 Features in Development
-
-### Current Implementation Status
-
-✅ **Completed Features**
-- User authentication and role management
-- Course, module, and topic CRUD operations
-- Rich text editor with media support
-- Task submission and grading system
-- Real-time chat functionality
-- Student dashboard with progress tracking
-- Admin panel with comprehensive management tools
-- Email notification system
-- File upload and storage integration
-- Responsive UI with Tailwind CSS
-
-🚧 **In Progress**
-- Advanced analytics and reporting
-- AI-powered content recommendations
-- Enhanced progress tracking
-- Mobile app optimization
-- Jupyter notebook integration improvements
-
-🔮 **Planned Features**
-- Quiz and assessment system
-- Video conferencing integration
-- Offline mode support
-- Advanced search functionality
-- Gamification elements
-- Multi-language support
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ## 🆘 Support
 
-For support and questions:
+For support:
 - Create an issue in the GitHub repository
-- Check the documentation in the `/docs` folder
-- Review the troubleshooting guides in project files
+- Check documentation in code comments
+- Review database schema in `/database` folder
 
 ## 🙏 Acknowledgments
 
-- [Next.js](https://nextjs.org/) - The React framework
-- [Supabase](https://supabase.io/) - Backend as a Service
+- [Next.js](https://nextjs.org/) - React framework
+- [Supabase](https://supabase.io/) - Backend platform
 - [Tailwind CSS](https://tailwindcss.com/) - CSS framework
 - [Tiptap](https://tiptap.dev/) - Rich text editor
-- [Framer Motion](https://www.framer.com/motion/) - Animation library
+- [Resend](https://resend.com/) - Email service
 - [Vercel](https://vercel.com/) - Deployment platform
 
 ---
 
-Built with ❤️ for modern education and AI-enhanced learning experiences.
+Built with ❤️ for modern education

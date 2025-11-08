@@ -4,8 +4,6 @@ import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePathname, useRouter } from 'next/navigation'
-import { BookIcon, CheckCircleIcon, UsersIcon, ArrowRightIcon } from '@/components/landing/Icons'
-import { AIInsights } from '@/components/landing/AIInsights'
 
 export default function Home() {
   const { user, loading } = useAuth()
@@ -18,10 +16,10 @@ export default function Home() {
 
   if (loading || !mounted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-samsung-blue/5 via-white to-samsung-cyan/5">
         <div className="relative">
-          <div className="animate-spin rounded-full h-32 w-32 border-4 border-indigo-200" />
-          <div className="animate-spin rounded-full h-32 w-32 border-4 border-indigo-600 border-t-transparent absolute top-0 left-0" />
+          <div className="animate-spin rounded-full h-32 w-32 border-4 border-samsung-blue/20" />
+          <div className="animate-spin rounded-full h-32 w-32 border-4 border-samsung-blue border-t-transparent absolute top-0 left-0" />
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="animate-pulse">
               <Logo size="lg" showText uppercase={false} />
@@ -33,233 +31,338 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white relative overflow-hidden">
-      {/* Samsung Bokeh Background Effects */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="samsung-bokeh absolute -top-40 -right-32 w-[600px] h-[600px] bg-samsung-blue" style={{ animationDelay: '0s' }} />
-        <div className="samsung-bokeh absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-samsung-accent-cyan" style={{ animationDelay: '3s' }} />
-        <div className="samsung-bokeh absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-samsung-blue-light" style={{ animationDelay: '6s' }} />
-        {/* Circular motifs */}
-        <div className="absolute top-20 left-20 w-6 h-6 samsung-circle bg-samsung-blue opacity-20 animate-float" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-40 right-32 w-8 h-8 samsung-circle bg-samsung-accent-cyan opacity-20 animate-float" style={{ animationDelay: '4s' }} />
-        <div className="absolute bottom-32 left-1/3 w-5 h-5 samsung-circle bg-samsung-blue-light opacity-20 animate-float" style={{ animationDelay: '7s' }} />
-      </div>
-      <div className="relative z-10">
-        <nav className="glass backdrop-blur-2xl border-0 shadow-samsung-card bg-white/80">
-          <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-            <div className="flex justify-between items-center py-3">
-              <div className="flex items-center space-x-4">
-                <Logo size="md" uppercase showText />
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center py-4">
+            <Logo size="md" uppercase showText />
+            <div className="flex items-center gap-3">
+              <Link
+                href="/auth/signin"
+                className="px-5 py-2.5 rounded-xl samsung-body text-sm font-semibold text-gray-700 hover:text-samsung-blue hover:bg-gray-50 transition-all duration-300"
+              >
+                Daxil ol
+              </Link>
+              <Link
+                href="/auth/signup"
+                className="px-6 py-2.5 rounded-xl samsung-body text-sm font-semibold bg-samsung-blue hover:bg-samsung-blue-dark text-white shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Qeydiyyat
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <main className="pt-20">
+        {/* Hero Section */}
+        <section className="relative py-20 md:py-32 px-6 sm:px-8 lg:px-12 overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute inset-0 -z-10">
+            <div className="absolute top-20 right-10 w-72 h-72 bg-samsung-blue/10 rounded-full blur-3xl" />
+            <div className="absolute bottom-20 left-10 w-96 h-96 bg-samsung-cyan/10 rounded-full blur-3xl" />
+          </div>
+
+          <div className="max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              {/* Left Content */}
+              <div className="space-y-8">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-samsung-blue/10 border border-samsung-blue/20">
+                  <span className="w-2 h-2 bg-samsung-blue rounded-full mr-2 animate-pulse" />
+                  <span className="text-sm samsung-body font-semibold text-samsung-blue">Müasir Təhsil Platforması</span>
+                </div>
+
+                <h1 className="text-5xl md:text-6xl samsung-heading text-gray-900 leading-tight">
+                  Öyrənməni <span className="text-samsung-blue">Sadələşdir</span>
+                </h1>
+
+                <p className="text-xl samsung-body text-gray-600 leading-relaxed">
+                  Kurslar, tapşırıqlar və davamiyyət idarəetməsi üçün yaradılmış peşəkar təhsil platforması. Tələbələr və müəllimlər üçün vahid həll.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link
+                    href="/auth/signup"
+                    className="px-8 py-4 rounded-xl samsung-body font-semibold bg-samsung-blue hover:bg-samsung-blue-dark text-white shadow-lg hover:shadow-xl transition-all duration-300 text-center"
+                  >
+                    Pulsuz Başla →
+                  </Link>
+                  <a
+                    href="#features"
+                    className="px-8 py-4 rounded-xl samsung-body font-semibold bg-gray-100 hover:bg-gray-200 text-gray-900 transition-all duration-300 text-center"
+                  >
+                    Daha Ətraflı
+                  </a>
+                </div>
+
+                <div className="flex items-center gap-8 pt-4">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm samsung-body text-gray-600">Pulsuz</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm samsung-body text-gray-600">Asan istifadə</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm samsung-body text-gray-600">Təhlükəsiz</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-3">
-                {/* Sign In */}
-                <Link
-                  href="/auth/signin"
-                  aria-label="Panelə giriş"
-                  className="inline-flex items-center px-4 py-2 rounded-xl samsung-body text-sm font-semibold text-gray-700 hover:text-samsung-blue bg-white border border-gray-200 hover:border-samsung-blue shadow-sm hover:shadow-md transition-all duration-300"
-                >
-                  Daxil ol
-                </Link>
-                {/* Sign Up */}
-                <Link
-                  href="/auth/signup"
-                  aria-label="İnkişafını başlat"
-                  className="inline-flex items-center gap-2 px-5 py-2 rounded-xl samsung-body text-sm font-semibold bg-samsung-blue hover:bg-samsung-blue-dark text-white shadow-samsung-card hover:shadow-lg transition-all duration-300"
-                >
-                  <span>⚡</span> Qeydiyyat
-                </Link>
+
+              {/* Right Visual */}
+              <div className="relative">
+                <div className="glass-card rounded-3xl p-8 shadow-2xl">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg samsung-heading text-gray-900">Tələbə Paneli</h3>
+                      <span className="px-3 py-1 rounded-full text-xs samsung-body font-semibold bg-green-100 text-green-700">Aktiv</span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-samsung-blue to-samsung-blue-dark rounded-2xl p-5 text-white">
+                        <p className="text-sm samsung-body opacity-90 mb-2">Kurslar</p>
+                        <p className="text-3xl samsung-heading">12</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-samsung-cyan to-blue-500 rounded-2xl p-5 text-white">
+                        <p className="text-sm samsung-body opacity-90 mb-2">Tapşırıqlar</p>
+                        <p className="text-3xl samsung-heading">24</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl p-5 text-white">
+                        <p className="text-sm samsung-body opacity-90 mb-2">Davamiyyət</p>
+                        <p className="text-3xl samsung-heading">94%</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-5 text-white">
+                        <p className="text-sm samsung-body opacity-90 mb-2">Qiymətlər</p>
+                        <p className="text-3xl samsung-heading">A-</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+                        <span className="samsung-body text-sm font-medium text-gray-700">Növbəti dərs</span>
+                        <span className="samsung-body text-sm text-gray-500">Sabah, 10:00</span>
+                      </div>
+                      <div className="flex items-center justify-between p-4 rounded-xl bg-gray-50">
+                        <span className="samsung-body text-sm font-medium text-gray-700">Son yoxlama</span>
+                        <span className="samsung-body text-sm text-green-600 font-semibold">85/100</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </nav>
-        <main>
-          {/* HERO - Samsung Immersive Design */}
-          <section id="hero" className="relative pt-32 md:pt-40 pb-32 px-6 sm:px-8 lg:px-12">
-            <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-              <div className="space-y-10 animate-fade-in-up">
-                <div className="inline-flex items-center px-6 py-3 rounded-full bg-white/95 backdrop-blur-sm border-2 border-samsung-blue/20 shadow-samsung-card text-sm font-bold text-samsung-gray-800 samsung-ripple">
-                  <span className="w-2.5 h-2.5 samsung-circle bg-samsung-accent-teal mr-3 animate-pulse" />
-                  Real vaxtlı AI Dəstəklı Təhsil • 2025
-                </div>
-                <h1 className="text-5xl md:text-6xl lg:text-7xl samsung-heading tracking-tight text-samsung-gray-900 leading-[1.05]">
-                  Öyrənməni <span className="gradient-text">Şəxsi</span> <span className="gradient-text">Təcrübəyə</span> Çevir
-                </h1>
-                <p className="text-xl md:text-2xl samsung-body text-samsung-gray-700 max-w-xl leading-relaxed">
-                  SÜNİ İNTELLEKT; fərdiləşdirilmiş məzmun, adaptiv tapşırıqlar və dərin analitika ilə öyrənmə yolunuzu optimallaşdıran AI əsaslı yeni nəsil platformadır.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-5">
-                  <Link href="/auth/signup" className="btn btn-primary samsung-ripple px-10 py-5 text-lg samsung-body shadow-samsung-float hover:shadow-2xl">
-                    İndi Başla <ArrowRightIcon className="w-6 h-6 ml-2" />
-                  </Link>
-                  <a href="#features" className="btn btn-secondary samsung-ripple px-10 py-5 text-lg samsung-body">
-                    Xüsusiyyətlərə Bax
-                  </a>
-                </div>
-                <div className="flex flex-wrap gap-8 pt-6 text-base samsung-body text-samsung-gray-600">
-                  <div className="flex items-center gap-3"><span className="text-samsung-accent-teal text-xl">✓</span> Pulsuz başla</div>
-                  <div className="flex items-center gap-3"><span className="text-samsung-accent-teal text-xl">✓</span> Kredit kartı tələb olunmur</div>
-                  <div className="flex items-center gap-3"><span className="text-samsung-accent-teal text-xl">✓</span> Ani izləmə</div>
-                </div>
-              </div>
-              {/* Immersive Product Card */}
-              <div className="relative group animate-fade-in-scale" style={{ animationDelay: '0.2s' }}>
-                <div className="absolute -inset-6 bg-gradient-to-tr from-samsung-blue/10 via-samsung-accent-cyan/10 to-transparent rounded-[3rem] blur-3xl opacity-60 group-hover:opacity-80 transition-opacity duration-700" />
-                <div className="relative glass-card rounded-[2.5rem] p-10 md:p-12 overflow-hidden border-2 border-samsung-blue/10">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-xl samsung-heading text-samsung-gray-900">Canlı İrəliləyiş Paneli</h3>
-                    <span className="px-4 py-2 rounded-full text-sm font-bold bg-samsung-blue/10 text-samsung-blue samsung-circle">Demo</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-5 mb-8">
-                    {[
-                      { label: 'Tamamlanmış Tapşırıq', value: 82, color: 'from-samsung-accent-teal to-emerald-500' },
-                      { label: 'Aktiv Kurs', value: 6, color: 'from-samsung-blue to-samsung-blue-dark' },
-                      { label: 'Uğur Faizi', value: 94, color: 'from-samsung-accent-purple to-purple-600' },
-                      { label: 'Tövsiyə Edilən Məzmun', value: 12, color: 'from-samsung-accent-pink to-pink-600' }
-                    ].map((s) => (
-                      <div key={s.label} className="rounded-2xl p-5 bg-white/80 border-2 border-samsung-gray-200/70 shadow-sm hover:shadow-samsung-card transition-all duration-500 hover:scale-105 samsung-ripple">
-                        <p className="text-xs font-bold samsung-body text-samsung-gray-600 mb-3">{s.label}</p>
-                        <div className="flex items-end justify-between">
-                          <span className="text-3xl samsung-heading text-samsung-gray-900">{s.value}<span className="text-base font-semibold">{s.label.includes('%') ? '' : s.label === 'Uğur Faizi' ? '%' : ''}</span></span>
-                          <span className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${s.color} opacity-90 samsung-circle`} />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="grid gap-4 text-base">
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-gradient-to-r from-samsung-blue/5 to-samsung-accent-cyan/5 border-2 border-samsung-blue/10 samsung-ripple">
-                      <span className="samsung-body font-bold text-samsung-gray-800">AI Tövsiyəsi</span>
-                      <span className="text-samsung-blue samsung-body font-bold">Yeni Tapşırıq</span>
-                    </div>
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/80 border-2 border-samsung-gray-200 samsung-ripple">
-                      <span className="samsung-body font-bold text-samsung-gray-800">Diqqət Səviyyəsi</span>
-                      <span className="samsung-body text-samsung-gray-900">Yüksək</span>
-                    </div>
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-white/80 border-2 border-samsung-gray-200 samsung-ripple">
-                      <span className="samsung-body font-bold text-samsung-gray-800">Öyrənmə Ritmi</span>
-                      <span className="samsung-body text-samsung-gray-900">Optimal</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        </section>
+
+        {/* Features Section */}
+        <section id="features" className="py-20 px-6 sm:px-8 lg:px-12 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl samsung-heading text-gray-900 mb-4">
+                Platformanın İmkanları
+              </h2>
+              <p className="text-xl samsung-body text-gray-600 max-w-2xl mx-auto">
+                Təhsil prosesini asanlaşdıran və effektivləşdirən funksiyalar
+              </p>
             </div>
-          </section>
 
-          {/* STEPS / HOW IT WORKS - Samsung Card Design */}
-          <section id="how" className="py-24 px-6 sm:px-8 lg:px-12 bg-samsung-gray-50">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl samsung-heading text-samsung-gray-900 mb-6">Necə İşləyir?</h2>
-                <p className="text-xl samsung-body text-samsung-gray-700 max-w-2xl mx-auto">Ağıllı alqoritmlər öyrənmə tərzinizi analiz edir və şəxsi hədəflərinizə uyğun yeni marşrut qurur.</p>
-              </div>
-              <div className="grid md:grid-cols-3 gap-10">
-                {[
-                  { step: 1, title: 'Profilini Yarat', desc: 'Hədəflərin və maraqlarınla şəxsi öyrənmə xəritən başlasın.' },
-                  { step: 2, title: 'AI Analizi', desc: 'Platform performans və davranışlarını analiz edib adaptiv məzmun yaradır.' },
-                  { step: 3, title: 'Optimallaşdırılmış Öyrən', desc: 'Fərdiləşdirilmiş tapşırıqlar, izləmə və tövsiyələrlə inkişafını sürətləndir.' }
-                ].map(s => (
-                  <div key={s.step} className="glass-card rounded-3xl p-10 hover:shadow-samsung-float transition-all duration-700 group samsung-ripple">
-                    <div className="w-20 h-20 mb-8 rounded-3xl bg-samsung-blue text-white flex items-center justify-center samsung-heading text-3xl shadow-samsung-card group-hover:scale-110 group-hover:bg-samsung-blue-light transition-all duration-500">{s.step}</div>
-                    <h3 className="text-2xl samsung-heading text-samsung-gray-900 mb-4">{s.title}</h3>
-                    <p className="samsung-body text-samsung-gray-700 leading-relaxed text-lg">{s.desc}</p>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {/* Feature Cards */}
+              {[
+                {
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                  ),
+                  title: 'Kurs İdarəetməsi',
+                  description: 'Müxtəlif kursları yaradın, təşkil edin və tələbələrə təyin edin. Video, PDF və Jupyter Notebook dəstəyi.'
+                },
+                {
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  ),
+                  title: 'Tapşırıqlar',
+                  description: 'Müəllimlər tapşırıqlar yaradır, tələbələr təhvil verir və real-vaxtda qiymətləndirmə alır.'
+                },
+                {
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  ),
+                  title: 'Davamiyyət İzləmə',
+                  description: 'Hər dərs üçün tələbə davamiyyətini qeyd edin. İştirak, qayıb və üzrlü statusları ilə.'
+                },
+                {
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  ),
+                  title: 'Sinif İdarəetməsi',
+                  description: 'Tələbələri siniflərə qruplaşdırın, kursları təyin edin və irəliləyişi izləyin.'
+                },
+                {
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  ),
+                  title: 'Qiymətləndirmə',
+                  description: 'Tapşırıqlara qiymət verin, şərhlər yazın və tələbələrin performansını analiz edin.'
+                },
+                {
+                  icon: (
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  ),
+                  title: 'Məzmun Yükləmə',
+                  description: 'Dərs materialları, videolar, sənədlər və kod nümunələrini asanlıqla paylaşın.'
+                }
+              ].map((feature, index) => (
+                <div key={index} className="glass-card rounded-2xl p-8 hover:shadow-xl transition-all duration-300 group">
+                  <div className="w-16 h-16 rounded-2xl bg-samsung-blue text-white flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                    {feature.icon}
                   </div>
-                ))}
-              </div>
+                  <h3 className="text-xl samsung-heading text-gray-900 mb-3">{feature.title}</h3>
+                  <p className="samsung-body text-gray-600 leading-relaxed">{feature.description}</p>
+                </div>
+              ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* CORE FEATURES - Samsung Card-Based Content Blocks */}
-          <section id="features" className="py-24 bg-white px-6 sm:px-8 lg:px-12">
-            <div className="max-w-7xl mx-auto">
-              <div className="text-center mb-16">
-                <h2 className="text-4xl md:text-5xl samsung-heading text-samsung-gray-900 mb-6">Güclü AI Əsaslı Xüsusiyyətlər</h2>
-                <p className="text-xl samsung-body text-samsung-gray-700 max-w-3xl mx-auto">Öyrənmə təcrübəsini real vaxtlı geri bildirim və avtomatik fərdiləşdirmə ilə dəyişən modullar.</p>
-              </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[
-                  { icon: <BookIcon className="w-10 h-10" />, title: 'Adaptiv Məzmun Mühərriki', desc: 'İrəliləyiş və davranışını analiz edib hər istifadəçiyə xüsusi marşrut yaradır.' },
-                  { icon: <CheckCircleIcon className="w-10 h-10" />, title: 'Performans Proqnozu', desc: 'Statistik modellər yaxın imtahan göstəricilərinizi öncədən təxmin edir.' },
-                  { icon: <UsersIcon className="w-10 h-10" />, title: 'Kollektiv Zəka', desc: 'İcma daxilində qarşılıqlı əlaqələri şərh edib əməkdaşlıq tövsiyələri verir.' },
-                  { icon: <BookIcon className="w-10 h-10" />, title: 'Tapşırıq Prioritetləşdirmə', desc: 'Zaman və çətinlik parametrlərinə görə edəcəklərin siyahısını tərtib edir.' },
-                  { icon: <UsersIcon className="w-10 h-10" />, title: 'Sosial Öyrənmə Analitikası', desc: 'Komanda daxili inkişaf balansını və sinerjini ölçür.' },
-                  { icon: <CheckCircleIcon className="w-10 h-10" />, title: 'Ani Geri Bildirim', desc: 'Tamamlanan tapşırıqlardan dərhal mənalı nəticələr çıxarır.' }
-                ].map(f => (
-                  <div key={f.title} className="glass-card rounded-3xl p-9 flex flex-col hover:shadow-samsung-float transition-all duration-700 group samsung-ripple border-2 border-samsung-gray-100 hover:border-samsung-blue/30">
-                    <div className="w-20 h-20 mb-7 rounded-3xl bg-samsung-blue text-white flex items-center justify-center shadow-samsung-card group-hover:bg-samsung-blue-light group-hover:scale-110 transition-all duration-500">
-                      {f.icon}
+        {/* How It Works */}
+        <section className="py-20 px-6 sm:px-8 lg:px-12 bg-white">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl samsung-heading text-gray-900 mb-4">
+                Necə Başlamaq?
+              </h2>
+              <p className="text-xl samsung-body text-gray-600">
+                3 sadə addımda platformadan istifadəyə başlayın
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-12">
+              {[
+                {
+                  step: '01',
+                  title: 'Qeydiyyatdan keçin',
+                  description: 'Email və şifrə ilə hesab yaradın. Admin və ya tələbə olaraq daxil olun.'
+                },
+                {
+                  step: '02',
+                  title: 'Profili tamamlayın',
+                  description: 'Ad-soyad, şəkil və digər məlumatları əlavə edərək profilinizi şəxsiləşdirin.'
+                },
+                {
+                  step: '03',
+                  title: 'Öyrənməyə başlayın',
+                  description: 'Kurslara qoşulun, tapşırıqları yerinə yetirin və irəliləyişinizi izləyin.'
+                }
+              ].map((step, index) => (
+                <div key={index} className="relative">
+                  <div className="text-6xl samsung-heading text-samsung-blue/20 mb-4">{step.step}</div>
+                  <h3 className="text-2xl samsung-heading text-gray-900 mb-3">{step.title}</h3>
+                  <p className="samsung-body text-gray-600 leading-relaxed">{step.description}</p>
+                  {index < 2 && (
+                    <div className="hidden md:block absolute top-12 -right-6 text-samsung-blue/30">
+                      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      </svg>
                     </div>
-                    <h3 className="text-xl samsung-heading text-samsung-gray-900 mb-3">{f.title}</h3>
-                    <p className="samsung-body text-samsung-gray-700 text-base leading-relaxed flex-1">{f.desc}</p>
-                  </div>
-                ))}
-              </div>
+                  )}
+                </div>
+              ))}
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* INTERACTIVE AI INSIGHTS */}
-          <AIInsights />
-
-          {/* CATEGORIES (commented out on request)
-          <section id="categories" className="py-20 px-4 sm:px-6 lg:px-8">
-            ...original categories section removed...
-          </section>
-          */}
-
-          {/* TESTIMONIALS (commented out on request)
-          <Testimonials />
-          */}
-
-          {/* CTA */}
-          <section id="cta" className="py-24 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto text-center glass-card rounded-3xl p-12 relative overflow-hidden">
-              <div className="absolute -top-10 -right-10 w-64 h-64 bg-gradient-to-br from-indigo-400/20 to-purple-400/20 rounded-full blur-3xl" />
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6">Öyrənmə Təcrübəni Dönüşdürməyə Hazırsan?</h2>
-              <p className="text-lg text-gray-600 mb-10 max-w-3xl mx-auto">Bu gün pulsuz başlayın və platformanın AI gücü ilə şəxsi öyrənmə səyahətinizi necə sürətləndirəcəyini kəşf edin.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/auth/signup" className="btn btn-primary px-10 py-4 text-base font-semibold shadow-lg hover:shadow-xl">Pulsuz Başla <ArrowRightIcon className="w-5 h-5 ml-2" /></Link>
-                <Link href="/auth/signin" className="btn btn-secondary px-10 py-4 text-base font-semibold">Daxil Ol</Link>
-              </div>
+        {/* CTA Section */}
+        <section className="py-20 px-6 sm:px-8 lg:px-12 bg-gradient-to-br from-samsung-blue to-samsung-blue-dark text-white">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl md:text-5xl samsung-heading mb-6">
+              Bu gün başlayın
+            </h2>
+            <p className="text-xl samsung-body mb-10 opacity-90">
+              Təhsil səyahətinizi effektiv idarə etmək üçün hazır platformaya qoşulun
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/auth/signup"
+                className="px-10 py-4 rounded-xl samsung-body font-semibold bg-white text-samsung-blue hover:bg-gray-100 shadow-xl transition-all duration-300"
+              >
+                Pulsuz Qeydiyyat
+              </Link>
+              <Link
+                href="/auth/signin"
+                className="px-10 py-4 rounded-xl samsung-body font-semibold bg-white/10 hover:bg-white/20 backdrop-blur-sm border-2 border-white/30 transition-all duration-300"
+              >
+                Daxil Ol
+              </Link>
             </div>
-          </section>
+          </div>
+        </section>
 
-          {/* FOOTER */}
-          <footer className="border-t border-gray-200/60 bg-white/70 backdrop-blur-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid md:grid-cols-4 gap-12 text-sm">
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-12 px-6 sm:px-8 lg:px-12">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-4 gap-12 mb-8">
               <div className="space-y-4">
                 <Logo size="md" uppercase showText />
-                <p className="text-gray-600 leading-relaxed">AI ile güçlendirilmiş uyarlanabilir içerik ve veriye dayalı öğrenme deneyimi.</p>
-                <p className="text-gray-400 text-xs">© {new Date().getFullYear()} SÜNİ İNTELLEKT. Tüm hakları saklıdır.</p>
+                <p className="samsung-body text-gray-400 text-sm leading-relaxed">
+                  Müasir təhsil platforması - kurslar, tapşırıqlar və davamiyyət idarəetməsi
+                </p>
               </div>
+              
               <div>
-                <h4 className="font-semibold text-gray-900 mb-4">Platforma</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li><a href="#features" className="hover:text-indigo-600 transition">Xüsusiyyətlər</a></li>
-                  <li><a href="#how" className="hover:text-indigo-600 transition">Necə İşləyir</a></li>
-                  <li><a href="#categories" className="hover:text-indigo-600 transition">Kateqoriyalar</a></li>
-                  <li><a href="#cta" className="hover:text-indigo-600 transition">Başla</a></li>
+                <h4 className="samsung-heading font-semibold mb-4">Platform</h4>
+                <ul className="space-y-2 samsung-body text-sm">
+                  <li><a href="#features" className="text-gray-400 hover:text-white transition">Xüsusiyyətlər</a></li>
+                  <li><a href="/auth/signup" className="text-gray-400 hover:text-white transition">Qeydiyyat</a></li>
+                  <li><a href="/auth/signin" className="text-gray-400 hover:text-white transition">Giriş</a></li>
                 </ul>
               </div>
+
               <div>
-                <h4 className="font-semibold text-gray-900 mb-4">Resurslar</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li><span className="opacity-70">Bloq (tezliklə)</span></li>
-                  <li><span className="opacity-70">Kömək Mərkəzi</span></li>
-                  <li><span className="opacity-70">Məxfilik</span></li>
-                  <li><span className="opacity-70">Şərtlər</span></li>
+                <h4 className="samsung-heading font-semibold mb-4">Dəstək</h4>
+                <ul className="space-y-2 samsung-body text-sm text-gray-400">
+                  <li>Kömək Mərkəzi</li>
+                  <li>Əlaqə</li>
+                  <li>FAQ</li>
                 </ul>
               </div>
+
               <div>
-                <h4 className="font-semibold text-gray-900 mb-4">İcma</h4>
-                <ul className="space-y-2 text-gray-600">
-                  <li><span className="opacity-70">Discord</span></li>
-                  <li><span className="opacity-70">Twitter / X</span></li>
-                  <li><span className="opacity-70">LinkedIn</span></li>
-                  <li><span className="opacity-70">GitHub</span></li>
+                <h4 className="samsung-heading font-semibold mb-4">Hüquqi</h4>
+                <ul className="space-y-2 samsung-body text-sm text-gray-400">
+                  <li>Məxfilik Siyasəti</li>
+                  <li>İstifadə Şərtləri</li>
+                  <li>Kukilər</li>
                 </ul>
               </div>
             </div>
-          </footer>
-        </main>
-      </div>
+
+            <div className="border-t border-gray-800 pt-8 text-center samsung-body text-sm text-gray-400">
+              <p>© {new Date().getFullYear()} SÜNİ İNTELLEKT. Bütün hüquqlar qorunur.</p>
+            </div>
+          </div>
+        </footer>
+      </main>
     </div>
   )
 }
