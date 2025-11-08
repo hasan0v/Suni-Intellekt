@@ -51,16 +51,18 @@ export default function ClassAttendancePage() {
     }
     fetchClassInfo()
     fetchStudents()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, profile])
 
   useEffect(() => {
     if (selectedDate && lessonNumber && students.length > 0) {
       fetchAttendance()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, lessonNumber, students])
 
   const fetchClassInfo = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('classes')
       .select('id, name, description')
       .eq('id', classId)
@@ -71,7 +73,7 @@ export default function ClassAttendancePage() {
 
   const fetchStudents = async () => {
     setLoading(true)
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('class_enrollments')
       .select(`
         user_id,
@@ -85,18 +87,24 @@ export default function ClassAttendancePage() {
       .eq('status', 'active')
 
     if (data) {
-      const studentsList = data.map(enrollment => ({
-        id: enrollment.user_profiles.id,
-        full_name: enrollment.user_profiles.full_name,
-        profile_image_url: enrollment.user_profiles.profile_image_url
-      }))
+      const studentsList = data.map(enrollment => {
+        const profile = Array.isArray(enrollment.user_profiles) 
+          ? enrollment.user_profiles[0] 
+          : enrollment.user_profiles
+        
+        return {
+          id: profile.id,
+          full_name: profile.full_name,
+          profile_image_url: profile.profile_image_url
+        }
+      })
       setStudents(studentsList)
     }
     setLoading(false)
   }
 
   const fetchAttendance = async () => {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('class_attendance')
       .select('*')
       .eq('class_id', classId)
@@ -178,15 +186,6 @@ export default function ClassAttendancePage() {
       setMessage({ type: 'error', text: 'Xəta baş verdi. Yenidən cəhd edin.' })
     } finally {
       setSaving(false)
-    }
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'present': return 'bg-green-100 text-green-800 border-green-300'
-      case 'absent': return 'bg-red-100 text-red-800 border-red-300'
-      case 'excused': return 'bg-yellow-100 text-yellow-800 border-yellow-300'
-      default: return 'bg-gray-100 text-gray-800 border-gray-300'
     }
   }
 

@@ -16,7 +16,7 @@ interface AttendanceRecord {
   classes: {
     id: string
     name: string
-  }
+  } | null
 }
 
 interface ClassStats {
@@ -36,16 +36,10 @@ export default function StudentAttendancePage() {
   const [selectedClass, setSelectedClass] = useState<string>('all')
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (profile?.id) {
-      fetchAttendance()
-    }
-  }, [profile])
-
   const fetchAttendance = async () => {
     setLoading(true)
     
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from('class_attendance')
       .select(`
         id,
@@ -63,17 +57,26 @@ export default function StudentAttendancePage() {
       .order('lesson_date', { ascending: false })
 
     if (data) {
-      setAttendance(data as any)
-      calculateStats(data as any)
+      setAttendance(data as unknown as AttendanceRecord[])
+      calculateStats(data as unknown as AttendanceRecord[])
     }
     
     setLoading(false)
   }
 
+  useEffect(() => {
+    if (profile?.id) {
+      fetchAttendance()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile])
+
   const calculateStats = (records: AttendanceRecord[]) => {
     const classMap = new Map<string, ClassStats>()
 
     records.forEach(record => {
+      if (!record.classes) return
+      
       const classId = record.classes.id
       const className = record.classes.name
 
@@ -107,7 +110,7 @@ export default function StudentAttendancePage() {
 
   const filteredAttendance = selectedClass === 'all' 
     ? attendance 
-    : attendance.filter(a => a.classes.id === selectedClass)
+    : attendance.filter(a => a.classes?.id === selectedClass)
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -230,7 +233,7 @@ export default function StudentAttendancePage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-gray-900 samsung-body">
-                            {record.classes.name}
+                            {record.classes?.name || 'Unknown Class'}
                           </h3>
                           {getStatusBadge(record.status)}
                         </div>
