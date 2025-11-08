@@ -48,28 +48,83 @@ const CourseCardSkeleton = () => (
 )
 
 export default function StudentCoursesPage() {
-  const { profile } = useAuth()
+  const { profile, user } = useAuth()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
+  const [enrolledClasses, setEnrolledClasses] = useState<string[]>([])
 
   useEffect(() => {
-    if (!profile) return
-    fetchCourses()
-  }, [profile])
+    if (!profile || !user) return
+    fetchEnrolledClasses()
+  }, [profile, user])
+
+  useEffect(() => {
+    if (enrolledClasses.length > 0 || profile?.role === 'admin') {
+      fetchCourses()
+    }
+  }, [enrolledClasses, profile])
+
+  const fetchEnrolledClasses = async () => {
+    if (!user || profile?.role === 'admin') return
+
+    try {
+      const { data, error } = await supabase
+        .from('class_enrollments')
+        .select('class_id')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+
+      if (error) throw error
+
+      const classIds = data?.map(e => e.class_id) || []
+      setEnrolledClasses(classIds)
+    } catch (error) {
+      console.error('Error fetching enrolled classes:', error)
+      setEnrolledClasses([])
+    }
+  }
 
   const fetchCourses = async () => {
     try {
+      // Admins see all courses
+      if (profile?.role === 'admin') {
+        const { data, error } = await supabase
+          .from('courses')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        setCourses(data || [])
+        return
+      }
+
+      // Students see only courses assigned to their enrolled classes
+      if (enrolledClasses.length === 0) {
+        setCourses([])
+        return
+      }
+
+      const { data: classCourses, error: classCoursesError } = await supabase
+        .from('class_courses')
+        .select('course_id')
+        .in('class_id', enrolledClasses)
+
+      if (classCoursesError) throw classCoursesError
+
+      const courseIds = [...new Set(classCourses?.map(cc => cc.course_id) || [])]
+
+      if (courseIds.length === 0) {
+        setCourses([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('courses')
         .select('*')
+        .in('id', courseIds)
         .order('created_at', { ascending: false })
 
-      if (error) {
-        console.error('Supabase error:', error)
-        throw error
-      }
-
-      console.log('Fetched courses:', data)
+      if (error) throw error
       setCourses(data || [])
     } catch (error) {
       console.error('Error fetching courses:', error)
@@ -82,16 +137,20 @@ export default function StudentCoursesPage() {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Enhanced Header */}
-        <div className="text-center">
-          <div className="course-icon-container inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 shadow-lg">
-            <CourseIcon className="w-8 h-8 text-white" />
+        <div className="flex items-center justify-between p-6 glass-card rounded-2xl border-2 border-samsung-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-samsung-blue/10">
+              <CourseIcon className="w-7 h-7 text-samsung-blue" />
+            </div>
+            <div>
+              <h1 className="text-2xl samsung-heading text-samsung-gray-900">
+                Available Courses
+              </h1>
+              <p className="samsung-body text-sm text-samsung-gray-600 mt-1">
+                Explore our comprehensive catalog of courses
+              </p>
+            </div>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Available Courses
-          </h1>
-          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
-            Explore our comprehensive catalog of courses designed to accelerate your learning journey
-          </p>
         </div>
 
         {/* Loading state */}
@@ -103,78 +162,65 @@ export default function StudentCoursesPage() {
           </div>
         ) : courses.length === 0 ? (
           <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mb-6">
-              <span className="text-4xl">📚</span>
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-samsung-blue/10 mb-6">
+              <CourseIcon className="w-12 h-12 text-samsung-blue" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-3">No courses available yet</h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <h3 className="text-2xl samsung-heading text-samsung-gray-900 mb-3">No courses available yet</h3>
+            <p className="samsung-body text-base text-samsung-gray-700 mb-6 max-w-md mx-auto">
               Our course catalog is being prepared. Check back soon for exciting new learning opportunities!
             </p>
-            <div className="inline-flex items-center text-sm text-primary-600 font-medium">
+            <div className="inline-flex items-center samsung-body text-sm text-samsung-blue">
               <span className="animate-pulse">🔄</span>
               <span className="ml-2">Coming soon...</span>
             </div>
           </div>
         ) : (
           <>
-            {/* Stats Banner */}
-            <div className="glass-card p-6 bg-gradient-to-r from-blue-50 to-purple-50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">Total Available Courses</p>
-                  <p className="text-3xl font-bold text-blue-600">{courses.length}</p>
-                </div>
-                <div className="course-icon-container w-12 h-12 rounded-xl flex items-center justify-center">
-                  <CourseIcon className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-
             {/* Course Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {courses.map((course, index) => (
                 <div 
                   key={course.id} 
-                  className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl"
+                  className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20 samsung-ripple"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
+                  <div className="p-8">
+                    <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center space-x-3">
-                        <div className="course-icon-container w-10 h-10 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
-                          <CourseIcon className="w-5 h-5 text-white" />
+                        <div className="w-12 h-12 rounded-2xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                          <CourseIcon className="w-6 h-6" />
                         </div>
-                        <span className="text-xs font-medium text-blue-600 bg-blue-100 px-3 py-1 rounded-full">
+                        <span className="text-xs samsung-body font-bold text-samsung-blue bg-samsung-blue/10 px-3 py-1.5 rounded-full">
                           Course
                         </span>
                       </div>
                     </div>
                     
-                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
+                    <h3 className="text-xl samsung-heading text-samsung-gray-900 mb-3 line-clamp-2 group-hover:text-samsung-blue transition-colors duration-500">
                       {course.title}
                     </h3>
                     
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
+                    <p className="samsung-body text-base text-samsung-gray-700 mb-6 line-clamp-3 leading-relaxed">
                       {course.description || 'Comprehensive course content designed to enhance your skills and knowledge in this subject area.'}
                     </p>
                     
-                    <div className="flex items-center justify-between text-xs text-gray-500 mb-6">
-                      <div className="flex items-center space-x-1">
-                        <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
+                    <div className="flex items-center justify-between samsung-body text-xs text-samsung-gray-500 mb-6">
+                      <div className="flex items-center space-x-2">
+                        <span className="w-2 h-2 bg-samsung-blue rounded-full"></span>
                         <span>ID: {course.id.slice(0, 8)}...</span>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <CalendarIcon className="w-3 h-3" />
+                      <div className="flex items-center space-x-2">
+                        <CalendarIcon className="w-3.5 h-3.5" />
                         <span>{new Date(course.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     
                     <Link
                       href={`/dashboard/courses/${course.id}`}
-                      className="course-start-button w-full inline-flex items-center justify-center py-3 px-4 rounded-xl transition-all duration-200 font-medium text-sm shadow-lg hover:shadow-xl group-hover:scale-[1.02]"
+                      className="btn btn-primary w-full inline-flex items-center justify-center py-4 px-6 rounded-2xl transition-all duration-500 samsung-body font-bold shadow-samsung-card hover:shadow-samsung-float group samsung-ripple"
                     >
                       <span>Start Learning</span>
-                      <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                      <ArrowRightIcon className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-500" />
                     </Link>
                   </div>
                 </div>

@@ -22,6 +22,29 @@ export async function uploadFile(
   allowOverwrite: boolean = false
 ): Promise<FileUploadResult> {
   try {
+    // First, check if bucket exists
+    const { data: buckets, error: bucketsError } = await supabase.storage.listBuckets()
+    
+    if (bucketsError) {
+      console.error('Error checking buckets:', bucketsError)
+      return {
+        url: '',
+        path: '',
+        error: 'Unable to access storage. Please contact administrator.'
+      }
+    }
+
+    const bucketExists = buckets?.some(b => b.name === bucket)
+    
+    if (!bucketExists) {
+      console.error(`Storage bucket "${bucket}" does not exist`)
+      return {
+        url: '',
+        path: '',
+        error: `Storage bucket "${bucket}" not found. Please contact administrator to set up storage.`
+      }
+    }
+
     // Generate unique filename if not provided
     const timestamp = Date.now()
     const randomSuffix = Math.random().toString(36).substring(2, 15)
@@ -31,7 +54,8 @@ export async function uploadFile(
     const filePath = `${folder}/${finalFileName}`
 
     // Upload file to Supabase Storage
-    const { error } = await supabase.storage
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { data, error } = await supabase.storage
       .from(bucket)
       .upload(filePath, file, {
         cacheControl: '3600',
@@ -39,7 +63,15 @@ export async function uploadFile(
       })
 
     if (error) {
-      throw error
+      console.error('Upload error:', {
+        message: error.message,
+        name: error.name
+      })
+      return {
+        url: '',
+        path: '',
+        error: error.message || 'Upload failed'
+      }
     }
 
     // Get public URL for the uploaded file
@@ -53,7 +85,12 @@ export async function uploadFile(
     }
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Failed to upload file'
-    console.error('File upload error:', error)
+    console.error('File upload error:', {
+      message: errorMessage,
+      error: error,
+      type: typeof error,
+      stringified: JSON.stringify(error)
+    })
     return {
       url: '',
       path: '',

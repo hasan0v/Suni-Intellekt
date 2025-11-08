@@ -75,21 +75,21 @@ const StatCard = ({
   delay?: number
 }) => (
   <div 
-    className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl"
+    className="glass-card group hover:scale-[1.02] transition-all duration-500 hover:shadow-samsung-float"
     style={{ animationDelay: `${delay}ms` }}
   >
     <div className="p-6">
       <div className="flex items-center">
         <div className="flex-shrink-0">
-          <div className={`w-12 h-12 ${color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+          <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
             <Icon className="w-6 h-6 text-white" />
           </div>
         </div>
         <div className="ml-5 w-0 flex-1">
-          <dt className="text-sm font-medium text-gray-600 truncate">{title}</dt>
-          <dd className="text-2xl font-bold text-gray-900 mt-1">
+          <dt className="text-sm samsung-body text-gray-600 truncate">{title}</dt>
+          <dd className="text-2xl samsung-heading text-gray-900 mt-1">
             {loading ? (
-              <div className="animate-pulse bg-gray-200 h-8 w-16 rounded"></div>
+              <div className="animate-pulse bg-samsung-gray-100 h-8 w-16 rounded-xl"></div>
             ) : (
               <span className="count-up">{value}</span>
             )}
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
   if (!user || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-samsung-blue"></div>
       </div>
     )
   }
@@ -171,50 +171,40 @@ export default function AdminDashboard() {
       description: 'Create, edit, and organize comprehensive course content and materials',
       href: '/dashboard/admin/courses',
       icon: CoursesIcon,
-      color: 'bg-gradient-to-br from-blue-500 to-blue-600',
-      stat: `${stats.totalCourses} courses`,
-      bgColor: 'from-blue-50 to-blue-100',
-      textColor: 'text-blue-600'
+      color: 'bg-samsung-blue',
+      stat: `${stats.totalCourses} courses`
     },
     {
       title: 'Manage Tasks',
       description: 'Create and organize assignments, projects, and learning activities',
       href: '/dashboard/admin/tasks',
       icon: TasksIcon,
-      color: 'bg-gradient-to-br from-green-500 to-green-600',
-      stat: `${stats.totalTasks} tasks`,
-      bgColor: 'from-green-50 to-green-100',
-      textColor: 'text-green-600'
+      color: 'bg-samsung-cyan',
+      stat: `${stats.totalTasks} tasks`
     },
     {
       title: 'Student Rankings',
       description: 'View detailed student performance metrics, rankings, and analytics',
       href: '/dashboard/admin/rankings',
       icon: RankingsIcon,
-      color: 'bg-gradient-to-br from-amber-500 to-amber-600',
-      stat: `${stats.totalStudents} students`,
-      bgColor: 'from-amber-50 to-amber-100',
-      textColor: 'text-amber-600'
+      color: 'bg-samsung-teal',
+      stat: `${stats.totalStudents} students`
     },
     {
       title: 'Grading Queue',
       description: 'Review, evaluate, and provide feedback on student submissions',
       href: '/dashboard/grading',
       icon: GradingIcon,
-      color: 'bg-gradient-to-br from-orange-500 to-orange-600',
-      stat: `${stats.pendingSubmissions} pending`,
-      bgColor: 'from-orange-50 to-orange-100',
-      textColor: 'text-orange-600'
+      color: 'bg-samsung-purple',
+      stat: `${stats.pendingSubmissions} pending`
     },
     {
       title: 'User Management',
       description: 'Monitor student progress and manage user accounts and permissions',
       href: '/dashboard/admin/users',
       icon: UsersIcon,
-      color: 'bg-gradient-to-br from-purple-500 to-purple-600',
-      stat: `${stats.totalStudents} students`,
-      bgColor: 'from-purple-50 to-purple-100',
-      textColor: 'text-purple-600'
+      color: 'bg-samsung-blue',
+      stat: `${stats.totalStudents} students`
     }
   ]
 
@@ -223,17 +213,21 @@ export default function AdminDashboard() {
       <DashboardLayout>
         <div className="space-y-8">
           {/* Enhanced Header */}
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-primary-500 to-secondary-500 rounded-3xl mb-6 shadow-xl">
-              <AdminIcon className="w-10 h-10 text-white" />
+          <div className="glass-card p-8 flex items-center gap-6">
+            <div className="flex-shrink-0">
+              <div className="w-14 h-14 rounded-2xl bg-samsung-blue flex items-center justify-center">
+                <AdminIcon className="w-7 h-7 text-white" />
+              </div>
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-              Admin Dashboard
-            </h1>
-            <p className="mt-3 text-lg text-gray-600 max-w-2xl mx-auto">
-              Welcome back, <span className="font-semibold text-primary-600">{profile.full_name || 'Admin'}</span>! 
-              Manage your Süni İntellekt platform with powerful administrative tools.
-            </p>
+            <div className="flex-1">
+              <h1 className="text-2xl samsung-heading text-gray-900">
+                Admin Dashboard
+              </h1>
+              <p className="mt-1 samsung-body text-gray-600">
+                Welcome back, <span className="font-semibold text-samsung-blue">{profile.full_name || 'Admin'}</span>! 
+                Manage your Süni İntellekt platform with powerful administrative tools.
+              </p>
+            </div>
           </div>
 
           {/* Enhanced Stats Overview */}
@@ -242,7 +236,7 @@ export default function AdminDashboard() {
               title="Total Courses"
               value={stats.totalCourses}
               icon={CoursesIcon}
-              color="bg-gradient-to-br from-blue-500 to-blue-600"
+              color="bg-samsung-blue"
               loading={loading}
               delay={0}
             />
@@ -250,7 +244,7 @@ export default function AdminDashboard() {
               title="Total Tasks"
               value={stats.totalTasks}
               icon={TasksIcon}
-              color="bg-gradient-to-br from-green-500 to-green-600"
+              color="bg-samsung-cyan"
               loading={loading}
               delay={100}
             />
@@ -258,7 +252,7 @@ export default function AdminDashboard() {
               title="Total Submissions"
               value={stats.totalSubmissions}
               icon={() => <span className="text-white">📝</span>}
-              color="bg-gradient-to-br from-indigo-500 to-indigo-600"
+              color="bg-samsung-teal"
               loading={loading}
               delay={200}
             />
@@ -266,7 +260,7 @@ export default function AdminDashboard() {
               title="Pending Grading"
               value={stats.pendingSubmissions}
               icon={GradingIcon}
-              color="bg-gradient-to-br from-orange-500 to-orange-600"
+              color="bg-samsung-purple"
               loading={loading}
               delay={300}
             />
@@ -274,7 +268,7 @@ export default function AdminDashboard() {
               title="Students"
               value={stats.totalStudents}
               icon={UsersIcon}
-              color="bg-gradient-to-br from-purple-500 to-purple-600"
+              color="bg-samsung-blue"
               loading={loading}
               delay={400}
             />
@@ -282,9 +276,9 @@ export default function AdminDashboard() {
 
           {/* Enhanced Quick Actions */}
           <div>
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Quick Actions</h2>
-              <p className="text-gray-600">Access the most important administrative functions</p>
+            <div className="glass-card p-6 mb-6">
+              <h2 className="text-xl samsung-heading text-gray-900 mb-1">Quick Actions</h2>
+              <p className="samsung-body text-gray-600">Access the most important administrative functions</p>
             </div>
             
             {loading ? (
@@ -299,25 +293,25 @@ export default function AdminDashboard() {
                   <Link
                     key={index}
                     href={action.href}
-                    className="group glass-card p-6 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl"
+                    className="group glass-card p-6 hover:scale-[1.02] transition-all duration-500 hover:shadow-samsung-float"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
                     <div className="flex items-start space-x-4">
-                      <div className={`w-14 h-14 ${action.color} rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                      <div className={`w-14 h-14 ${action.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
                         <action.icon className="w-7 h-7 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors duration-200 mb-2">
+                        <h3 className="text-lg samsung-heading text-gray-900 group-hover:text-samsung-blue transition-colors duration-300 mb-2">
                           {action.title}
                         </h3>
-                        <p className="text-gray-600 text-sm mb-3 leading-relaxed">
+                        <p className="samsung-body text-gray-600 text-sm mb-3 leading-relaxed">
                           {action.description}
                         </p>
-                        <div className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r ${action.bgColor} ${action.textColor}`}>
+                        <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs samsung-body bg-samsung-blue/10 text-samsung-blue">
                           {action.stat}
                         </div>
                       </div>
-                      <div className="text-gray-400 group-hover:text-primary-600 transition-all duration-200 group-hover:translate-x-1">
+                      <div className="text-gray-400 group-hover:text-samsung-blue transition-all duration-300 group-hover:translate-x-1">
                         <ArrowRightIcon />
                       </div>
                     </div>
@@ -329,31 +323,33 @@ export default function AdminDashboard() {
 
           {/* Enhanced Recent Activity Section */}
           <div>
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">System Overview</h2>
-              <p className="text-gray-600">Monitor platform activity and performance</p>
+            <div className="glass-card p-6 mb-6">
+              <h2 className="text-xl samsung-heading text-gray-900 mb-1">System Overview</h2>
+              <p className="samsung-body text-gray-600">Monitor platform activity and performance</p>
             </div>
             
             <div className="glass-card p-8">
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-4">
-                  <span className="text-3xl">📊</span>
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-samsung-blue/10 rounded-2xl mb-4">
+                  <svg className="w-8 h-8 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Analytics Dashboard</h3>
-                <p className="text-gray-600 mb-4 max-w-md mx-auto">
+                <h3 className="text-xl samsung-heading text-gray-900 mb-2">Analytics Dashboard</h3>
+                <p className="samsung-body text-gray-600 mb-4 max-w-md mx-auto">
                   Comprehensive analytics and activity tracking features are being developed to provide detailed insights into platform usage.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm text-gray-500">
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm samsung-body text-gray-500">
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-samsung-cyan rounded-full animate-pulse"></div>
                     <span>Real-time monitoring</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-samsung-blue rounded-full animate-pulse"></div>
                     <span>Performance metrics</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-samsung-purple rounded-full animate-pulse"></div>
                     <span>User engagement data</span>
                   </div>
                 </div>

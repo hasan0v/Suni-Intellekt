@@ -89,7 +89,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const now = Date.now()
-    if (now - lastFetchTimeRef.current < 5000 && !isRetry) {
+    // Reduce throttle window from 5000ms to 1000ms and allow retries to bypass throttling
+    if (now - lastFetchTimeRef.current < 1000 && !isRetry) {
       console.log('[Auth] Profile fetch throttled.')
       return
     }
@@ -156,7 +157,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (event === 'SIGNED_IN') {
         if (session?.user) {
-          fetchProfile(session.user.id)
+          // Check cache first, then fetch if needed
+          const cachedProfile = loadFromCache(session.user.id)
+          if (cachedProfile) {
+            setProfile(cachedProfile)
+            setAuthState('AUTHENTICATED')
+          } else {
+            // Use retry flag to bypass throttling for sign-in events
+            fetchProfile(session.user.id, true)
+          }
         }
       } else if (event === 'SIGNED_OUT') {
         setProfile(null)
@@ -179,9 +188,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
-    setProfile(null)
-    clearCache()
+    try {
+      // Try the standard signOut first
+      const { error } = await supabase.auth.signOut()
+      
+      if (error) {
+        console.warn('Standard signOut failed, trying local signOut:', error.message)
+        // If global signOut fails, try local signOut
+        const { error: localError } = await supabase.auth.signOut({ scope: 'local' })
+        
+        if (localError) {
+          console.warn('Local signOut also failed:', localError.message)
+          // Try to get current session and force sign out
+          const { data: sessionData } = await supabase.auth.getSession()
+          if (sessionData.session?.access_token) {
+            await supabase.auth.admin.signOut(sessionData.session.access_token)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('SignOut error:', error)
+    } finally {
+      // Always clear local state regardless of API response
+      setSession(null)
+      setUser(null)
+      setProfile(null)
+      setAuthState('UNAUTHENTICATED')
+      clearCache()
+      
+      // Force redirect to login page
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth/signin'
+      }
+    }
   }
 
   const refreshProfile = useCallback(() => {

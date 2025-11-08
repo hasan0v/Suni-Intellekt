@@ -175,23 +175,22 @@ export default function DashboardPage() {
     return profile.full_name.split(' ')[0] || 'User'
   }, [profile?.full_name])
 
-  const StatCard = useCallback(({ title, value, icon, gradient, delay = 0 }: {
+  const StatCard = useCallback(({ title, value, icon, delay = 0 }: {
     title: string
     value: number | string
     icon: React.ReactNode
-    gradient: string
     delay?: number
   }) => (
     <div 
-      className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl p-6"
+      className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 samsung-ripple border-2 border-samsung-gray-100 hover:border-samsung-blue/20"
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
-          <p className="text-sm font-medium text-gray-500 mb-2">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 count-up">{value}</p>
+          <p className="text-sm samsung-body font-bold text-samsung-gray-600 mb-3">{title}</p>
+          <p className="text-4xl samsung-heading text-samsung-gray-900 count-up">{value}</p>
         </div>
-        <div className={`w-14 h-14 ${gradient} rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+        <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:shadow-samsung-card group-hover:scale-110 transition-all duration-500 [&>svg]:text-samsung-blue [&>svg]:group-hover:text-samsung-blue">
           {icon}
         </div>
       </div>
@@ -207,20 +206,20 @@ export default function DashboardPage() {
   }) => (
     <Link
       href={href}
-      className="quick-action-card group glass-card hover:scale-[1.02] transition-all duration-300 hover:shadow-xl p-6 block w-full"
+      className="quick-action-card group glass-card hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 block w-full samsung-ripple border-2 border-samsung-gray-100 hover:border-samsung-blue/20"
       style={{ animationDelay: `${delay}s` }}
     >
       <div className="flex items-start justify-between w-full">
-        <div className="flex items-start space-x-4 flex-1 min-w-0">
-          <div className="course-icon-container w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+        <div className="flex items-start space-x-5 flex-1 min-w-0">
+          <div className="w-14 h-14 rounded-2xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:shadow-samsung-card group-hover:scale-110 transition-all duration-500 flex-shrink-0 [&>svg]:text-samsung-blue [&>svg]:group-hover:text-samsung-blue">
             {icon}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors mb-1 truncate">{title}</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">{description}</p>
+            <h3 className="samsung-heading text-lg text-samsung-gray-900 group-hover:text-samsung-blue transition-colors mb-2 truncate">{title}</h3>
+            <p className="samsung-body text-base text-samsung-gray-700 leading-relaxed">{description}</p>
           </div>
         </div>
-        <ArrowRightIcon className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all duration-200 flex-shrink-0 ml-4" />
+        <ArrowRightIcon className="w-5 h-5 text-samsung-gray-400 group-hover:text-samsung-blue group-hover:translate-x-1 transition-all duration-500 flex-shrink-0 ml-4" />
       </div>
     </Link>
   ), [])
@@ -234,19 +233,23 @@ export default function DashboardPage() {
     <DashboardLayout>
       <div className="space-y-8">
         {/* Enhanced Header Section */}
-        <div className="text-center">
-          <div className="course-icon-container inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 shadow-xl">
-            <TrendingUpIcon className="w-10 h-10 text-white" />
+        <div className="flex items-center justify-between p-6 glass-card rounded-2xl border-2 border-samsung-gray-100 mb-8">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-samsung-blue/10">
+              <TrendingUpIcon className="w-7 h-7 text-samsung-blue" />
+            </div>
+            <div>
+              <h1 className="text-2xl samsung-heading text-samsung-gray-900">
+                Welcome back, {userGreeting}! 👋
+              </h1>
+              <p className="samsung-body text-sm text-samsung-gray-600 mt-1">
+                {isAdmin 
+                  ? "Manage your platform and monitor student progress" 
+                  : "Continue your learning journey and track your progress"
+                }
+              </p>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
-            Welcome back, {userGreeting}! <span className="text-yellow-400">👋</span>
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            {isAdmin 
-              ? "Manage your platform and monitor student progress from your administrative dashboard." 
-              : "Continue your learning journey and track your progress across all courses."
-            }
-          </p>
         </div>
 
         {/* Stats Grid */}
@@ -267,12 +270,11 @@ export default function DashboardPage() {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <StatCard
               title={isAdmin ? 'Total Courses' : 'Available Courses'}
               value={stats.totalCourses}
-              icon={<BookIcon />}
-              gradient="bg-gradient-to-br from-blue-500 to-blue-600"
+              icon={<BookIcon className="w-8 h-8" />}
               delay={0.1}
             />
             
@@ -281,16 +283,14 @@ export default function DashboardPage() {
                 <StatCard
                   title="Completed"
                   value={stats.completedSubmissions}
-                  icon={<CheckIcon />}
-                  gradient="bg-gradient-to-br from-green-500 to-green-600"
+                  icon={<CheckIcon className="w-8 h-8" />}
                   delay={0.2}
                 />
                 
                 <StatCard
                   title="Pending Review"
                   value={stats.pendingSubmissions}
-                  icon={<ClockIcon />}
-                  gradient="bg-gradient-to-br from-orange-500 to-orange-600"
+                  icon={<ClockIcon className="w-8 h-8" />}
                   delay={0.3}
                 />
                 
@@ -299,8 +299,7 @@ export default function DashboardPage() {
                   value={`${stats.totalCourses > 0 
                     ? Math.round((stats.completedSubmissions / stats.totalCourses) * 100) 
                     : 0}%`}
-                  icon={<TrendingUpIcon />}
-                  gradient="bg-gradient-to-br from-purple-500 to-purple-600"
+                  icon={<TrendingUpIcon className="w-8 h-8" />}
                   delay={0.4}
                 />
               </>
@@ -309,22 +308,19 @@ export default function DashboardPage() {
                 <StatCard
                   title="Total Tasks"
                   value={stats.totalTasks}
-                  icon={<ClipboardIcon />}
-                  gradient="bg-gradient-to-br from-green-500 to-green-600"
+                  icon={<ClipboardIcon className="w-8 h-8" />}
                   delay={0.2}
                 />
                 <StatCard
                   title="Pending Grading"
                   value={stats.pendingGrading}
-                  icon={<ClockIcon />}
-                  gradient="bg-gradient-to-br from-orange-500 to-orange-600"
+                  icon={<ClockIcon className="w-8 h-8" />}
                   delay={0.3}
                 />
                 <StatCard
                   title="Total Students"
                   value={stats.totalStudents}
-                  icon={<EditIcon />}
-                  gradient="bg-gradient-to-br from-purple-500 to-purple-600"
+                  icon={<EditIcon className="w-8 h-8" />}
                   delay={0.4}
                 />
               </>
@@ -337,36 +333,36 @@ export default function DashboardPage() {
           {/* Quick Actions */}
           <div className="dashboard-section space-y-6">
             <div className="text-center lg:text-left mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl samsung-heading text-samsung-gray-900 mb-3">
                 {isAdmin ? 'Administrative Tools' : 'Continue Learning'}
               </h2>
-              <p className="text-gray-600">
+              <p className="samsung-body text-lg text-samsung-gray-700">
                 {isAdmin ? 'Access powerful tools to manage your platform' : 'Explore courses and track your progress'}
               </p>
             </div>
             
-            <div className="space-y-4">
+            <div className="space-y-5">
               {isAdmin ? (
                 <>
                   <QuickActionCard
                     title="Manage Courses"
                     description="Create, edit, and organize course content and materials"
                     href="/dashboard/admin/courses"
-                    icon={<EditIcon />}
+                    icon={<EditIcon className="w-7 h-7" />}
                     delay={0.5}
                   />
                   <QuickActionCard
                     title="Review Submissions"
                     description="Grade student assignments and provide feedback"
                     href="/dashboard/grading"
-                    icon={<ClipboardIcon />}
+                    icon={<ClipboardIcon className="w-7 h-7" />}
                     delay={0.6}
                   />
                   <QuickActionCard
                     title="Manage Users"
                     description="Add and manage student accounts and permissions"
                     href="/dashboard/admin/users"
-                    icon={<EditIcon />}
+                    icon={<EditIcon className="w-7 h-7" />}
                     delay={0.7}
                   />
                 </>
@@ -376,21 +372,21 @@ export default function DashboardPage() {
                     title="Browse Courses"
                     description="Explore available learning materials and start new courses"
                     href="/dashboard/courses"
-                    icon={<BookIcon />}
+                    icon={<BookIcon className="w-7 h-7" />}
                     delay={0.5}
                   />
                   <QuickActionCard
                     title="My Tasks"
                     description="View and complete assignments across all your courses"
                     href="/dashboard/tasks"
-                    icon={<ClipboardIcon />}
+                    icon={<ClipboardIcon className="w-7 h-7" />}
                     delay={0.6}
                   />
                   <QuickActionCard
                     title="My Grades"
                     description="Check your progress, scores, and instructor feedback"
                     href="/dashboard/grades"
-                    icon={<TrendingUpIcon />}
+                    icon={<TrendingUpIcon className="w-7 h-7" />}
                     delay={0.7}
                   />
                 </>
@@ -401,36 +397,36 @@ export default function DashboardPage() {
           {/* Recent Activity / System Overview */}
           <div className="dashboard-section space-y-6">
             <div className="text-center lg:text-left">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-3xl samsung-heading text-samsung-gray-900 mb-3">
                 {isAdmin ? 'System Status' : 'Recent Activity'}
               </h2>
-              <p className="text-gray-600">
+              <p className="samsung-body text-lg text-samsung-gray-700">
                 {isAdmin ? 'Monitor platform health and performance' : 'Your latest learning activities'}
               </p>
             </div>
             
-            <div className="glass-card p-8" style={{ animationDelay: '0.8s' }}>
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-4">
-                  <ClockIcon className="w-8 h-8 text-gray-400" />
+            <div className="glass-card p-10 rounded-3xl border-2 border-samsung-gray-100" style={{ animationDelay: '0.8s' }}>
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-samsung-blue/10 mb-6">
+                  <ClockIcon className="w-10 h-10 text-samsung-blue" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl samsung-heading text-samsung-gray-900 mb-3">
                   No {isAdmin ? 'system alerts' : 'recent activity'} at this time
                 </h3>
-                <p className="text-gray-500 mb-4">
+                <p className="samsung-body text-base text-samsung-gray-600 mb-6">
                   {isAdmin 
                     ? 'All systems are running smoothly. Platform performance is optimal.'
                     : 'Start exploring courses to see your activity timeline here.'
                   }
                 </p>
-                <div className="flex justify-center space-x-4 text-sm text-gray-400">
-                  <div className="flex items-center space-x-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="flex justify-center space-x-6 samsung-body text-sm text-samsung-gray-500">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2.5 h-2.5 bg-samsung-accent-teal samsung-circle animate-pulse"></div>
                     <span>System Online</span>
                   </div>
                   {!isAdmin && (
-                    <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2.5 h-2.5 bg-samsung-blue samsung-circle animate-pulse"></div>
                       <span>Ready to Learn</span>
                     </div>
                   )}
@@ -442,20 +438,20 @@ export default function DashboardPage() {
 
         {/* Bottom CTA Section */}
         {!isAdmin && (
-          <div className="glass-card bg-gradient-to-r from-blue-50 to-purple-50 p-8 text-center" style={{ animationDelay: '1s' }}>
+          <div className="glass-card rounded-3xl p-12 text-center border-2 border-samsung-blue/10 bg-gradient-to-r from-samsung-blue/5 to-samsung-accent-cyan/5" style={{ animationDelay: '1s' }}>
             <div className="max-w-2xl mx-auto">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-3xl samsung-heading text-samsung-gray-900 mb-5">
                 Ready to Start Learning?
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="samsung-body text-lg text-samsung-gray-700 mb-8">
                 Explore our comprehensive course library and begin your journey towards mastering new skills in artificial intelligence and technology.
               </p>
               <Link
                 href="/dashboard/courses"
-                className="course-start-button inline-flex items-center px-8 py-3 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] group"
+                className="btn btn-primary samsung-ripple inline-flex items-center px-10 py-4 text-lg samsung-body shadow-samsung-float hover:shadow-2xl group"
               >
                 Browse Courses
-                <ArrowRightIcon className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRightIcon className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>

@@ -41,9 +41,10 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/favicon.png" />
         
-        {/* Preload critical resources */}
-        <link rel="preload" href="/favicon.png" as="image" />
-        <link rel="preload" href="/logo.png" as="image" />
+    {/* Preload critical resources (removed explicit favicon/logo preloads to avoid unused-preload warnings).
+      Favicons and small site icons are handled by the browser via the icon links above, and
+      hero/LCP images should be preloaded from the page that actually renders them (or via
+      Next/Image priority) to avoid the "preloaded but not used" warning. */}
         
         {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />

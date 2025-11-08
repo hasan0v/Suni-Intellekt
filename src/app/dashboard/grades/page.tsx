@@ -95,15 +95,15 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
     <div className={`bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-white/40 ${className}`}>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-indigo-600" />
+          <h3 className="text-lg samsung-heading text-samsung-gray-900 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-samsung-blue" />
             Class Performance Comparison
           </h3>
-          <p className="text-sm text-gray-600 mt-1">Your exact position among all students (anonymized & privacy-protected)</p>
+          <p className="samsung-body text-sm text-samsung-gray-600 mt-1">Your exact position among all students (anonymized & privacy-protected)</p>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-indigo-600">#{currentUserRank}</div>
-          <div className="text-xs text-gray-500">Your rank</div>
+          <div className="text-2xl samsung-heading text-samsung-blue">#{currentUserRank}</div>
+          <div className="samsung-body text-xs text-samsung-gray-500">Your rank</div>
         </div>
       </div>
       
@@ -116,13 +116,13 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
           {/* Grid lines */}
           <defs>
             <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#6366f1" />
-              <stop offset="50%" stopColor="#8b5cf6" />
-              <stop offset="100%" stopColor="#ec4899" />
+              <stop offset="0%" stopColor="#1428A0" />
+              <stop offset="50%" stopColor="#0BB4C3" />
+              <stop offset="100%" stopColor="#00A9A5" />
             </linearGradient>
             <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#6366f1" stopOpacity="0.1" />
-              <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+              <stop offset="0%" stopColor="#1428A0" stopOpacity="0.1" />
+              <stop offset="100%" stopColor="#1428A0" stopOpacity="0" />
             </linearGradient>
           </defs>
           
@@ -170,13 +170,13 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
                 cx={getX(i)}
                 cy={getY(point.averageGrade)}
                 r={point.isCurrentUser ? "8" : "4"}
-                fill={point.isCurrentUser ? "#f59e0b" : "#6366f1"}
+                fill={point.isCurrentUser ? "#0BB4C3" : "#1428A0"}
                 stroke={point.isCurrentUser ? "#ffffff" : "none"}
                 strokeWidth={point.isCurrentUser ? "3" : "0"}
                 opacity={animated ? "1" : "0"}
                 style={{ 
                   transition: `opacity 1s ease-out ${i * 0.1}s`,
-                  filter: point.isCurrentUser ? 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.5))' : 'none'
+                  filter: point.isCurrentUser ? 'drop-shadow(0 0 8px rgba(11, 180, 195, 0.5))' : 'none'
                 }}
               />
               {/* Grade value label for each point */}
@@ -204,7 +204,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
                 width="50"
                 height="25"
                 rx="12"
-                fill="#f59e0b"
+                fill="#0BB4C3"
               />
               <text
                 x={getX(currentUserIndex)}
@@ -242,12 +242,12 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 mt-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-indigo-500"></div>
-            <span className="text-gray-600">Other Students (Anonymized)</span>
+            <div className="w-3 h-3 rounded-full bg-samsung-blue"></div>
+            <span className="samsung-body text-samsung-gray-600">Other Students (Anonymized)</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-amber-500 ring-2 ring-white"></div>
-            <span className="text-gray-600">Your Performance</span>
+            <div className="w-4 h-4 rounded-full bg-samsung-cyan ring-2 ring-white"></div>
+            <span className="samsung-body text-samsung-gray-600">Your Performance</span>
           </div>
         </div>
         
@@ -258,21 +258,21 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
         
         {/* Performance insights */}
         <div className="mt-4 grid grid-cols-3 gap-4 text-center">
-          <div className="bg-blue-50 rounded-lg p-3">
-            <div className="text-lg font-bold text-blue-600">{data.length}</div>
-            <div className="text-xs text-blue-600">Total Students</div>
+          <div className="bg-samsung-blue/10 rounded-xl p-3 border border-samsung-blue/20">
+            <div className="text-lg samsung-heading text-samsung-blue">{data.length}</div>
+            <div className="text-xs samsung-body text-samsung-blue">Total Students</div>
           </div>
-          <div className="bg-green-50 rounded-lg p-3">
-            <div className="text-lg font-bold text-green-600">
+          <div className="bg-samsung-cyan/10 rounded-xl p-3 border border-samsung-cyan/20">
+            <div className="text-lg samsung-heading text-samsung-cyan">
               {((data.length - currentUserRank + 1) / data.length * 100).toFixed(0)}%
             </div>
-            <div className="text-xs text-green-600">Better Than</div>
+            <div className="text-xs samsung-body text-samsung-cyan">Better Than</div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-3">
-            <div className="text-lg font-bold text-purple-600">
+          <div className="bg-samsung-purple/10 rounded-xl p-3 border border-samsung-purple/20">
+            <div className="text-lg samsung-heading text-samsung-purple">
               {(data.reduce((sum, d) => sum + d.averageGrade, 0) / data.length).toFixed(1)}
             </div>
-            <div className="text-xs text-purple-600">Class Average</div>
+            <div className="text-xs samsung-body text-samsung-purple">Class Average</div>
           </div>
         </div>
       </div>
@@ -532,67 +532,60 @@ export default function StudentGradesPage() {
     <DashboardLayout>
       <div className="space-y-8 bg-white/90 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-sm">
         {/* Enhanced Header Section */}
-        <div className="text-center">
-          <div className="course-icon-container inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 shadow-xl">
-            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
+        <div className="flex items-center justify-between p-6 glass-card rounded-2xl border-2 border-samsung-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-samsung-blue/10">
+              <svg className="w-7 h-7 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-2xl samsung-heading text-samsung-gray-900">
+                My Grades
+              </h1>
+              <p className="samsung-body text-sm text-samsung-gray-600 mt-1">
+                Track your progress and instructor feedback
+              </p>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
-            My Grades <span className="text-blue-500">📊</span>
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Track your progress and see feedback from instructors across all your courses.
-          </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-blue-400/10 via-indigo-400/10 to-purple-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center space-x-4">
-              <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow-md ring-2 ring-blue-100/40">
-                <FileText className="h-6 w-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <FileText className="h-8 w-8" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 font-medium">Total Submissions</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalSubmissions}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600">Total Submissions</p>
+                <p className="text-3xl samsung-heading text-samsung-gray-900">{stats.totalSubmissions}</p>
               </div>
             </div>
-            </div>
           </div>
-          <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-green-400/10 via-emerald-400/10 to-teal-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center space-x-4">
-              <div className="p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl text-white shadow-lg ring-4 ring-green-100/40">
-                <CheckCircle className="h-6 w-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <CheckCircle className="h-8 w-8" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 font-medium">Graded</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.gradedSubmissions}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600">Graded</p>
+                <p className="text-3xl samsung-heading text-samsung-gray-900">{stats.gradedSubmissions}</p>
               </div>
             </div>
-            </div>
           </div>
-          <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-purple-400/10 via-fuchsia-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center space-x-4">
-              <div className="p-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl text-white shadow-lg ring-4 ring-purple-100/40">
-                <Star className="h-6 w-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <Star className="h-8 w-8" />
               </div>
               <div>
-                <p className="text-sm text-gray-600 font-medium">Total Points</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.totalPoints}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600">Total Points</p>
+                <p className="text-3xl samsung-heading text-samsung-gray-900">{stats.totalPoints}</p>
               </div>
             </div>
-            </div>
           </div>
-          <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-orange-400/10 via-amber-400/10 to-yellow-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
               <div className="flex items-center space-x-5">
                 <div className="relative w-20 h-20">
                   {(() => {
@@ -604,13 +597,12 @@ export default function StudentGradesPage() {
                       <svg className="w-20 h-20" viewBox="0 0 80 80" role="img" aria-label={`Average grade ${percent.toFixed(0)} percent`}>
                         <defs>
                           <linearGradient id="avgGrad" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0%" stopColor="#f59e0b" />
-                            <stop offset="50%" stopColor="#f97316" />
-                            <stop offset="100%" stopColor="#ec4899" />
+                            <stop offset="0%" stopColor="#1428A0" />
+                            <stop offset="100%" stopColor="#1E3BC4" />
                           </linearGradient>
                         </defs>
                         <g transform="rotate(-90 40 40)">
-                          <circle cx="40" cy="40" r={r} stroke="rgba(0,0,0,0.07)" strokeWidth="8" fill="transparent" />
+                          <circle cx="40" cy="40" r={r} stroke="rgba(20,40,160,0.1)" strokeWidth="8" fill="transparent" />
                           <circle
                             cx="40"
                             cy="40"
@@ -629,7 +621,7 @@ export default function StudentGradesPage() {
                           y="50%"
                           dominantBaseline="middle"
                           textAnchor="middle"
-                          className="fill-gray-800 font-semibold text-sm select-none"
+                          className="fill-samsung-blue samsung-heading text-sm select-none"
                         >
                           {percent.toFixed(0)}%
                         </text>
@@ -638,12 +630,11 @@ export default function StudentGradesPage() {
                   })()}
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Average Grade</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.averageGrade.toFixed(1)}</p>
-                  <p className="text-[11px] text-gray-500 mt-1">Based on graded submissions</p>
+                  <p className="samsung-body text-sm font-bold text-samsung-gray-600">Average Grade</p>
+                  <p className="text-3xl samsung-heading text-samsung-gray-900">{stats.averageGrade.toFixed(1)}</p>
+                  {/* <p className="samsung-body text-xs text-samsung-gray-500 mt-1">Based on graded submissions</p> */}
                 </div>
               </div>
-            </div>
           </div>
         </div>
 
@@ -731,12 +722,20 @@ export default function StudentGradesPage() {
                 </div>
                 
                 {grade.feedback && (
-                  <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
-                    <p className="text-sm font-semibold text-gray-900 mb-2 flex items-center">
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Instructor Feedback:
-                    </p>
-                    <p className="text-sm text-gray-700 leading-relaxed">{grade.feedback}</p>
+                  <div className="mt-6 p-6 bg-gradient-to-br from-samsung-blue/5 to-samsung-cyan/5 rounded-2xl border-2 border-samsung-blue/20">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-xl bg-samsung-blue flex items-center justify-center">
+                        <MessageSquare className="h-4 w-4 text-white" />
+                      </div>
+                      <p className="text-base samsung-heading text-gray-900">
+                        Instructor Feedback
+                      </p>
+                    </div>
+                    <div className="pl-10">
+                      <p className="samsung-body text-sm text-gray-700 leading-loose whitespace-pre-wrap">
+                        {grade.feedback}
+                      </p>
+                    </div>
                   </div>
                 )}
                   </div>

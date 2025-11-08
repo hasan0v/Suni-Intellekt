@@ -444,8 +444,8 @@ export default function AdminGradingPage() {
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">📊</span>
+                  <div className="w-8 h-8 bg-samsung-purple rounded-md flex items-center justify-center">
+                    <span className="text-white text-sm samsung-body">📊</span>
                   </div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
@@ -470,10 +470,10 @@ export default function AdminGradingPage() {
                 <button
                   key={filterOption}
                   onClick={() => setFilter(filterOption)}
-                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`px-4 py-2 text-sm samsung-body rounded-xl transition-colors ${
                     filter === filterOption
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-500 hover:text-gray-700'
+                      ? 'bg-samsung-blue text-white'
+                      : 'bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20'
                   }`}
                 >
                   {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
@@ -525,18 +525,18 @@ export default function AdminGradingPage() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         onClick={() => selectSubmission(submission)}
-                        className={`p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
+                        className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
                           selectedSubmission?.id === submission.id
-                            ? 'border-indigo-500 bg-indigo-50 shadow-md'
+                            ? 'border-samsung-blue bg-samsung-blue/5 shadow-md'
                             : 'border-gray-200 hover:bg-gray-50 hover:shadow-sm'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-medium text-gray-900">
+                          <h4 className="text-sm samsung-body text-gray-900">
                             {submission.student.full_name}
                           </h4>
                           <div className="flex items-center space-x-2">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            <span className={`px-2 py-1 text-xs samsung-body rounded-full ${
                               submission.status === 'graded'
                                 ? 'bg-green-100 text-green-800'
                                 : 'bg-yellow-100 text-yellow-800'
@@ -552,7 +552,7 @@ export default function AdminGradingPage() {
                         </div>
                         
                         <div className="text-sm">
-                          <p className="font-medium text-gray-900 mb-1">{submission.task.title}</p>
+                          <p className="samsung-body text-gray-900 mb-1">{submission.task.title}</p>
                           <p className="text-gray-600 text-xs mb-2">
                             📚 {submission.task.topic.module.course.title} › {submission.task.topic.module.title} › {submission.task.topic.title}
                           </p>
@@ -586,10 +586,10 @@ export default function AdminGradingPage() {
                     {/* Student Info */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-lg font-medium text-gray-900">
+                        <h3 className="text-lg samsung-heading text-gray-900">
                           {selectedSubmission.student?.full_name || 'Unknown Student'}
                         </h3>
-                        <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                        <span className={`px-3 py-1 text-sm samsung-body rounded-full ${
                           selectedSubmission.status === 'graded'
                             ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
@@ -601,8 +601,8 @@ export default function AdminGradingPage() {
 
                     {/* Assignment Info */}
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Assignment</h4>
-                      <div className="bg-gray-50 rounded-lg p-4">
+                      <h4 className="text-sm samsung-body text-gray-900 mb-2">Assignment</h4>
+                      <div className="bg-gray-50 rounded-xl p-4">
                         <p className="text-sm font-medium text-gray-900 mb-1">
                           {selectedSubmission.task?.title || 'Task title not available'}
                         </p>
@@ -620,8 +620,8 @@ export default function AdminGradingPage() {
 
                     {/* Submission Content */}
                     <div>
-                      <h4 className="text-sm font-medium text-gray-900 mb-2">Submission</h4>
-                      <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                      <h4 className="text-sm samsung-body text-gray-900 mb-2">Submission</h4>
+                      <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                         <p className="text-xs text-gray-500">
                           📅 Submitted: {new Date(selectedSubmission.submitted_at).toLocaleString()}
                         </p>
@@ -682,12 +682,12 @@ export default function AdminGradingPage() {
 
                     {/* Grading Form */}
                     <div className="border-t border-gray-200 pt-6">
-                      <h4 className="text-sm font-medium text-gray-900 mb-4">
+                      <h4 className="text-sm samsung-heading text-gray-900 mb-4">
                         {selectedSubmission.status === 'graded' ? 'Update Grade' : 'Grade Assignment'}
                       </h4>
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm samsung-body text-gray-700 mb-2">
                             Points * (Max: {selectedSubmission.task.max_score})
                           </label>
                           <input
@@ -696,20 +696,20 @@ export default function AdminGradingPage() {
                             max={selectedSubmission.task.max_score}
                             value={points}
                             onChange={(e) => setPoints(e.target.value)}
-                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                            className="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-samsung-blue/20 focus:border-samsung-blue sm:text-sm text-gray-900"
                             placeholder={`Enter points (0-${selectedSubmission.task.max_score})`}
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm samsung-body text-gray-700 mb-2">
                             Feedback
                           </label>
                           <textarea
                             rows={4}
                             value={feedback}
                             onChange={(e) => setFeedback(e.target.value)}
-                            className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                            className="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-samsung-blue/20 focus:border-samsung-blue sm:text-sm text-gray-900"
                             placeholder="Provide feedback to the student..."
                           />
                         </div>
@@ -720,7 +720,7 @@ export default function AdminGradingPage() {
                             whileTap={{ scale: grading ? 1 : 0.95 }}
                             onClick={handleGrade}
                             disabled={!points || grading}
-                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-all"
+                            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm samsung-body rounded-xl text-white bg-samsung-blue hover:bg-samsung-blue-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-samsung-blue/20 disabled:opacity-50 transition-all"
                           >
                             {grading ? (
                               <>
@@ -742,9 +742,9 @@ export default function AdminGradingPage() {
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-green-50 border border-green-200 rounded-lg p-4"
+                        className="bg-green-50 border border-green-200 rounded-xl p-4"
                       >
-                        <h5 className="text-sm font-medium text-green-900 mb-2">✅ Current Grade</h5>
+                        <h5 className="text-sm samsung-heading text-green-900 mb-2">✅ Current Grade</h5>
                         <div className="space-y-2">
                           <div className="flex justify-between">
                             <span className="text-sm text-green-700">Points:</span>
@@ -804,16 +804,16 @@ export default function AdminGradingPage() {
                 {selectedSubmission ? (
                   <div className="space-y-4">
                     {/* Current Module */}
-                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-                      <h4 className="text-sm font-medium text-indigo-900 mb-1">
+                    <div className="glass-card border-2 border-samsung-blue/20 rounded-xl p-3">
+                      <h4 className="text-sm samsung-heading text-gray-900 mb-1">
                         📚 {selectedSubmission.task.topic.module.title}
                       </h4>
-                      <div className="bg-indigo-100 rounded p-2">
+                      <div className="bg-samsung-blue/10 rounded-xl p-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-indigo-800">
+                          <span className="text-sm samsung-body text-samsung-blue">
                             📝 {selectedSubmission.task.topic.title}
                           </span>
-                          <span className="text-xs bg-indigo-200 text-indigo-800 px-2 py-1 rounded">
+                          <span className="text-xs samsung-body bg-samsung-blue/20 text-samsung-blue px-2 py-1 rounded-xl">
                             Current
                           </span>
                         </div>
@@ -845,7 +845,7 @@ export default function AdminGradingPage() {
                     </div>
 
                     {/* Assignment Stats */}
-                    <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <div className="mt-4 p-3 bg-gray-50 rounded-xl">
                       <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
                         Assignment Info
                       </h5>

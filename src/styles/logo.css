@@ -1,0 +1,75 @@
+/* Samsung Design System - Logo Styles */
+
+/* Enhanced Logo Text with Samsung Blue */
+.logo-text-samsung {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    #1428A0 0%,
+    #0BB4C3 50%,
+    #1428A0 100%
+  );
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: samsung-gradient-flow 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(20, 40, 160, 0.15));
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-text-samsung:hover {
+  animation-duration: 2s;
+  filter: drop-shadow(0 4px 8px rgba(20, 40, 160, 0.25));
+  transform: translateY(-1px);
+}
+
+/* Samsung Gradient Animation */
+@keyframes samsung-gradient-flow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Logo Container with Samsung Style */
+.logo-container-samsung {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.logo-container-samsung:hover {
+  transform: translateY(-2px);
+}
+
+/* Samsung Blue Glow Effect on Hover */
+.logo-container-samsung::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(20, 40, 160, 0.4),
+    rgba(11, 180, 195, 0.4),
+    transparent
+  );
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.5s ease, width 0.5s ease;
+  filter: blur(4px);
+}
+
+.logo-container-samsung:hover::after {
+  opacity: 1;
+  width: 85%;
+}

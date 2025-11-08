@@ -424,56 +424,66 @@ export default function AdminTasksPage() {
       <DashboardLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Task Management</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Create and manage assignments for your courses
-            </p>
+        <div className="glass-card p-6 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-samsung-blue flex items-center justify-center">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-2xl samsung-heading text-gray-900">Task Management</h1>
+              <p className="mt-1 samsung-body text-gray-600">
+                Create and manage assignments for your courses
+              </p>
+            </div>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300"
           >
-            <span className="mr-2">✏️</span>
             Create Task
           </motion.button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
+          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
+            <div className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">📝</span>
+                  <div className="w-12 h-12 bg-samsung-blue rounded-2xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    </svg>
                   </div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Tasks</dt>
-                    <dd className="text-lg font-medium text-gray-900">{tasks.length}</dd>
+                    <dt className="text-sm samsung-body text-gray-600 truncate">Total Tasks</dt>
+                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">{tasks.length}</dd>
                   </dl>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
+          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
+            <div className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">✅</span>
+                  <div className="w-12 h-12 bg-samsung-cyan rounded-2xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                   </div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Published</dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dt className="text-sm samsung-body text-gray-600 truncate">Published</dt>
+                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">
                       {tasks.filter(t => t.is_published).length}
                     </dd>
                   </dl>
@@ -482,18 +492,20 @@ export default function AdminTasksPage() {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
+          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
+            <div className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-yellow-500 rounded-md flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">📄</span>
+                  <div className="w-12 h-12 bg-samsung-teal rounded-2xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
                   </div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Drafts</dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dt className="text-sm samsung-body text-gray-600 truncate">Drafts</dt>
+                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">
                       {tasks.filter(t => !t.is_published).length}
                     </dd>
                   </dl>
@@ -502,18 +514,20 @@ export default function AdminTasksPage() {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
+          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
+            <div className="p-6">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                    <span className="text-white text-sm font-medium">📊</span>
+                  <div className="w-12 h-12 bg-samsung-purple rounded-2xl flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
                   </div>
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">Total Submissions</dt>
-                    <dd className="text-lg font-medium text-gray-900">
+                    <dt className="text-sm samsung-body text-gray-600 truncate">Total Submissions</dt>
+                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">
                       {tasks.reduce((sum, task) => sum + (task._count?.submissions || 0), 0)}
                     </dd>
                   </dl>
@@ -524,16 +538,16 @@ export default function AdminTasksPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="bg-white shadow rounded-lg p-4">
-          <div className="flex space-x-4">
+        <div className="glass-card p-4">
+          <div className="flex space-x-3">
             {['all', 'published', 'draft'].map((filterOption) => (
               <button
                 key={filterOption}
                 onClick={() => setFilter(filterOption as 'all' | 'published' | 'draft')}
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                className={`px-5 py-2.5 text-sm samsung-body rounded-xl transition-all duration-300 ${
                   filter === filterOption
-                    ? 'bg-indigo-100 text-indigo-700'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'bg-samsung-blue text-white shadow-samsung-card'
+                    : 'bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20'
                 }`}
               >
                 {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
@@ -546,27 +560,26 @@ export default function AdminTasksPage() {
         </div>
 
         {/* Tasks List */}
-        <div className="bg-white shadow overflow-hidden sm:rounded-md">
+        <div className="glass-card overflow-hidden">
           {filteredTasks.length > 0 ? (
-            <ul role="list" className="divide-y divide-gray-200">
+            <ul role="list" className="divide-y divide-samsung-gray-100">
               {filteredTasks.map((task) => (
                 <motion.li
                   key={task.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="px-4 py-4 sm:px-6 hover:bg-gray-50 transition-colors"
-                >
+                  className="px-6 py-6 hover:bg-samsung-blue/5 transition-colors duration-300">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center space-x-3">
-                          <h3 className="text-sm font-medium text-gray-900 truncate">
+                          <h3 className="text-sm samsung-heading text-gray-900 truncate">
                             {task.title}
                           </h3>
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          <span className={`px-3 py-1 text-xs samsung-body rounded-xl ${
                             task.is_published
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-samsung-cyan/10 text-samsung-cyan'
+                              : 'bg-samsung-teal/10 text-samsung-teal'
                           }`}>
                             {task.is_published ? 'Published' : 'Draft'}
                           </span>
@@ -575,51 +588,51 @@ export default function AdminTasksPage() {
                               {task.topics.slice(0, 2).map((topic, index) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-md"
+                                  className="px-2 py-1 text-xs bg-samsung-blue/10 text-samsung-blue rounded-lg samsung-body"
                                 >
                                   {topic}
                                 </span>
                               ))}
                               {task.topics.length > 2 && (
-                                <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-md">
+                                <span className="px-2 py-1 text-xs bg-samsung-gray-100 text-gray-600 rounded-lg samsung-body">
                                   +{task.topics.length - 2} more
                                 </span>
                               )}
                             </div>
                           )}
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-500">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-sm samsung-body text-gray-500">
                             {task._count?.submissions || 0} submissions
                           </span>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm samsung-body text-gray-500">
                             Max: {task.max_score} pts
                           </span>
                         </div>
                       </div>
 
                       {task.topic && task.topic.module && task.topic.module.course ? (
-                        <p className="text-sm text-gray-600 mb-2">
-                          📚 {task.topic.module.course.title} › {task.topic.module.title} › {task.topic.title}
+                        <p className="text-sm samsung-body text-gray-600 mb-2">
+                          {task.topic.module.course.title} › {task.topic.module.title} › {task.topic.title}
                         </p>
                       ) : (
-                        <p className="text-sm text-gray-500 mb-2">
-                          📚 No course assignment
+                        <p className="text-sm samsung-body text-gray-500 mb-2">
+                          No course assignment
                         </p>
                       )}
 
-                      <p className="text-sm text-gray-700 line-clamp-2 mb-2">
+                      <p className="text-sm samsung-body text-gray-700 line-clamp-2 mb-2">
                         {task.description || task.content}
                       </p>
 
-                      <div className="flex items-center justify-between text-sm text-gray-500">
+                      <div className="flex items-center justify-between text-sm samsung-body text-gray-500">
                         <div className="flex items-center space-x-4">
-                          <span>📅 Created: {new Date(task.created_at).toLocaleDateString()}</span>
+                          <span>Created: {new Date(task.created_at).toLocaleDateString()}</span>
                           {task.due_date && (
-                            <span>⏰ Due: {new Date(task.due_date).toLocaleString()}</span>
+                            <span>Due: {new Date(task.due_date).toLocaleString()}</span>
                           )}
                           {task.attachments && task.attachments.length > 0 && (
-                            <span>📎 {task.attachments.length} attachment(s)</span>
+                            <span>{task.attachments.length} attachment(s)</span>
                           )}
                         </div>
                       </div>
@@ -630,17 +643,17 @@ export default function AdminTasksPage() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleEditTask(task)}
-                        className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                        className="inline-flex items-center px-4 py-2 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300"
                       >
-                        ✏️ Edit
+                        Edit
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => handleDeleteTask(task.id)}
-                        className="inline-flex items-center px-3 py-1 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50"
+                        className="inline-flex items-center px-4 py-2 rounded-xl text-sm samsung-body text-red-600 bg-red-50 hover:bg-red-100 transition-all duration-300"
                       >
-                        🗑️ Delete
+                        Delete
                       </motion.button>
                     </div>
                   </div>
@@ -649,14 +662,18 @@ export default function AdminTasksPage() {
             </ul>
           ) : (
             <div className="text-center py-12">
-              <div className="text-gray-400 text-6xl mb-4">📝</div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No tasks found</h3>
-              <p className="text-gray-500 mb-4">Create your first task to get started</p>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-samsung-blue/10 flex items-center justify-center">
+                <svg className="w-8 h-8 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                </svg>
+              </div>
+              <h3 className="text-lg samsung-heading text-gray-900 mb-2">No tasks found</h3>
+              <p className="samsung-body text-gray-500 mb-4">Create your first task to get started</p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300"
               >
-                ✏️ Create Task
+                Create Task
               </button>
             </div>
           )}
@@ -669,7 +686,7 @@ export default function AdminTasksPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
               onClick={() => {
                 setShowCreateModal(false)
                 setEditingTask(null)
@@ -681,10 +698,10 @@ export default function AdminTasksPage() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                className="glass-card rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
               >
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">
+                <div className="px-8 py-6 border-b-2 border-samsung-gray-100">
+                  <h3 className="text-xl samsung-heading text-gray-900">
                     {editingTask ? 'Edit Task' : 'Create New Task'}
                   </h3>
                 </div>
@@ -693,20 +710,20 @@ export default function AdminTasksPage() {
                   {/* Basic Information */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm samsung-body text-gray-700 mb-2">
                         Task Title *
                       </label>
                       <input
                         type="text"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                        className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                         placeholder="Enter task title"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm samsung-body text-gray-700 mb-2">
                         Max Score
                       </label>
                       <input
@@ -715,46 +732,46 @@ export default function AdminTasksPage() {
                         max="1000"
                         value={formData.max_score}
                         onChange={(e) => setFormData({ ...formData, max_score: parseInt(e.target.value) || 100 })}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                        className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm samsung-body text-gray-700 mb-2">
                       Description
                     </label>
                     <input
                       type="text"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                      className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                       placeholder="Brief task description"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm samsung-body text-gray-700 mb-2">
                       Task Content *
                     </label>
                     <textarea
                       rows={6}
                       value={formData.content}
                       onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                      className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                       placeholder="General task overview and context..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm samsung-body text-gray-700 mb-2">
                       Instructions *
                     </label>
                     <textarea
                       rows={8}
                       value={formData.instructions}
                       onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                      className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                       placeholder="Detailed step-by-step instructions and requirements..."
                     />
                   </div>
@@ -762,7 +779,7 @@ export default function AdminTasksPage() {
                   {/* Topics and Course Assignment */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm samsung-body text-gray-700 mb-2">
                         Related Topics (comma-separated)
                       </label>
                       <input
@@ -772,19 +789,19 @@ export default function AdminTasksPage() {
                           ...formData, 
                           topics: e.target.value.split(',').map(t => t.trim()).filter(t => t)
                         })}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                        className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                         placeholder="JavaScript, React, Node.js"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm samsung-body text-gray-700 mb-2">
                         Assign to Course Topic (optional)
                       </label>
                       <select
                         value={formData.topic_id}
                         onChange={(e) => setFormData({ ...formData, topic_id: e.target.value })}
-                        className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                        className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                       >
                         <option value="">Select a topic</option>
                         {courses.map(course => (
@@ -803,20 +820,20 @@ export default function AdminTasksPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm samsung-body text-gray-700 mb-2">
                       Due Date (optional)
                     </label>
                     <input
                       type="datetime-local"
                       value={formData.due_date}
                       onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                      className="block w-full border-2 border-samsung-gray-100 rounded-xl samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
                     />
                   </div>
 
                   {/* File Attachments */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm samsung-body text-gray-700 mb-2">
                       Attachments
                     </label>
                     <input
@@ -886,9 +903,9 @@ export default function AdminTasksPage() {
                       type="checkbox"
                       checked={formData.is_published}
                       onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                      className="h-4 w-4 text-samsung-blue focus:ring-samsung-blue/20 border-samsung-gray-100 rounded"
                     />
-                    <label htmlFor="is_published" className="ml-2 block text-sm text-gray-900">
+                    <label htmlFor="is_published" className="ml-2 block text-sm samsung-body text-gray-900">
                       Publish immediately (students can see and submit)
                     </label>
                   </div>
@@ -901,7 +918,7 @@ export default function AdminTasksPage() {
                       setEditingTask(null)
                       resetForm()
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    className="px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20 transition-all duration-300"
                   >
                     Cancel
                   </button>
@@ -910,7 +927,7 @@ export default function AdminTasksPage() {
                     whileTap={{ scale: 0.95 }}
                     onClick={editingTask ? handleUpdateTask : handleCreateTask}
                     disabled={!formData.title || !formData.content || creating}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300 disabled:opacity-50"
                   >
                     {creating ? (
                       <>

@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useAuth } from '@/contexts/AuthContext'
 import Link from 'next/link'
+import Logo from '@/components/Logo'
 import { useRouter } from 'next/navigation'
 
 interface ValidationState {
@@ -35,7 +35,6 @@ export default function SignUpPage() {
     overall: false
   })
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
-  const { signUp } = useAuth()
   const router = useRouter()
 
   // Email validation function
@@ -97,40 +96,44 @@ export default function SignUpPage() {
 
     // Client-side validation
     if (!fullName.trim()) {
-      setError('Full name is required')
+      setError('Tam ad tələb olunur')
       setLoading(false)
       return
     }
 
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address')
+      setError('Düzgün email ünvanı daxil edin')
       setLoading(false)
       return
     }
 
     if (!passwordValidation.overall) {
-      setError('Password does not meet the required criteria')
+      setError('Şifrə bütün tələbləri ödəməlidir')
       setLoading(false)
       return
     }
 
     try {
-      const { error } = await signUp(email, password, fullName)
-      if (error) {
-        if (error.includes('already registered') || error.includes('already exists') || error.includes('User already registered')) {
-          setError('This email is already associated with an existing account')
-        } else {
-          setError(error)
-        }
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password, fullName })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || 'Qeydiyyat zamanı xəta baş verdi')
         return
       }
       
       setSuccess(true)
       setTimeout(() => {
-        router.replace('/auth/signin')
-      }, 2000)
+        router.push('/auth/signin')
+      }, 3000)
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An error occurred')
+      console.error('Signup error:', error)
+      setError('Şəbəkə xətası baş verdi')
     } finally {
       setLoading(false)
     }
@@ -138,29 +141,29 @@ export default function SignUpPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-samsung-gray-50 via-samsung-blue/5 to-samsung-cyan/10 relative overflow-hidden">
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-32 w-[600px] h-[600px] bg-gradient-to-br from-purple-400/15 to-indigo-400/15 rounded-full blur-3xl animate-float"></div>
-          <div className="absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-gradient-to-tr from-indigo-400/15 to-blue-400/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-purple-300/20 to-pink-300/20 rounded-full blur-2xl animate-pulse-gentle"></div>
-          <div className="absolute top-20 left-20 w-4 h-4 bg-indigo-400/40 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-40 right-32 w-6 h-6 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '3s' }}></div>
-          <div className="absolute bottom-32 left-1/3 w-5 h-5 bg-blue-400/40 rounded-full animate-float" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute -top-40 -right-32 w-[600px] h-[600px] bg-gradient-to-br from-samsung-blue/10 to-samsung-cyan/10 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-gradient-to-tr from-samsung-cyan/10 to-samsung-teal/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-samsung-purple/15 to-samsung-blue/15 rounded-full blur-2xl animate-pulse-gentle"></div>
+          <div className="absolute top-20 left-20 w-4 h-4 bg-samsung-blue/30 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-40 right-32 w-6 h-6 bg-samsung-cyan/30 rounded-full animate-float" style={{ animationDelay: '3s' }}></div>
+          <div className="absolute bottom-32 left-1/3 w-5 h-5 bg-samsung-teal/30 rounded-full animate-float" style={{ animationDelay: '4s' }}></div>
         </div>
 
         {/* Header */}
         <header className="relative z-20">
-          <nav className="glass backdrop-blur-xl border-0 shadow-xl bg-white/10">
+          <nav className="glass-card backdrop-blur-xl border-0 shadow-samsung-card bg-white/10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center py-4">
-                <Link href="/" className="logo-container group inline-flex items-center gap-2">
-                  <h1 className="logo-text logo-text-medium group-hover:opacity-90 transition">SÜNİ İNTELLEKT</h1>
-                </Link>
+              <div className="flex justify-between items-center p-0">
+                <div className="flex items-center space-x-4">
+                  <Logo size="md" uppercase showText />
+                </div>
                 <div className="flex items-center gap-3">
-                  <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:text-indigo-700 transition">Daxil ol</Link>
-                  <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white text-sm font-bold shadow hover:shadow-md transition">
-                    <span className="text-yellow-300">⚡</span> Qeydiyyat
+                  <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Daxil ol</Link>
+                  <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
+                    <span>⚡</span> Qeydiyyat
                   </Link>
                 </div>
               </div>
@@ -170,14 +173,14 @@ export default function SignUpPage() {
 
         <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-84px)] px-4 py-12 sm:px-6 lg:px-8">
           <div className="max-w-md w-full text-center animate-fade-in-up">
-            <div className="glass-card bg-green-50/80 border border-green-200/50 text-green-800 px-8 py-8 rounded-2xl backdrop-blur-md shadow-xl">
+            <div className="glass-card bg-green-50 border-2 border-green-200 text-green-800 px-8 py-8 rounded-3xl backdrop-blur-md shadow-samsung-card">
               <div className="flex items-center justify-center mb-4">
                 <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center">
                   <span className="text-2xl">✨</span>
                 </div>
               </div>
-              <h3 className="font-bold text-xl mb-3">Hesab Uğurla Yaradıldı!</h3>
-              <p className="text-sm font-medium">Hesabınızı təsdiqləmək və quraşdırmanı tamamlamaq üçün emailinizi yoxlayın.</p>
+              <h3 className="samsung-heading text-xl mb-3">Qeydiyyat Uğurlu Oldu!</h3>
+              <p className="samsung-body text-sm">Email ünvanınızı yoxlayın və hesabınızı təsdiqləyin. Daha sonra daxil ola bilərsiniz.</p>
             </div>
           </div>
         </div>
@@ -186,30 +189,30 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Enhanced Animated Background Elements */}
+    <div className="min-h-screen bg-gradient-to-br from-samsung-gray-50 via-samsung-blue/5 to-samsung-cyan/10 relative overflow-hidden">
+      {/* Samsung Design Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-32 w-[600px] h-[600px] bg-gradient-to-br from-purple-400/15 to-indigo-400/15 rounded-full blur-3xl animate-float"></div>
-        <div className="absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-gradient-to-tr from-indigo-400/15 to-blue-400/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-purple-300/20 to-pink-300/20 rounded-full blur-2xl animate-pulse-gentle"></div>
+        <div className="absolute -top-40 -right-32 w-[600px] h-[600px] bg-gradient-to-br from-samsung-blue/10 to-samsung-cyan/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-40 -left-32 w-[600px] h-[600px] bg-gradient-to-tr from-samsung-cyan/10 to-samsung-teal/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-samsung-purple/15 to-samsung-blue/15 rounded-full blur-2xl animate-pulse-gentle"></div>
         
         {/* Floating particles */}
-        <div className="absolute top-20 left-20 w-4 h-4 bg-indigo-400/40 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-40 right-32 w-6 h-6 bg-purple-400/40 rounded-full animate-float" style={{ animationDelay: '3s' }}></div>
-        <div className="absolute bottom-32 left-1/3 w-5 h-5 bg-blue-400/40 rounded-full animate-float" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-20 left-20 w-4 h-4 bg-samsung-blue/30 rounded-full animate-float" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute top-40 right-32 w-6 h-6 bg-samsung-cyan/30 rounded-full animate-float" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute bottom-32 left-1/3 w-5 h-5 bg-samsung-teal/30 rounded-full animate-float" style={{ animationDelay: '4s' }}></div>
       </div>
       {/* Header aligned with main page */}
       <header className="relative z-20">
-        <nav className="glass backdrop-blur-xl border-0 shadow-xl bg-white/10">
+        <nav className="glass-card backdrop-blur-xl border-0 shadow-samsung-card bg-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center py-4">
-              <Link href="/" className="logo-container group inline-flex items-center gap-2">
-                <h1 className="logo-text logo-text-medium group-hover:opacity-90 transition">SÜNİ İNTELLEKT</h1>
-              </Link>
+            <div className="flex justify-between items-center p-0">
+              <div className="flex items-center space-x-4">
+                <Logo size="md" uppercase showText />
+              </div>
               <div className="flex items-center gap-3">
-                <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl text-sm font-semibold text-gray-700 hover:text-indigo-700 transition">Daxil ol</Link>
-                <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white text-sm font-bold shadow hover:shadow-md transition">
-                  <span className="text-yellow-300">⚡</span> Qeydiyyat
+                <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Daxil ol</Link>
+                <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
+                  <span>⚡</span> Qeydiyyat
                 </Link>
               </div>
             </div>
@@ -221,40 +224,28 @@ export default function SignUpPage() {
         <div className="max-w-lg w-full space-y-10 mt-4">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="flex justify-center mb-8">
-              <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-3xl blur-2xl opacity-40 animate-pulse-gentle"></div>
-                <div className="relative glass-card p-6 rounded-3xl border-2 border-white/40 shadow-2xl hover:shadow-3xl transition-all duration-500">
-                  <div className="logo-container">
-                    <h1 className="text-4xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-                      Süni İntellekt
-                    </h1>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <h2 className="text-5xl font-black bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent mb-4">
-              İnqilaba Qoşul <span className="text-yellow-400">✨</span>
+            <h2 className="text-5xl samsung-heading text-gray-900 mb-4">
+              İnqilaba Qoşul
             </h2>
-            <p className="text-gray-600 text-xl font-light mb-6">
+            <p className="samsung-body text-gray-700 text-xl mb-6">
               Hesab yaradın və AI dəstəklı öyrənmə səyahətinə başlayın
             </p>
-            <p className="text-gray-500 text-lg">
+            <p className="samsung-body text-gray-600">
               Artıq hesabınız var?{' '}
-              <Link href="/auth/signin" className="font-bold text-indigo-600 hover:text-indigo-500 transition-colors hover:underline">
+              <Link href="/auth/signin" className="font-semibold text-samsung-blue hover:text-samsung-blue-dark transition-colors hover:underline">
                 Buradan daxil olun
               </Link>
             </p>
           </div>
 
           {/* Enhanced Form */}
-          <div className="glass-card p-10 relative z-10 border border-white/25 shadow-xl hover:shadow-2xl transition-all duration-500 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <div className="glass-card p-10 relative z-10 border border-white/25 shadow-samsung-card hover:shadow-2xl transition-all duration-500 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             <form className="space-y-8" onSubmit={handleSubmit}>
               {error && (
-                <div className="bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-200/50 text-red-700 px-6 py-4 rounded-2xl animate-fade-in-scale shadow-lg">
+                <div className="bg-red-50 border-2 border-red-200 text-red-700 px-6 py-4 rounded-2xl animate-fade-in-scale shadow-samsung-card">
                   <div className="flex items-center">
                     <span className="text-red-500 mr-3 text-xl">⚠️</span>
-                    <span className="font-semibold">{error}</span>
+                    <span className="samsung-body font-semibold">{error}</span>
                   </div>
                 </div>
               )}
@@ -281,7 +272,9 @@ export default function SignUpPage() {
                       placeholder="Tam adınızı daxil edin"
                     />
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="text-gray-400 text-xl">👤</span>
+                      <svg className="w-5 h-5 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
                     </div>
                   </div>
                   {touchedFields.has('fullName') && !fullName.trim() && (
@@ -315,7 +308,9 @@ export default function SignUpPage() {
                       placeholder="Email ünvanınızı daxil edin"
                     />
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="text-gray-400 text-xl">📧</span>
+                      <svg className="w-5 h-5 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                      </svg>
                     </div>
                     {touchedFields.has('email') && email && (
                       <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
@@ -357,16 +352,25 @@ export default function SignUpPage() {
                       placeholder="Güclü şifrə yaradın"
                     />
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <span className="text-gray-400 text-xl">🔒</span>
+                      <svg className="w-5 h-5 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
                     </div>
                     <button
                       type="button"
                       className="absolute inset-y-0 right-0 pr-4 flex items-center hover:scale-110 transition-transform duration-300"
                       onClick={() => setShowPassword(!showPassword)}
                     >
-                      <span className="text-gray-400 hover:text-gray-600 cursor-pointer text-xl">
-                        {showPassword ? '🙈' : '👁️'}
-                      </span>
+                      <svg className="w-5 h-5 text-samsung-blue hover:text-samsung-blue-dark transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {showPassword ? (
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                        ) : (
+                          <>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                          </>
+                        )}
+                      </svg>
                     </button>
                   </div>
                   
@@ -402,7 +406,7 @@ export default function SignUpPage() {
                 <button
                   type="submit"
                   disabled={loading || !emailValidation.isValid || !passwordValidation.overall || !fullName.trim()}
-          className="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white py-4 rounded-xl text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.01] disabled:opacity-50 disabled:cursor-not-allowed group"
+          className="w-full bg-samsung-blue hover:bg-samsung-blue-dark text-white py-4 rounded-xl samsung-body text-lg font-semibold shadow-samsung-card hover:shadow-lg transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
@@ -417,7 +421,7 @@ export default function SignUpPage() {
                   )}
                 </button>
                 {(!emailValidation.isValid || !passwordValidation.overall || !fullName.trim()) && (
-          <p className="mt-4 text-gray-500 text-center text-sm font-medium">
+          <p className="mt-4 samsung-body text-gray-600 text-center text-sm">
                     Davam etmək üçün bütün sahələri düzgün doldurun
                   </p>
                 )}

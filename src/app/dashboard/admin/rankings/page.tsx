@@ -43,6 +43,11 @@ interface RankingStats {
   mostImproved: string
 }
 
+interface ClassOption {
+  id: string
+  name: string
+}
+
 export default function AdminStudentRankingsPage() {
   const { user, profile } = useAuth()
   const [rankings, setRankings] = useState<StudentRankingData[]>([])
@@ -58,15 +63,39 @@ export default function AdminStudentRankingsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortBy, setSortBy] = useState<'rank' | 'name' | 'average' | 'submissions' | 'completion'>('rank')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [classes, setClasses] = useState<ClassOption[]>([])
+  const [selectedClass, setSelectedClassFilter] = useState<string>('all')
 
   // Check if user is admin
   const isAdmin = profile?.role === 'admin'
 
   useEffect(() => {
     if (user && isAdmin) {
+      fetchClasses()
       fetchRankingsData()
     }
   }, [user, isAdmin])
+
+  useEffect(() => {
+    if (user && isAdmin) {
+      fetchRankingsData()
+    }
+  }, [selectedClass])
+
+  const fetchClasses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('classes')
+        .select('id, name')
+        .eq('status', 'active')
+        .order('name')
+
+      if (error) throw error
+      setClasses(data || [])
+    } catch (error) {
+      console.error('Error fetching classes:', error)
+    }
+  }
 
   const fetchRankingsData = async () => {
     try {
@@ -87,7 +116,23 @@ export default function AdminStudentRankingsPage() {
 
       console.log(`✅ Profiles fetched: ${profiles?.length || 0} students`)
 
-      if (!profiles || profiles.length === 0) {
+      // Filter by class if selected
+      let filteredProfiles = profiles || []
+      if (selectedClass !== 'all') {
+        const { data: classEnrollments, error: enrollError } = await supabase
+          .from('class_enrollments')
+          .select('user_id')
+          .eq('class_id', selectedClass)
+          .eq('status', 'active')
+
+        if (enrollError) throw enrollError
+
+        const enrolledStudentIds = new Set(classEnrollments?.map(e => e.user_id) || [])
+        filteredProfiles = profiles.filter(p => enrolledStudentIds.has(p.id))
+        console.log(`🎯 Filtered to ${filteredProfiles.length} students in selected class`)
+      }
+
+      if (!filteredProfiles || filteredProfiles.length === 0) {
         console.log('⚠️ No student profiles found')
         setRankings([])
         setStats({
@@ -166,9 +211,9 @@ export default function AdminStudentRankingsPage() {
       console.log('🔄 Processing student data...')
       const rankingData: StudentRankingData[] = []
 
-      for (let i = 0; i < (profiles?.length || 0); i++) {
-        const profile = profiles[i]
-        console.log(`👤 Processing student ${i + 1}/${profiles.length}: ${profile.full_name || `User ${profile.id}`}`)
+      for (let i = 0; i < filteredProfiles.length; i++) {
+        const profile = filteredProfiles[i]
+        console.log(`👤 Processing student ${i + 1}/${filteredProfiles.length}: ${profile.full_name || `User ${profile.id}`}`)
         const studentSubmissions = submissions?.filter(s => s.student_id === profile.id) || []
         const studentEnrollments = enrollments?.filter(e => e.student_id === profile.id) || []
 
@@ -397,7 +442,7 @@ export default function AdminStudentRankingsPage() {
       <DashboardLayout>
         <div className="space-y-8">
           <div className="text-center">
-            <div className="animate-pulse bg-gradient-to-br from-indigo-500/30 to-purple-500/30 w-20 h-20 rounded-3xl mx-auto mb-4" />
+            <div className="animate-pulse bg-samsung-blue/30 w-20 h-20 rounded-3xl mx-auto mb-4" />
             <div className="h-8 w-64 bg-gray-200/60 rounded-lg mx-auto animate-pulse mb-2" />
             <div className="h-4 w-96 bg-gray-200/50 rounded mx-auto animate-pulse" />
           </div>
@@ -424,10 +469,10 @@ export default function AdminStudentRankingsPage() {
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 shadow-xl bg-gradient-to-br from-amber-500 to-orange-600">
             <Trophy className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl samsung-heading bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
             Student Rankings <span className="text-amber-500">🏆</span>
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-600 samsung-body max-w-2xl mx-auto">
             Comprehensive overview of student performance, engagement, and progress metrics.
           </p>
         </div>
@@ -435,60 +480,60 @@ export default function AdminStudentRankingsPage() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-blue-400/10 via-indigo-400/10 to-purple-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+            <div className="absolute -inset-px rounded-3xl bg-samsung-blue/5 opacity-0 group-hover:opacity-100 blur-md transition" />
+            <div className="relative glass-card rounded-2xl shadow-samsung-card hover:shadow-samsung-float p-6 transition-all duration-300 ease-out hover:bg-samsung-blue/5 hover:-translate-y-0.5">
               <div className="flex items-center space-x-4">
-                <div className="p-4 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl text-white shadow-md">
+                <div className="p-4 bg-samsung-blue rounded-2xl text-white shadow-md">
                   <Users className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Active Students</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalActiveStudents}</p>
+                  <p className="text-sm text-gray-600 samsung-body">Active Students</p>
+                  <p className="text-2xl samsung-heading text-gray-900">{stats.totalActiveStudents}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-green-400/10 via-emerald-400/10 to-teal-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+            <div className="absolute -inset-px rounded-3xl bg-samsung-blue/5 opacity-0 group-hover:opacity-100 blur-md transition" />
+            <div className="relative glass-card rounded-2xl shadow-samsung-card hover:shadow-samsung-float p-6 transition-all duration-300 ease-out hover:bg-samsung-blue/5 hover:-translate-y-0.5">
               <div className="flex items-center space-x-4">
                 <div className="p-4 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl text-white shadow-md">
                   <BarChart3 className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Class Average</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.averageClassGrade.toFixed(1)}</p>
+                  <p className="text-sm text-gray-600 samsung-body">Class Average</p>
+                  <p className="text-2xl samsung-heading text-gray-900">{stats.averageClassGrade.toFixed(1)}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-purple-400/10 via-fuchsia-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+            <div className="absolute -inset-px rounded-3xl bg-samsung-purple/5 opacity-0 group-hover:opacity-100 blur-md transition" />
+            <div className="relative glass-card rounded-2xl shadow-samsung-card hover:shadow-samsung-float p-6 transition-all duration-300 ease-out hover:bg-samsung-purple/5 hover:-translate-y-0.5">
               <div className="flex items-center space-x-4">
-                <div className="p-4 bg-gradient-to-br from-purple-500 to-fuchsia-600 rounded-2xl text-white shadow-md">
+                <div className="p-4 bg-samsung-purple rounded-2xl text-white shadow-md">
                   <FileText className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Total Submissions</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalSubmissions}</p>
+                  <p className="text-sm text-gray-600 samsung-body">Total Submissions</p>
+                  <p className="text-2xl samsung-heading text-gray-900">{stats.totalSubmissions}</p>
                 </div>
               </div>
             </div>
           </div>
 
           <div className="relative group rounded-3xl">
-            <div className="absolute -inset-px rounded-3xl bg-gradient-to-br from-amber-400/10 via-orange-400/10 to-red-400/10 opacity-0 group-hover:opacity-100 blur-md transition" />
-            <div className="relative bg-white/65 backdrop-blur-xl border border-white/40 rounded-3xl shadow-sm hover:shadow-lg p-6 transition-all duration-300 ease-out hover:bg-white/75 hover:-translate-y-0.5">
+            <div className="absolute -inset-px rounded-3xl bg-samsung-blue/5 opacity-0 group-hover:opacity-100 blur-md transition" />
+            <div className="relative glass-card rounded-2xl shadow-samsung-card hover:shadow-samsung-float p-6 transition-all duration-300 ease-out hover:bg-samsung-blue/5 hover:-translate-y-0.5">
               <div className="flex items-center space-x-4">
                 <div className="p-4 bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl text-white shadow-md">
                   <Target className="h-6 w-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 font-medium">Completion Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.completionRate.toFixed(1)}%</p>
+                  <p className="text-sm text-gray-600 samsung-body">Completion Rate</p>
+                  <p className="text-2xl samsung-heading text-gray-900">{stats.completionRate.toFixed(1)}%</p>
                 </div>
               </div>
             </div>
@@ -500,19 +545,19 @@ export default function AdminStudentRankingsPage() {
           <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-200">
             <div className="flex items-center gap-3 mb-2">
               <Award className="w-6 h-6 text-amber-600" />
-              <h3 className="text-lg font-semibold text-amber-900">Top Performer</h3>
+              <h3 className="text-lg samsung-heading text-amber-900">Top Performer</h3>
             </div>
-            <p className="text-2xl font-bold text-amber-800">{stats.topPerformer}</p>
-            <p className="text-sm text-amber-600">Highest average grade</p>
+            <p className="text-2xl samsung-heading text-amber-800">{stats.topPerformer}</p>
+            <p className="text-sm samsung-body text-amber-600">Highest average grade</p>
           </div>
 
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
             <div className="flex items-center gap-3 mb-2">
               <TrendingUp className="w-6 h-6 text-green-600" />
-              <h3 className="text-lg font-semibold text-green-900">Most Active</h3>
+              <h3 className="text-lg samsung-heading text-green-900">Most Active</h3>
             </div>
-            <p className="text-2xl font-bold text-green-800">{stats.mostImproved}</p>
-            <p className="text-sm text-green-600">Highest recent activity</p>
+            <p className="text-2xl samsung-heading text-green-800">{stats.mostImproved}</p>
+            <p className="text-sm samsung-body text-green-600">Highest recent activity</p>
           </div>
         </div>
 
@@ -529,6 +574,19 @@ export default function AdminStudentRankingsPage() {
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
+
+            <select
+              value={selectedClass}
+              onChange={(e) => setSelectedClassFilter(e.target.value)}
+              className="border-2 border-samsung-gray-100 rounded-xl px-4 py-2 samsung-body text-gray-900 focus:ring-2 focus:ring-samsung-blue/20 focus:border-samsung-blue transition-all duration-300"
+            >
+              <option value="all">All Classes</option>
+              {classes.map((cls) => (
+                <option key={cls.id} value={cls.id}>
+                  {cls.name}
+                </option>
+              ))}
+            </select>
             
             <div className="flex items-center gap-2">
               <Filter className="w-4 h-4 text-gray-400" />
@@ -546,7 +604,7 @@ export default function AdminStudentRankingsPage() {
               
               <button
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+                className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-samsung-blue/5 transition"
               >
                 {sortOrder === 'asc' ? '↑' : '↓'}
               </button>
@@ -555,7 +613,7 @@ export default function AdminStudentRankingsPage() {
 
           <button
             onClick={exportToCSV}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-samsung-blue text-white rounded-xl hover:bg-samsung-blue-dark shadow-samsung-card transition"
           >
             <Download className="w-4 h-4" />
             Export CSV
@@ -566,63 +624,63 @@ export default function AdminStudentRankingsPage() {
         <div className="space-y-4">
           {filteredAndSortedRankings.map((student) => (
             <div key={student.studentId} className="relative group">
-              <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-indigo-300/30 via-purple-300/30 to-pink-300/30 opacity-0 group-hover:opacity-100 blur-md transition" />
-              <div className="relative rounded-2xl bg-white/65 backdrop-blur-xl border border-white/40 shadow-sm hover:shadow-xl transition-all duration-400 ease-out hover:-translate-y-0.5 hover:bg-white/80">
+              <div className="absolute -inset-px rounded-2xl bg-samsung-blue/10 opacity-0 group-hover:opacity-100 blur-md transition" />
+              <div className="relative glass-card rounded-2xl shadow-samsung-card hover:shadow-samsung-float transition-all duration-400 ease-out hover:-translate-y-0.5 hover:bg-samsung-blue/5">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-4">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-lg ${
+                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center samsung-heading text-white shadow-lg ${
                         student.rank === 1 ? 'bg-gradient-to-br from-yellow-400 to-yellow-600' :
                         student.rank === 2 ? 'bg-gradient-to-br from-gray-400 to-gray-600' :
                         student.rank === 3 ? 'bg-gradient-to-br from-amber-600 to-amber-800' :
-                        'bg-gradient-to-br from-indigo-500 to-purple-600'
+                        'bg-samsung-blue'
                       }`}>
                         #{student.rank}
                       </div>
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900">{student.studentName}</h3>
-                        <p className="text-sm text-gray-600">{student.email}</p>
+                        <h3 className="text-lg samsung-heading text-gray-900">{student.studentName}</h3>
+                        <p className="text-sm samsung-body text-gray-600">{student.email}</p>
                       </div>
                     </div>
                     
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-2xl font-bold text-indigo-600">{student.averageGrade.toFixed(1)}</div>
-                        <div className="text-xs text-gray-500">Average Grade</div>
+                        <div className="text-2xl samsung-heading text-samsung-blue">{student.averageGrade.toFixed(1)}</div>
+                        <div className="text-xs samsung-body text-gray-500">Average Grade</div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="h-px bg-gradient-to-r from-transparent via-indigo-200/60 to-transparent mb-4" />
+                  <div className="h-px bg-gradient-to-r from-transparent via-samsung-blue/20 to-transparent mb-4" />
 
                   <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-4">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-lg font-bold text-blue-600">{student.totalSubmissions}</div>
-                      <div className="text-xs text-blue-600">Total Submissions</div>
+                    <div className="text-center p-3 bg-samsung-blue/10 rounded-lg">
+                      <div className="text-lg samsung-heading text-samsung-blue">{student.totalSubmissions}</div>
+                      <div className="text-xs samsung-body text-samsung-blue">Total Submissions</div>
                     </div>
                     <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <div className="text-lg font-bold text-green-600">{student.gradedSubmissions}</div>
-                      <div className="text-xs text-green-600">Graded</div>
+                      <div className="text-lg samsung-heading text-green-600">{student.gradedSubmissions}</div>
+                      <div className="text-xs samsung-body text-green-600">Graded</div>
                     </div>
                     <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                      <div className="text-lg font-bold text-yellow-600">{student.pendingSubmissions}</div>
-                      <div className="text-xs text-yellow-600">Pending</div>
+                      <div className="text-lg samsung-heading text-yellow-600">{student.pendingSubmissions}</div>
+                      <div className="text-xs samsung-body text-yellow-600">Pending</div>
                     </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="text-lg font-bold text-purple-600">{student.completionRate.toFixed(1)}%</div>
-                      <div className="text-xs text-purple-600">Completion</div>
+                    <div className="text-center p-3 bg-samsung-purple/10 rounded-lg">
+                      <div className="text-lg samsung-heading text-samsung-purple">{student.completionRate.toFixed(1)}%</div>
+                      <div className="text-xs samsung-body text-samsung-purple">Completion</div>
                     </div>
-                    <div className="text-center p-3 bg-indigo-50 rounded-lg">
-                      <div className="text-lg font-bold text-indigo-600">{student.coursesEnrolled}</div>
-                      <div className="text-xs text-indigo-600">Courses</div>
+                    <div className="text-center p-3 bg-samsung-blue/10 rounded-lg">
+                      <div className="text-lg samsung-heading text-samsung-blue">{student.coursesEnrolled}</div>
+                      <div className="text-xs samsung-body text-samsung-blue">Courses</div>
                     </div>
                     <div className="text-center p-3 bg-gray-50 rounded-lg">
-                      <div className="text-lg font-bold text-gray-600">{student.recentActivity.submissionsLast7Days}</div>
-                      <div className="text-xs text-gray-600">Last 7 Days</div>
+                      <div className="text-lg samsung-heading text-gray-600">{student.recentActivity.submissionsLast7Days}</div>
+                      <div className="text-xs samsung-body text-gray-600">Last 7 Days</div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center justify-between text-sm samsung-body text-gray-600">
                     <div className="flex items-center gap-6">
                       <span className="flex items-center gap-1">
                         <span className="w-2 h-2 bg-green-400 rounded-full"></span>
@@ -642,16 +700,16 @@ export default function AdminStudentRankingsPage() {
                     </div>
                     
                     <div className="flex items-center gap-2">
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      <span className="text-xs samsung-body bg-green-100 text-green-800 px-2 py-1 rounded-full">
                         {student.gradeDistribution.excellent} A&apos;s
                       </span>
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                      <span className="text-xs samsung-body bg-samsung-blue/10 text-samsung-blue px-2 py-1 rounded-full">
                         {student.gradeDistribution.good} B&apos;s
                       </span>
-                      <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
+                      <span className="text-xs samsung-body bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
                         {student.gradeDistribution.fair} C&apos;s
                       </span>
-                      <span className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">
+                      <span className="text-xs samsung-body bg-red-100 text-red-800 px-2 py-1 rounded-full">
                         {student.gradeDistribution.poor} D&apos;s
                       </span>
                     </div>

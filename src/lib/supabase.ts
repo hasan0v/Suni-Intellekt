@@ -10,11 +10,11 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 export interface UserProfile {
   id: string
   full_name: string
-  email?: string
   phone_number?: string
   profile_image_url?: string
   bio?: string
   role: 'student' | 'admin'
+  email_verified?: boolean
   created_at: string
 }
 
@@ -74,4 +74,45 @@ export interface Submission {
   status: 'submitted' | 'graded'
   points?: number
   feedback?: string
+}
+
+export interface Class {
+  id: string
+  name: string
+  description: string | null
+  start_date: string | null
+  end_date: string | null
+  status: 'active' | 'completed' | 'archived'
+  created_by: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ClassEnrollment {
+  id: string
+  class_id: string
+  user_id: string
+  status: 'active' | 'completed' | 'dropped'
+  enrolled_at: string
+  updated_at: string
+}
+
+export interface ClassCourse {
+  id: string
+  class_id: string
+  course_id: string
+  assigned_at: string
+}
+
+export interface ClassMaterial {
+  id: string
+  class_id: string
+  title: string
+  description: string | null
+  file_url: string | null
+  file_path: string | null
+  material_type: 'document' | 'video' | 'link' | 'other'
+  created_by: string
+  created_at: string
+  updated_at: string
 }

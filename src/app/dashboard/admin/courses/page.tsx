@@ -8,7 +8,6 @@ import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { supabase, Course } from '@/lib/supabase'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import Logo from '@/components/Logo'
 
 type AdminCourseListItem = Pick<Course, 'id' | 'title' | 'description' | 'created_at'>
 
@@ -121,12 +120,9 @@ export default function AdminCoursesPage() {
       <DashboardLayout>
       <div className="mb-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-col gap-3">
-            <Logo size="md" />
-            <div>
-              <h1 className="text-3xl font-bold gradient-text">Manage Courses</h1>
-              <p className="text-gray-600 mt-1">Create, organize, and maintain your course catalog</p>
-            </div>
+          <div>
+            <h1 className="text-3xl font-bold gradient-text">Manage Courses</h1>
+            <p className="text-gray-600 mt-1">Create, organize, and maintain your course catalog</p>
           </div>
           <div className="flex items-center gap-2">
             <div className="relative group">

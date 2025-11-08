@@ -36,14 +36,14 @@ export async function HEAD(request: NextRequest) {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error } = await supabase.auth.getUser(token)
+    const { data: { user } } = await supabase.auth.getUser(token)
 
-    if (error || !user) {
+    if (!user) {
       return new NextResponse(null, { status: 401 })
     }
 
     return new NextResponse(null, { status: 200 })
-  } catch (error) {
+  } catch {
     return new NextResponse(null, { status: 500 })
   }
 }

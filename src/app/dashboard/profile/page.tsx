@@ -54,7 +54,6 @@ export default function ProfilePage() {
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [isDarkMode, setIsDarkMode] = useState(false)
 
   const [formData, setFormData] = useState<FormData>({
     full_name: '',
@@ -238,6 +237,14 @@ export default function ProfilePage() {
     
     if (result.error) {
       console.error('Profile image upload failed:', result.error)
+      
+      // Show helpful error message for storage setup
+      if (result.error.includes('not found') || result.error.includes('does not exist')) {
+        showNotification('error', 'Storage not configured. Please contact administrator to run: POST /api/setup-storage')
+      } else {
+        showNotification('error', result.error)
+      }
+      
       throw new Error(result.error)
     }
     
@@ -415,150 +422,204 @@ export default function ProfilePage() {
 
   return (
     <DashboardLayout>
-      <div className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-colors duration-300 ${
-        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
-      }`}>
-        {/* Header with Theme Toggle */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">My Profile</h1>
-            <p className="mt-1 text-gray-600 dark:text-gray-400">
-              Manage your personal information and preferences
-            </p>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="glass-card p-6 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-samsung-blue flex items-center justify-center">
+              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-2xl samsung-heading text-gray-900">My Profile</h1>
+              <p className="mt-1 samsung-body text-gray-600">
+                Manage your personal information
+              </p>
+            </div>
           </div>
-          <div className="flex items-center space-x-4">
-            {/* <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-2 rounded-full transition-colors ${
-                isDarkMode 
-                  ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' 
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
-              } shadow-md`}
-              title="Toggle theme"
+          {!isEditing && (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setIsEditing(true)}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300"
             >
-              {isDarkMode ? '☀️' : '🌙'}
-            </button> */}
-            {!isEditing && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setIsEditing(true)}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-              >
-                <span className="mr-2">✏️</span>
-                Edit Profile
-              </motion.button>
-            )}
-          </div>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              Edit Profile
+            </motion.button>
+          )}
         </div>
 
         {/* Notification */}
         <AnimatePresence>
           {notification && (
             <motion.div
-              initial={{ opacity: 0, y: -50 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              className={`mb-6 p-4 rounded-md ${
+              exit={{ opacity: 0, y: -20 }}
+              className={`glass-card p-4 border-l-4 ${
                 notification.type === 'success'
-                  ? 'bg-green-50 border border-green-200 text-green-800'
-                  : 'bg-red-50 border border-red-200 text-red-800'
+                  ? 'border-green-500 bg-green-50/50'
+                  : 'border-red-500 bg-red-50/50'
               }`}
             >
-              <div className="flex">
-                <span className="mr-2">
-                  {notification.type === 'success' ? '✅' : '❌'}
-                </span>
-                {notification.message}
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                  notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                }`}>
+                  {notification.type === 'success' ? (
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  )}
+                </div>
+                <p className={`samsung-body text-sm ${
+                  notification.type === 'success' ? 'text-green-800' : 'text-red-800'
+                }`}>
+                  {notification.message}
+                </p>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Profile Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className={`${
-            isDarkMode ? 'bg-gray-800' : 'bg-white'
-          } shadow-xl rounded-2xl overflow-hidden transition-colors duration-300`}
-        >
-          {/* Profile Header */}
-          <div className={`${
-            isDarkMode ? 'bg-gradient-to-r from-indigo-600 to-purple-600' : 'bg-gradient-to-r from-indigo-500 to-purple-500'
-          } px-6 py-8`}>
-            <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-              {/* Profile Picture */}
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-white shadow-lg">
-                  {profileImage ? (
-                    <Image
-                      src={profileImage}
-                      alt="Profile"
-                      width={96}
-                      height={96}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500 text-2xl">
-                      👤
-                    </div>
-                  )}
-                </div>
-                {isEditing && (
-                  <div className="absolute -bottom-2 -right-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Profile Picture & Quick Info */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Profile Picture Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="glass-card p-6"
+            >
+              <div className="text-center">
+                <div className="relative inline-block mb-4">
+                  <div className="w-32 h-32 rounded-3xl overflow-hidden bg-samsung-blue/10 shadow-samsung-card mx-auto">
+                    {profileImage ? (
+                      <Image
+                        src={profileImage}
+                        alt="Profile"
+                        width={128}
+                        height={128}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg className="w-16 h-16 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  {isEditing && (
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center text-indigo-600 hover:bg-gray-50 transition-colors"
-                      title="Change photo"
+                      className="absolute -bottom-2 -right-2 w-10 h-10 bg-samsung-blue rounded-2xl shadow-samsung-card flex items-center justify-center text-white hover:bg-samsung-blue-dark transition-all duration-300"
                     >
-                      📷
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
                     </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Profile Info */}
-              <div className="text-center sm:text-left">
-                <h2 className="text-2xl font-bold text-white">
+                  )}
+                </div>
+                <h2 className="text-xl samsung-heading text-gray-900 mb-1">
                   {extendedProfile?.full_name || profile?.full_name || 'User'}
                 </h2>
-                <p className="text-indigo-100 capitalize">
-                  {extendedProfile?.role || profile?.role} • Member since {new Date(extendedProfile?.created_at || profile?.created_at || '').toLocaleDateString()}
+                <p className="samsung-body text-sm text-gray-600 capitalize mb-4">
+                  {extendedProfile?.role || profile?.role}
                 </p>
+                {isEditing && profileImage && (
+                  <button
+                    onClick={handleRemoveImage}
+                    disabled={saving}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs samsung-body text-red-600 bg-red-50 hover:bg-red-100 transition-all duration-300 disabled:opacity-50"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Remove Photo
+                  </button>
+                )}
               </div>
-            </div>
+            </motion.div>
+
+            {/* Account Info Card */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 }}
+              className="glass-card p-6"
+            >
+              <h3 className="text-base samsung-heading text-gray-900 mb-4">Account Information</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 p-3 bg-samsung-blue/5 rounded-xl">
+                  <div className="w-8 h-8 rounded-lg bg-samsung-blue/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs samsung-body text-gray-600">Role</p>
+                    <p className="text-sm samsung-body text-gray-900 capitalize">
+                      {extendedProfile?.role || profile?.role}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 p-3 bg-samsung-cyan/5 rounded-xl">
+                  <div className="w-8 h-8 rounded-lg bg-samsung-cyan/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-samsung-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs samsung-body text-gray-600">Member Since</p>
+                    <p className="text-sm samsung-body text-gray-900">
+                      {new Date(extendedProfile?.created_at || profile?.created_at || '').toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Profile Form */}
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Right Column - Profile Form */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="lg:col-span-2 glass-card p-8"
+          >
+            <h3 className="text-lg samsung-heading text-gray-900 mb-6">Personal Details</h3>
+            
+            <div className="space-y-6">
               {/* Full Name */}
-              <div className="space-y-2">
-                <label className={`block text-sm font-medium ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Full Name *
+              <div>
+                <label className="block text-sm samsung-body text-gray-700 mb-2">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
                 {isEditing ? (
                   <motion.input
-                    whileFocus={{ scale: 1.02 }}
+                    whileFocus={{ scale: 1.01 }}
                     type="text"
                     value={formData.full_name}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('full_name', e.target.value)}
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                    onChange={(e) => handleInputChange('full_name', e.target.value)}
+                    className={`block w-full border-2 rounded-xl px-4 py-3 samsung-body text-gray-900 transition-all duration-300 ${
                       errors.full_name
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : isDarkMode
-                        ? 'border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-indigo-200'
-                        : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200'
-                    } focus:ring-4 focus:ring-opacity-20`}
+                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
+                        : 'border-samsung-gray-100 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/20'
+                    }`}
                     placeholder="Enter your full name"
                   />
                 ) : (
-                  <p className={`px-4 py-3 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                  }`}>
+                  <p className="px-4 py-3 samsung-body text-gray-900 bg-samsung-gray-50 rounded-xl">
                     {formData.full_name || 'Not provided'}
                   </p>
                 )}
@@ -566,39 +627,36 @@ export default function ProfilePage() {
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-red-500 text-sm flex items-center"
+                    className="text-red-500 text-xs samsung-body mt-1 flex items-center gap-1"
                   >
-                    ⚠️ {errors.full_name}
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.full_name}
                   </motion.p>
                 )}
               </div>
 
               {/* Email */}
-              <div className="space-y-2">
-                <label className={`block text-sm font-medium ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Email Address *
+              <div>
+                <label className="block text-sm samsung-body text-gray-700 mb-2">
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 {isEditing ? (
                   <motion.input
-                    whileFocus={{ scale: 1.02 }}
+                    whileFocus={{ scale: 1.01 }}
                     type="email"
                     value={formData.email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('email', e.target.value)}
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className={`block w-full border-2 rounded-xl px-4 py-3 samsung-body text-gray-900 transition-all duration-300 ${
                       errors.email
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : isDarkMode
-                        ? 'border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-indigo-200'
-                        : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200'
-                    } focus:ring-4 focus:ring-opacity-20`}
+                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
+                        : 'border-samsung-gray-100 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/20'
+                    }`}
                     placeholder="Enter your email address"
                   />
                 ) : (
-                  <p className={`px-4 py-3 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                  }`}>
+                  <p className="px-4 py-3 samsung-body text-gray-900 bg-samsung-gray-50 rounded-xl">
                     {formData.email || 'Not provided'}
                   </p>
                 )}
@@ -606,39 +664,36 @@ export default function ProfilePage() {
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-red-500 text-sm flex items-center"
+                    className="text-red-500 text-xs samsung-body mt-1 flex items-center gap-1"
                   >
-                    ⚠️ {errors.email}
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email}
                   </motion.p>
                 )}
               </div>
 
               {/* Phone Number */}
-              <div className="space-y-2">
-                <label className={`block text-sm font-medium ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
+              <div>
+                <label className="block text-sm samsung-body text-gray-700 mb-2">
                   Phone Number
                 </label>
                 {isEditing ? (
                   <motion.input
-                    whileFocus={{ scale: 1.02 }}
+                    whileFocus={{ scale: 1.01 }}
                     type="tel"
                     value={formData.phone_number}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleInputChange('phone_number', e.target.value)}
-                    className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 ${
+                    onChange={(e) => handleInputChange('phone_number', e.target.value)}
+                    className={`block w-full border-2 rounded-xl px-4 py-3 samsung-body text-gray-900 transition-all duration-300 ${
                       errors.phone_number
-                        ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                        : isDarkMode
-                        ? 'border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-indigo-200'
-                        : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200'
-                    } focus:ring-4 focus:ring-opacity-20`}
+                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
+                        : 'border-samsung-gray-100 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/20'
+                    }`}
                     placeholder="Enter your phone number"
                   />
                 ) : (
-                  <p className={`px-4 py-3 ${
-                    isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                  }`}>
+                  <p className="px-4 py-3 samsung-body text-gray-900 bg-samsung-gray-50 rounded-xl">
                     {formData.phone_number || 'Not provided'}
                   </p>
                 )}
@@ -646,136 +701,108 @@ export default function ProfilePage() {
                   <motion.p
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-red-500 text-sm flex items-center"
+                    className="text-red-500 text-xs samsung-body mt-1 flex items-center gap-1"
                   >
-                    ⚠️ {errors.phone_number}
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.phone_number}
                   </motion.p>
                 )}
               </div>
 
-              {/* Role (Read-only) */}
-              <div className="space-y-2">
-                <label className={`block text-sm font-medium ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Role
+              {/* Bio */}
+              <div>
+                <label className="block text-sm samsung-body text-gray-700 mb-2">
+                  Bio
                 </label>
-                <p className={`px-4 py-3 capitalize ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                }`}>
-                  {extendedProfile?.role || profile?.role || 'Student'} 
-                  <span className="ml-2 text-xs text-gray-500">
-                    {(extendedProfile?.role || profile?.role) === 'admin' ? '👑' : '🎓'}
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* Bio */}
-            <div className="mt-6 space-y-2">
-              <label className={`block text-sm font-medium ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
-                Bio
-              </label>
-              {isEditing ? (
-                <motion.textarea
-                  whileFocus={{ scale: 1.02 }}
-                  value={formData.bio}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handleInputChange('bio', e.target.value)}
-                  rows={4}
-                  className={`w-full px-4 py-3 rounded-lg border-2 transition-all duration-200 resize-none ${
-                    errors.bio
-                      ? 'border-red-300 focus:border-red-500 focus:ring-red-200'
-                      : isDarkMode
-                      ? 'border-gray-600 bg-gray-700 text-white focus:border-indigo-500 focus:ring-indigo-200'
-                      : 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-200'
-                  } focus:ring-4 focus:ring-opacity-20`}
-                  placeholder="Tell us about yourself..."
-                />
-              ) : (
-                <p className={`px-4 py-3 min-h-[100px] ${
-                  isDarkMode ? 'text-gray-300' : 'text-gray-900'
-                }`}>
-                  {formData.bio || 'No bio provided'}
-                </p>
-              )}
-              <div className="flex justify-between items-center">
-                {errors.bio && (
-                  <motion.p
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-red-500 text-sm flex items-center"
-                  >
-                    ⚠️ {errors.bio}
-                  </motion.p>
+                {isEditing ? (
+                  <motion.textarea
+                    whileFocus={{ scale: 1.01 }}
+                    value={formData.bio}
+                    onChange={(e) => handleInputChange('bio', e.target.value)}
+                    rows={5}
+                    className={`block w-full border-2 rounded-xl px-4 py-3 samsung-body text-gray-900 resize-none transition-all duration-300 ${
+                      errors.bio
+                        ? 'border-red-300 focus:border-red-500 focus:ring-4 focus:ring-red-500/20'
+                        : 'border-samsung-gray-100 focus:border-samsung-blue focus:ring-4 focus:ring-samsung-blue/20'
+                    }`}
+                    placeholder="Tell us about yourself..."
+                  />
+                ) : (
+                  <p className="px-4 py-3 samsung-body text-gray-900 bg-samsung-gray-50 rounded-xl min-h-[120px] whitespace-pre-wrap">
+                    {formData.bio || 'No bio provided'}
+                  </p>
                 )}
-                <p className={`text-xs ${
-                  formData.bio.length > 450 ? 'text-red-500' : 'text-gray-500'
-                } ml-auto`}>
-                  {formData.bio.length}/500 characters
-                </p>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            {isEditing && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex flex-col sm:flex-row gap-3 mt-8 pt-6 border-t border-gray-200 dark:border-gray-700"
-              >
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 border border-transparent shadow-sm text-base font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <span className="mr-2">💾</span>
-                      Save Changes
-                    </>
+                <div className="flex justify-between items-center mt-1">
+                  {errors.bio && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-500 text-xs samsung-body flex items-center gap-1"
+                    >
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.bio}
+                    </motion.p>
                   )}
-                </motion.button>
-                
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={handleCancel}
-                  disabled={saving}
-                  className={`flex-1 sm:flex-none inline-flex items-center justify-center px-6 py-3 border-2 shadow-sm text-base font-medium rounded-lg transition-colors ${
-                    isDarkMode
-                      ? 'border-gray-600 text-gray-300 bg-gray-800 hover:bg-gray-700'
-                      : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  <span className="mr-2">❌</span>
-                  Cancel
-                </motion.button>
+                  {isEditing && (
+                    <p className={`text-xs samsung-body ml-auto ${
+                      formData.bio.length > 450 ? 'text-red-500' : 'text-gray-500'
+                    }`}>
+                      {formData.bio.length}/500
+                    </p>
+                  )}
+                </div>
+              </div>
 
-                {profileImage && (
+              {/* Action Buttons */}
+              {isEditing && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col sm:flex-row gap-3 pt-6 border-t-2 border-samsung-gray-100"
+                >
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleRemoveImage}
+                    onClick={handleSave}
                     disabled={saving}
-                    className="inline-flex items-center justify-center px-4 py-3 border-2 border-red-300 shadow-sm text-base font-medium rounded-lg text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <span className="mr-2">🗑️</span>
-                    Remove Photo
+                    {saving ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Save Changes
+                      </>
+                    )}
                   </motion.button>
-                )}
-              </motion.div>
-            )}
-          </div>
-        </motion.div>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleCancel}
+                    disabled={saving}
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl samsung-body border-2 border-samsung-gray-100 text-gray-700 bg-white hover:bg-samsung-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    Cancel
+                  </motion.button>
+                </motion.div>
+              )}
+            </div>
+          </motion.div>
+        </div>
 
         {/* Hidden file input */}
         <input

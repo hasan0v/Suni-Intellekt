@@ -375,23 +375,23 @@ export default function UserTasksPage() {
       const isOverdue = task.due_date && new Date(task.due_date) < new Date()
       return {
         label: isOverdue ? 'Overdue' : 'Available',
-        color: isOverdue ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800',
-        icon: isOverdue ? '⚠️' : '✅'
+        color: isOverdue ? 'bg-red-50 text-red-600 border-red-200' : 'bg-green-50 text-green-600 border-green-200',
+        icon: ''
       }
     }
 
     if (task.submission.status === 'graded') {
       return {
         label: 'Graded',
-        color: 'bg-blue-100 text-blue-800',
-        icon: '📊'
+        color: 'bg-samsung-blue/10 text-samsung-blue border-samsung-blue/20',
+        icon: ''
       }
     }
 
     return {
       label: 'Submitted',
-      color: 'bg-yellow-100 text-yellow-800',
-      icon: '📝'
+      color: 'bg-yellow-50 text-yellow-600 border-yellow-200',
+      icon: ''
     }
   }
 
@@ -421,74 +421,78 @@ export default function UserTasksPage() {
     <DashboardLayout>
       <div className="space-y-6">
         {/* Enhanced Header Section */}
-        <div className="text-center mb-8">
-          <div className="course-icon-container inline-flex items-center justify-center w-20 h-20 rounded-3xl mb-6 shadow-xl">
-            <ClipboardIcon className="w-10 h-10 text-white" />
+        <div className="flex items-center justify-between mb-8 p-6 glass-card rounded-2xl border-2 border-samsung-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-samsung-blue/10">
+              <ClipboardIcon className="w-7 h-7 text-samsung-blue" />
+            </div>
+            <div>
+              <h1 className="text-2xl samsung-heading text-samsung-gray-900">
+                My Tasks
+              </h1>
+              <p className="samsung-body text-sm text-samsung-gray-600 mt-1">
+                View and submit assignments across all courses
+              </p>
+            </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            My Tasks 📝
-          </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            View and submit your assignments across all courses. Stay on top of your learning journey.
-          </p>
         </div>
 
         {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500 mb-2">Total Tasks</p>
-                <p className="text-3xl font-bold text-gray-900">{tasks.length}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600 mb-2">Total Tasks</p>
+                <p className="text-4xl samsung-heading text-samsung-gray-900">{tasks.length}</p>
               </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <ClipboardIcon className="w-6 h-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <ClipboardIcon className="w-8 h-8" />
               </div>
             </div>
           </div>
 
-          <div className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl p-6">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500 mb-2">Available</p>
-                <p className="text-3xl font-bold text-gray-900">{tasks.filter(t => !t.submission).length}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600 mb-2">Available</p>
+                <p className="text-4xl samsung-heading text-samsung-gray-900">{tasks.filter(t => !t.submission).length}</p>
               </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <CheckIcon className="w-6 h-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <CheckIcon className="w-8 h-8" />
               </div>
             </div>
           </div>
 
-          <div className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl p-6">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500 mb-2">Submitted</p>
-                <p className="text-3xl font-bold text-gray-900">{tasks.filter(t => t.submission && t.submission.status === 'submitted').length}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600 mb-2">Submitted</p>
+                <p className="text-4xl samsung-heading text-samsung-gray-900">{tasks.filter(t => t.submission && t.submission.status === 'submitted').length}</p>
               </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <ClockIcon className="w-6 h-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <ClockIcon className="w-8 h-8" />
               </div>
             </div>
           </div>
 
-          <div className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl p-6">
+          <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500 mb-2">Graded</p>
-                <p className="text-3xl font-bold text-gray-900">{tasks.filter(t => t.submission && t.submission.status === 'graded').length}</p>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600 mb-2">Graded</p>
+                <p className="text-4xl samsung-heading text-samsung-gray-900">{tasks.filter(t => t.submission && t.submission.status === 'graded').length}</p>
               </div>
-              <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
-                <TrendingUpIcon className="w-6 h-6" />
+              <div className="w-16 h-16 rounded-3xl bg-samsung-blue/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-500 [&>svg]:text-samsung-blue">
+                <TrendingUpIcon className="w-8 h-8" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Enhanced Filter Tabs */}
-        <div className="glass-card p-6 mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Filter Tasks</h3>
-            <div className="text-sm text-gray-500">
+        <div className="glass-card p-8 mb-8 rounded-3xl border-2 border-samsung-gray-100">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl samsung-heading text-samsung-gray-900">Filter Tasks</h3>
+            <div className="samsung-body text-sm text-samsung-gray-500">
               {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} shown
             </div>
           </div>
@@ -497,17 +501,17 @@ export default function UserTasksPage() {
               <button
                 key={filterOption}
                 onClick={() => setFilter(filterOption)}
-                className={`px-6 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
+                className={`px-6 py-3 samsung-body font-bold rounded-2xl transition-all duration-500 samsung-ripple ${
                   filter === filterOption
-                    ? 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-lg transform scale-105'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-gray-200'
+                    ? 'bg-samsung-blue text-white shadow-samsung-card transform scale-105'
+                    : 'text-samsung-gray-700 hover:text-samsung-blue hover:bg-samsung-blue/5 border-2 border-samsung-gray-100 hover:border-samsung-blue/20'
                 }`}
               >
                 {filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
-                <span className={`ml-2 px-2 py-1 text-xs rounded-full ${
+                <span className={`ml-2 px-2.5 py-1 text-xs rounded-full ${
                   filter === filterOption 
                     ? 'bg-white/20 text-white' 
-                    : 'bg-gray-200 text-gray-600'
+                    : 'bg-samsung-gray-100 text-samsung-gray-600'
                 }`}>
                   {filter === filterOption ? filteredTasks.length : tasks.filter(t => {
                     if (filterOption === 'available') return !t.submission
@@ -531,20 +535,20 @@ export default function UserTasksPage() {
                   key={task.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="glass-card group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl border border-gray-200"
+                  className="glass-card group hover:scale-[1.01] transition-all duration-500 hover:shadow-samsung-float border-2 border-samsung-gray-100 rounded-2xl overflow-hidden"
                 >
                   <div className="p-6">
                     {/* Header */}
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-5">
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        <h3 className="samsung-heading text-lg text-samsung-gray-900 mb-3">
                           {task.title}
                         </h3>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${status.color}`}>
-                            {status.icon} {status.label}
+                        <div className="flex items-center flex-wrap gap-2">
+                          <span className={`px-3 py-1.5 text-xs samsung-body font-semibold rounded-full border ${status.color}`}>
+                            {status.label}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="px-3 py-1.5 text-xs samsung-body font-semibold rounded-full bg-samsung-gray-100 text-samsung-gray-700">
                             Max: {task.max_score} pts
                           </span>
                         </div>
@@ -553,11 +557,11 @@ export default function UserTasksPage() {
 
                     {/* Course Info */}
                     {task.topic && (
-                      <div className="mb-3">
-                        <p className="text-sm text-indigo-600 font-medium">
-                          📚 {task.topic.module.course.title}
+                      <div className="mb-4 pb-4 border-b border-samsung-gray-100">
+                        <p className="samsung-body text-sm text-samsung-blue font-semibold mb-1">
+                          {task.topic.module.course.title}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="samsung-body text-xs text-samsung-gray-600">
                           {task.topic.module.title} › {task.topic.title}
                         </p>
                       </div>
@@ -565,18 +569,18 @@ export default function UserTasksPage() {
 
                     {/* Topics */}
                     {task.topics && task.topics.length > 0 && (
-                      <div className="mb-3">
-                        <div className="flex flex-wrap gap-1">
+                      <div className="mb-4">
+                        <div className="flex flex-wrap gap-2">
                           {task.topics.slice(0, 3).map((topic, index) => (
                             <span
                               key={index}
-                              className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-md"
+                              className="px-2.5 py-1 samsung-body text-xs font-medium bg-samsung-cyan/10 text-samsung-cyan rounded-lg border border-samsung-cyan/20"
                             >
                               {topic}
                             </span>
                           ))}
                           {task.topics.length > 3 && (
-                            <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-md">
+                            <span className="px-2.5 py-1 samsung-body text-xs font-medium bg-samsung-gray-100 text-samsung-gray-600 rounded-lg">
                               +{task.topics.length - 3} more
                             </span>
                           )}
@@ -585,20 +589,19 @@ export default function UserTasksPage() {
                     )}
 
                     {/* Description */}
-                    <p className="text-sm text-gray-700 mb-4 line-clamp-3">
+                    <p className="samsung-body text-sm text-samsung-gray-700 mb-4 line-clamp-3 leading-relaxed">
                       {task.description || task.content}
                     </p>
 
                     {/* Due Date */}
                     {task.due_date && (
-                      <div className="mb-4">
-                        <div className={`text-sm flex items-center space-x-1 ${
-                          new Date(task.due_date) < new Date() ? 'text-red-600' : 'text-gray-600'
+                      <div className="mb-4 p-3 rounded-xl bg-samsung-gray-50 border border-samsung-gray-100">
+                        <div className={`samsung-body text-sm font-medium ${
+                          new Date(task.due_date) < new Date() ? 'text-red-600' : 'text-samsung-gray-900'
                         }`}>
-                          <span>⏰</span>
-                          <span>Due: {new Date(task.due_date).toLocaleString()}</span>
+                          Due: {new Date(task.due_date).toLocaleString()}
                         </div>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="samsung-body text-xs text-samsung-gray-600 mt-1">
                           {getDaysUntilDue(task.due_date)}
                         </div>
                       </div>
@@ -606,22 +609,22 @@ export default function UserTasksPage() {
 
                     {/* Attachments */}
                     {task.attachments && task.attachments.length > 0 && (
-                      <div className="mb-4">
-                        <p className="text-sm text-gray-600 mb-2">📎 Attachments:</p>
-                        <div className="space-y-1">
+                      <div className="mb-4 p-3 rounded-xl bg-samsung-purple/5 border border-samsung-purple/20">
+                        <p className="samsung-body text-sm font-semibold text-samsung-purple mb-2">Attachments</p>
+                        <div className="space-y-1.5">
                           {task.attachments.slice(0, 2).map((attachment, index) => (
                             <a
                               key={index}
                               href={attachment.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="block text-sm text-indigo-600 hover:text-indigo-800 truncate"
+                              className="block samsung-body text-sm text-samsung-blue hover:text-samsung-cyan truncate transition-colors duration-300"
                             >
-                              📄 {attachment.name}
+                              {attachment.name}
                             </a>
                           ))}
                           {task.attachments.length > 2 && (
-                            <p className="text-xs text-gray-500">
+                            <p className="samsung-body text-xs text-samsung-gray-600">
                               +{task.attachments.length - 2} more attachments
                             </p>
                           )}
@@ -631,27 +634,27 @@ export default function UserTasksPage() {
 
                     {/* Submission Info */}
                     {task.submission && (
-                      <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                      <div className="mb-5 p-4 bg-samsung-blue/5 rounded-xl border border-samsung-blue/20">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700">Your Submission</span>
+                          <span className="samsung-body text-sm font-semibold text-samsung-gray-900">Your Submission</span>
                           {task.submission.status === 'graded' && task.submission.points !== null && (
-                            <span className="text-sm font-semibold text-green-600">
+                            <span className="samsung-body text-sm font-bold text-samsung-blue">
                               {task.submission.points}/{task.max_score} pts
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-600">
+                        <p className="samsung-body text-xs text-samsung-gray-700 mb-1">
                           Submitted: {new Date(task.submission.submitted_at).toLocaleString()}
                         </p>
                         {task.submission.graded_at && (
-                          <p className="text-xs text-gray-600">
+                          <p className="samsung-body text-xs text-samsung-gray-700 mb-1">
                             Graded: {new Date(task.submission.graded_at).toLocaleString()}
                           </p>
                         )}
                         {task.submission.feedback && (
-                          <div className="mt-2">
-                            <p className="text-xs font-medium text-gray-700">Feedback:</p>
-                            <p className="text-xs text-gray-600 line-clamp-2">
+                          <div className="mt-3 pt-3 border-t border-samsung-blue/10">
+                            <p className="samsung-body text-xs font-semibold text-samsung-gray-900 mb-1">Feedback:</p>
+                            <p className="samsung-body text-xs text-samsung-gray-700 line-clamp-2 leading-relaxed">
                               {task.submission.feedback}
                             </p>
                           </div>
@@ -660,49 +663,49 @@ export default function UserTasksPage() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex space-x-2">
+                    <div className="flex gap-2">
                       <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                         onClick={() => {
                           setSelectedTask(task)
                         }}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+                        className="flex-1 px-4 py-2.5 rounded-xl samsung-body text-sm font-semibold text-samsung-blue bg-samsung-blue/10 hover:bg-samsung-blue/20 border border-samsung-blue/20 hover:border-samsung-blue/30 transition-all duration-300"
                       >
-                        📖 View Details
+                        View Details
                       </motion.button>
                       
                       {!task.submission && (
                         <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
                           onClick={() => {
                             setSelectedTask(task)
                             setShowSubmissionModal(true)
                           }}
-                          className="flex-1 px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                          className="flex-1 px-4 py-2.5 rounded-xl samsung-body text-sm font-semibold text-white bg-samsung-blue hover:bg-samsung-blue/90 transition-all duration-300 shadow-samsung-card hover:shadow-samsung-float"
                         >
-                          ✏️ Submit Work
+                          Submit Work
                         </motion.button>
                       )}
                       
                       {task.submission && task.submission.status === 'submitted' && (
                         <div className="flex gap-2 flex-1">
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => handleEditSubmission(task)}
-                            className="flex-1 px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors"
+                            className="flex-1 px-4 py-2.5 rounded-xl samsung-body text-sm font-semibold text-white bg-samsung-cyan hover:bg-samsung-cyan/90 transition-all duration-300 shadow-samsung-card hover:shadow-samsung-float"
                           >
-                            ✏️ Edit
+                            Edit
                           </motion.button>
                           <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                             onClick={() => handleDeleteSubmission(task)}
-                            className="flex-1 px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                            className="flex-1 px-4 py-2.5 rounded-xl samsung-body text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200 hover:border-red-300 transition-all duration-300"
                           >
-                            🗑️ Delete
+                            Delete
                           </motion.button>
                         </div>
                       )}
@@ -713,14 +716,14 @@ export default function UserTasksPage() {
             })}
           </div>
         ) : (
-          <div className="glass-card p-12 text-center">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl mb-6">
-              <ClipboardIcon className="w-10 h-10 text-gray-400" />
+          <div className="glass-card p-12 text-center rounded-3xl border-2 border-samsung-gray-100">
+            <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-samsung-blue/10 mb-6">
+              <ClipboardIcon className="w-12 h-12 text-samsung-blue" />
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            <h3 className="text-2xl samsung-heading text-samsung-gray-900 mb-3">
               {filter === 'all' ? 'No tasks available' : `No ${filter} tasks`}
             </h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <p className="samsung-body text-base text-samsung-gray-700 mb-6 max-w-md mx-auto">
               {filter === 'all' 
                 ? 'Check back later for new assignments from your instructors'
                 : `You don't have any ${filter} tasks at the moment`
@@ -729,10 +732,10 @@ export default function UserTasksPage() {
             {filter !== 'all' && (
               <button
                 onClick={() => setFilter('all')}
-                className="course-start-button inline-flex items-center px-6 py-3 font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.02] group"
+                className="btn btn-primary inline-flex items-center px-8 py-4 samsung-body font-bold rounded-2xl transition-all duration-500 shadow-samsung-card hover:shadow-samsung-float group samsung-ripple"
               >
                 View All Tasks
-                <ArrowRightIcon className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRightIcon className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-500" />
               </button>
             )}
           </div>
@@ -745,63 +748,60 @@ export default function UserTasksPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
               onClick={() => setSelectedTask(null)}
             >
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                className="glass-card max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-3xl border-2 border-samsung-gray-100 shadow-samsung-float"
               >
-                <div className="px-6 py-4 border-b border-gray-200">
+                <div className="px-8 py-6 border-b-2 border-samsung-gray-100 bg-samsung-blue/5">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium text-gray-900">
-                      {selectedTask.title || `Task from ${selectedTask.topic?.title || 'Unknown Topic'}`}
-                    </h3>
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-samsung-blue/10 flex items-center justify-center">
+                        <ClipboardIcon className="w-6 h-6 text-samsung-blue" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl samsung-heading text-samsung-gray-900">
+                          {selectedTask.title || `Task from ${selectedTask.topic?.title || 'Unknown Topic'}`}
+                        </h3>
+                        {selectedTask.topic && (
+                          <p className="samsung-body text-sm text-samsung-gray-600 mt-1">
+                            {selectedTask.topic.module?.course?.title} › {selectedTask.topic.module?.title} › {selectedTask.topic.title}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                     <button
                       onClick={() => setSelectedTask(null)}
-                      className="text-gray-400 hover:text-gray-600"
+                      className="w-10 h-10 rounded-xl bg-samsung-gray-100 hover:bg-samsung-gray-200 text-samsung-gray-600 hover:text-samsung-gray-900 transition-all duration-300 flex items-center justify-center"
                     >
-                      ✕
+                      <span className="text-xl">✕</span>
                     </button>
                   </div>
-                  {selectedTask.topic && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      📚 {selectedTask.topic.module?.course?.title} › {selectedTask.topic.module?.title} › {selectedTask.topic.title}
-                    </p>
-                  )}
                 </div>
 
-                <div className="px-6 py-4">
+                <div className="px-8 py-6">
                   {/* Task Info */}
                   <div className="space-y-6">
-                    {/* Course Information */}
-                    {selectedTask.topic && (
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Course Information</h4>
-                        <div className="bg-blue-50 rounded-lg p-3">
-                          <p className="text-sm text-blue-800">
-                            📚 {selectedTask.topic.module?.course?.title || 'Course'} › 
-                            {selectedTask.topic.module?.title || 'Module'} › 
-                            {selectedTask.topic.title || 'Topic'}
-                          </p>
-                        </div>
-                      </div>
-                    )}
-
                     {/* Task Details */}
                     <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-1">Max Score</h4>
-                        <p className="text-lg font-semibold text-indigo-600">{selectedTask.max_score} points</p>
+                      <div className="p-4 rounded-2xl bg-samsung-blue/5 border border-samsung-blue/20">
+                        <h4 className="samsung-body text-sm font-semibold text-samsung-gray-600 mb-2">Max Score</h4>
+                        <p className="samsung-heading text-2xl text-samsung-blue">{selectedTask.max_score} pts</p>
                       </div>
                       {selectedTask.due_date && (
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900 mb-1">Due Date</h4>
-                          <p className="text-sm text-gray-600">
+                        <div className="p-4 rounded-2xl bg-samsung-purple/5 border border-samsung-purple/20">
+                          <h4 className="samsung-body text-sm font-semibold text-samsung-gray-600 mb-2">Due Date</h4>
+                          <p className="samsung-body text-sm font-semibold text-samsung-gray-900">
                             {new Date(selectedTask.due_date).toLocaleDateString()}
+                          </p>
+                          <p className="samsung-body text-xs text-samsung-gray-600 mt-1">
+                            {new Date(selectedTask.due_date).toLocaleTimeString()}
                           </p>
                         </div>
                       )}
@@ -810,17 +810,17 @@ export default function UserTasksPage() {
                     {/* Description */}
                     {selectedTask.description && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Description</h4>
-                        <p className="text-gray-700 bg-gray-50 rounded-lg p-3">{selectedTask.description}</p>
+                        <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Description</h4>
+                        <p className="samsung-body text-samsung-gray-700 bg-samsung-gray-50 rounded-2xl p-4 border border-samsung-gray-100 leading-relaxed">{selectedTask.description}</p>
                       </div>
                     )}
 
                     {/* Content */}
                     {selectedTask.content && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Content</h4>
+                        <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Content</h4>
                         <div className="prose max-w-none">
-                          <div className="whitespace-pre-wrap text-gray-700 bg-gray-50 rounded-lg p-4">
+                          <div className="whitespace-pre-wrap samsung-body text-samsung-gray-700 bg-samsung-gray-50 rounded-2xl p-5 border border-samsung-gray-100 leading-relaxed">
                             {selectedTask.content}
                           </div>
                         </div>
@@ -830,9 +830,9 @@ export default function UserTasksPage() {
                     {/* Instructions */}
                     {selectedTask.instructions && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Instructions</h4>
+                        <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Instructions</h4>
                         <div className="prose max-w-none">
-                          <div className="whitespace-pre-wrap text-gray-700 bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
+                          <div className="whitespace-pre-wrap samsung-body text-samsung-gray-700 bg-samsung-blue/5 rounded-2xl p-5 border-l-4 border-samsung-blue leading-relaxed">
                             {selectedTask.instructions}
                           </div>
                         </div>
@@ -856,34 +856,47 @@ export default function UserTasksPage() {
                     {/* Submission Status */}
                     {selectedTask.submission && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-900 mb-2">Your Submission</h4>
-                        <div className="bg-gray-50 rounded-lg p-4 border">
-                          <div className="flex items-center justify-between mb-3">
-                            <span className={`px-3 py-1 text-sm font-medium rounded-full ${
+                        <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Your Submission</h4>
+                        <div className="bg-samsung-gray-50 rounded-2xl p-5 border-2 border-samsung-gray-100">
+                          <div className="flex items-center justify-between mb-4">
+                            <span className={`px-4 py-2 samsung-body text-sm font-bold rounded-full border ${
                               selectedTask.submission.status === 'graded' 
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
+                                ? 'bg-green-50 text-green-700 border-green-200'
+                                : 'bg-yellow-50 text-yellow-700 border-yellow-200'
                             }`}>
-                              {selectedTask.submission.status === 'graded' ? '✅ Graded' : '⏳ Submitted'}
+                              {selectedTask.submission.status === 'graded' ? 'Graded' : 'Submitted'}
                             </span>
                             {selectedTask.submission.points !== null && (
-                              <span className="text-lg font-semibold text-indigo-600">
-                                {selectedTask.submission.points}/{selectedTask.max_score} points
+                              <span className="samsung-heading text-2xl text-samsung-blue">
+                                {selectedTask.submission.points}/{selectedTask.max_score} pts
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-gray-600 mb-2">
-                            📅 Submitted: {new Date(selectedTask.submission.submitted_at).toLocaleString()}
+                          <p className="samsung-body text-sm text-samsung-gray-700 mb-2">
+                            Submitted: {new Date(selectedTask.submission.submitted_at).toLocaleString()}
                           </p>
                           {selectedTask.submission.graded_at && (
-                            <p className="text-sm text-gray-600 mb-2">
-                              ✅ Graded: {new Date(selectedTask.submission.graded_at).toLocaleString()}
+                            <p className="samsung-body text-sm text-samsung-gray-700 mb-2">
+                              Graded: {new Date(selectedTask.submission.graded_at).toLocaleString()}
                             </p>
                           )}
                           {selectedTask.submission.feedback && (
-                            <div className="mt-3 p-3 bg-white rounded border-l-4 border-blue-400">
-                              <p className="text-sm font-medium text-gray-700 mb-1">Instructor Feedback:</p>
-                              <p className="text-sm text-gray-600">{selectedTask.submission.feedback}</p>
+                            <div className="mt-6 p-6 bg-gradient-to-br from-samsung-blue/5 to-samsung-cyan/5 rounded-2xl border-2 border-samsung-blue/20">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div className="w-8 h-8 rounded-xl bg-samsung-blue flex items-center justify-center">
+                                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                  </svg>
+                                </div>
+                                <p className="text-base samsung-heading text-gray-900">
+                                  Instructor Feedback
+                                </p>
+                              </div>
+                              <div className="pl-10">
+                                <p className="samsung-body text-sm text-gray-700 leading-loose whitespace-pre-wrap">
+                                  {selectedTask.submission.feedback}
+                                </p>
+                              </div>
                             </div>
                           )}
                         </div>
@@ -919,21 +932,21 @@ export default function UserTasksPage() {
                   )}
                 </div>
 
-                <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+                <div className="px-8 py-6 border-t-2 border-samsung-gray-100 bg-samsung-gray-50/50 flex justify-end gap-3">
                   <button
                     onClick={() => setSelectedTask(null)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    className="px-6 py-3 rounded-xl samsung-body text-sm font-semibold text-samsung-gray-700 bg-white hover:bg-samsung-gray-100 border-2 border-samsung-gray-200 hover:border-samsung-gray-300 transition-all duration-300"
                   >
                     Close
                   </button>
                   {!selectedTask.submission && (
                     <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                       onClick={() => setShowSubmissionModal(true)}
-                      className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                      className="px-6 py-3 rounded-xl samsung-body text-sm font-semibold text-white bg-samsung-blue hover:bg-samsung-blue/90 transition-all duration-300 shadow-samsung-card hover:shadow-samsung-float"
                     >
-                      ✏️ Submit Work
+                      Submit Work
                     </motion.button>
                   )}
                 </div>
@@ -949,7 +962,7 @@ export default function UserTasksPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4 z-50"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
               onClick={() => {
                 setShowSubmissionModal(false)
                 setSubmissionContent('')
@@ -958,34 +971,35 @@ export default function UserTasksPage() {
               }}
             >
               <motion.div
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.95, opacity: 0 }}
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                className="glass-card max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-3xl border-2 border-samsung-gray-100 shadow-samsung-float"
               >
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    {isEditMode ? 'Edit Submission' : 'Submit'}: {selectedTask.title}
+                <div className="px-8 py-6 border-b-2 border-samsung-gray-100 bg-samsung-blue/5">
+                  <h3 className="samsung-heading text-xl text-samsung-gray-900">
+                    {isEditMode ? 'Edit Submission' : 'Submit Assignment'}: {selectedTask.title}
                   </h3>
                 </div>
 
-                <div className="px-6 py-4 space-y-6">
+                <div className="px-8 py-6 space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block samsung-body text-sm font-semibold text-samsung-gray-900 mb-3">
                       Written Response / Notes
                     </label>
                     <textarea
                       rows={8}
                       value={submissionContent}
                       onChange={(e) => setSubmissionContent(e.target.value)}
-                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm text-gray-900"
+                      className="block w-full border-2 border-samsung-gray-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-samsung-blue focus:border-samsung-blue samsung-body text-sm text-samsung-gray-900 p-4 transition-all duration-300"
                       placeholder="Enter your response, notes, or explanation here..."
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block samsung-body text-sm font-semibold text-samsung-gray-900 mb-3">
                       File Attachments
                     </label>
                     <input
@@ -996,21 +1010,25 @@ export default function UserTasksPage() {
                           setSubmissionFiles(Array.from(e.target.files))
                         }
                       }}
-                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                      className="block w-full samsung-body text-sm text-samsung-gray-700 file:mr-4 file:py-3 file:px-5 file:rounded-xl file:border-0 file:samsung-body file:text-sm file:font-semibold file:bg-samsung-blue/10 file:text-samsung-blue hover:file:bg-samsung-blue/20 file:transition-all file:duration-300"
                     />
                     
                     {submissionFiles.length > 0 && (
-                      <div className="mt-3">
-                        <p className="text-sm font-medium text-gray-700 mb-2">Selected Files:</p>
+                      <div className="mt-4">
+                        <p className="samsung-body text-sm font-semibold text-samsung-gray-900 mb-3">Selected Files:</p>
                         <div className="space-y-2">
                           {submissionFiles.map((file, index) => (
-                            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                              <div className="flex items-center space-x-2">
-                                <span className="text-sm">📎</span>
-                                <span className="text-sm text-gray-700">{file.name}</span>
-                                <span className="text-xs text-gray-500">
-                                  ({(file.size / 1024).toFixed(1)} KB)
-                                </span>
+                            <div key={index} className="flex items-center justify-between bg-samsung-gray-50 p-3 rounded-xl border border-samsung-gray-200">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-samsung-blue/10 flex items-center justify-center">
+                                  <span className="text-samsung-blue">📎</span>
+                                </div>
+                                <div>
+                                  <span className="samsung-body text-sm font-medium text-samsung-gray-900 block">{file.name}</span>
+                                  <span className="samsung-body text-xs text-samsung-gray-600">
+                                    {(file.size / 1024).toFixed(1)} KB
+                                  </span>
+                                </div>
                               </div>
                               <button
                                 onClick={() => {
@@ -1018,7 +1036,7 @@ export default function UserTasksPage() {
                                   updatedFiles.splice(index, 1)
                                   setSubmissionFiles(updatedFiles)
                                 }}
-                                className="text-red-600 hover:text-red-800 text-sm"
+                                className="samsung-body text-sm font-semibold text-red-600 hover:text-red-700 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-all duration-300"
                               >
                                 Remove
                               </button>
@@ -1031,13 +1049,13 @@ export default function UserTasksPage() {
 
                   {submitting && uploadProgress > 0 && (
                     <div>
-                      <div className="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Uploading files...</span>
-                        <span>{Math.round(uploadProgress)}%</span>
+                      <div className="flex justify-between samsung-body text-sm text-samsung-gray-700 mb-2">
+                        <span className="font-semibold">Uploading files...</span>
+                        <span className="font-bold text-samsung-blue">{Math.round(uploadProgress)}%</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full bg-samsung-gray-200 rounded-full h-3 overflow-hidden">
                         <div 
-                          className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                          className="bg-gradient-to-r from-samsung-blue to-samsung-cyan h-3 rounded-full transition-all duration-300"
                           style={{ width: `${uploadProgress}%` }}
                         ></div>
                       </div>
@@ -1045,7 +1063,7 @@ export default function UserTasksPage() {
                   )}
                 </div>
 
-                <div className="px-6 py-4 border-t border-gray-200 flex justify-end space-x-3">
+                <div className="px-8 py-6 border-t-2 border-samsung-gray-100 bg-samsung-gray-50/50 flex justify-end gap-3">
                   <button
                     onClick={() => {
                       setShowSubmissionModal(false)
@@ -1054,25 +1072,25 @@ export default function UserTasksPage() {
                       setIsEditMode(false)
                     }}
                     disabled={submitting}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="px-6 py-3 rounded-xl samsung-body text-sm font-semibold text-samsung-gray-700 bg-white hover:bg-samsung-gray-100 border-2 border-samsung-gray-200 hover:border-samsung-gray-300 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
                   <motion.button
-                    whileHover={{ scale: submitting ? 1 : 1.05 }}
-                    whileTap={{ scale: submitting ? 1 : 0.95 }}
+                    whileHover={{ scale: submitting ? 1 : 1.02 }}
+                    whileTap={{ scale: submitting ? 1 : 0.98 }}
                     onClick={handleSubmitTask}
                     disabled={(!submissionContent && submissionFiles.length === 0) || submitting}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl samsung-body text-sm font-semibold text-white bg-samsung-blue hover:bg-samsung-blue/90 transition-all duration-300 shadow-samsung-card hover:shadow-samsung-float disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {submitting ? (
                       <>
-                        <div className="animate-spin -ml-1 mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                        Submitting...
+                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                        <span>Submitting...</span>
                       </>
                     ) : (
                       <>
-                        {isEditMode ? '💾 Update Submission' : '📤 Submit Assignment'}
+                        <span>{isEditMode ? 'Update Submission' : 'Submit Assignment'}</span>
                       </>
                     )}
                   </motion.button>

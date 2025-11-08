@@ -59,34 +59,135 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   const isAdmin = profile.role === 'admin'
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
-    { name: 'Courses', href: '/dashboard/courses', icon: '📚' },
-    { name: 'Tasks', href: '/dashboard/tasks', icon: '📝' },
-    { name: 'Chat', href: '/dashboard/chat', icon: '💬' },
-    { name: 'My Grades', href: '/dashboard/grades', icon: '🎯' },
+    { 
+      name: 'Dashboard', 
+      href: '/dashboard', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Courses', 
+      href: '/dashboard/courses', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Tasks', 
+      href: '/dashboard/tasks', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+        </svg>
+      )
+    },
+    // Chat page temporarily disabled - keeping for future use
+    // { 
+    //   name: 'Chat', 
+    //   href: '/dashboard/chat', 
+    //   icon: (
+    //     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+    //     </svg>
+    //   )
+    // },
+    { 
+      name: 'My Grades', 
+      href: '/dashboard/grades', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Attendance', 
+      href: '/dashboard/attendance', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )
+    },
   ]
 
   const adminNavigation = [
-    { name: 'Admin Panel', href: '/dashboard/admin', icon: '⚙️' },
-    { name: 'Manage Courses', href: '/dashboard/admin/courses', icon: '📚' },
-    { name: 'Manage Tasks', href: '/dashboard/admin/tasks', icon: '📋' },
-    { name: 'Grading Queue', href: '/dashboard/grading', icon: '✏️' },
+    { 
+      name: 'Admin Panel', 
+      href: '/dashboard/admin', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Manage Classes', 
+      href: '/dashboard/admin/classes', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Manage Courses', 
+      href: '/dashboard/admin/courses', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Manage Tasks', 
+      href: '/dashboard/admin/tasks', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Grading Queue', 
+      href: '/dashboard/grading', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+        </svg>
+      )
+    },
+    { 
+      name: 'Storage Setup', 
+      href: '/dashboard/admin/setup-storage', 
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" />
+        </svg>
+      )
+    },
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-samsung-gray-50">
       {/* Sidebar for mobile */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-          <div className="fixed inset-y-0 left-0 flex h-full min-h-0 w-64 flex-col bg-white shadow-xl">
-            <div className="flex-shrink-0 flex items-center justify-center px-4 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-white/20">
-              <div className="flex items-center justify-center w-full">
-                <Logo href="/dashboard" uppercase size="md" showText className="justify-center" />
-              </div>
+          <div className="fixed inset-y-0 left-0 flex h-full min-h-0 w-64 flex-col bg-samsung-gray-50 shadow-xl">
+          <div className="flex-shrink-0 flex items-center justify-center px-6 py-8 bg-samsung-gray-50 border-b-2 border-samsung-gray-200">
+            <div className="flex items-center justify-center w-full">
+              <Logo href="/dashboard" uppercase size="md" showText className="justify-center" />
+            </div>
               <button 
                 onClick={() => setSidebarOpen(false)} 
-                className="text-gray-600 hover:text-gray-800 hover:bg-white/50 p-2 rounded-lg transition-all duration-200"
+                className="text-gray-600 hover:text-gray-800 hover:bg-samsung-gray-100 p-2 rounded-lg transition-all duration-200"
                 aria-label="Close sidebar"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,35 +195,39 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
                 </svg>
               </button>
             </div>
-            <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-6 pr-3 space-y-2 nice-scroll">
+            <nav className="flex-1 overflow-y-auto overscroll-contain px-6 py-8 space-y-3 nice-scroll">
               {navigation.map((item, index) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 animate-fade-in-up"
+                  className="group flex items-center gap-4 px-5 py-4 samsung-body text-samsung-gray-700 rounded-2xl hover:bg-samsung-blue/5 hover:text-samsung-blue transition-all duration-500 animate-fade-in-up border-2 border-transparent hover:border-samsung-blue/10"
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => setSidebarOpen(false)}
                 >
-                  <span className="mr-3 text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
-                  <span className="group-hover:translate-x-1 transition-transform">{item.name}</span>
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-samsung-blue/10 flex items-center justify-center transition-all duration-500 group-hover:scale-110 [&>svg]:text-samsung-blue [&>svg]:group-hover:text-samsung-blue">
+                    {item.icon}
+                  </div>
+                  <span className="samsung-body group-hover:translate-x-1 transition-transform">{item.name}</span>
                 </Link>
               ))}
               {isAdmin && (
                 <>
-                  <div className="border-t border-gray-200 my-6" />
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  <div className="border-t-2 border-samsung-gray-100 my-8" />
+                  <div className="px-5 py-3 samsung-heading text-xs text-samsung-gray-500 uppercase tracking-wider">
                     Admin Panel
                   </div>
                   {adminNavigation.map((item, index) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="group flex items-center px-4 py-3 text-sm font-medium text-indigo-700 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 animate-fade-in-up"
+                      className="group flex items-center gap-4 px-5 py-4 samsung-body text-samsung-blue rounded-2xl hover:bg-samsung-blue/5 transition-all duration-500 animate-fade-in-up border-2 border-transparent hover:border-samsung-blue/10"
                       style={{ animationDelay: `${(navigation.length + index) * 0.1}s` }}
                       onClick={() => setSidebarOpen(false)}
                     >
-                      <span className="mr-3 text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
-                      <span className="group-hover:translate-x-1 transition-transform">{item.name}</span>
+                      <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-samsung-blue/10 flex items-center justify-center transition-all duration-500 group-hover:scale-110 [&>svg]:text-samsung-blue [&>svg]:group-hover:text-samsung-blue">
+                        {item.icon}
+                      </div>
+                      <span className="samsung-body group-hover:translate-x-1 transition-transform">{item.name}</span>
                     </Link>
                   ))}
                 </>
@@ -174,37 +279,41 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
 
       {/* Desktop sidebar */}
       <div className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0">
-        <div className="flex h-full min-h-0 flex-col bg-white shadow-xl">
-          <div className="flex-shrink-0 flex items-center justify-center px-4 py-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-white/20">
+        <div className="flex h-full min-h-0 flex-col bg-samsung-gray-50 shadow-xl">
+          <div className="flex-shrink-0 flex items-center justify-center px-6 py-8 bg-samsung-gray-50 border-b-2 border-samsung-gray-200">
             <Logo href="/dashboard" uppercase size="md" showText className="justify-center" />
           </div>
-          <nav className="flex-1 overflow-y-auto overscroll-contain px-4 py-6 pr-3 space-y-2 nice-scroll">
+          <nav className="flex-1 overflow-y-auto overscroll-contain px-6 py-8 space-y-3 nice-scroll">
             {navigation.map((item, index) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 animate-fade-in-up"
+                className="group flex items-center gap-4 px-5 py-4 samsung-body text-samsung-gray-700 rounded-2xl hover:bg-samsung-blue/5 hover:text-samsung-blue transition-all duration-500 animate-fade-in-up border-2 border-transparent hover:border-samsung-blue/10"
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
-                <span className="mr-3 text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
-                <span className="group-hover:translate-x-1 transition-transform">{item.name}</span>
+                <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-samsung-blue/10 flex items-center justify-center transition-all duration-500 group-hover:scale-110 [&>svg]:text-samsung-blue [&>svg]:group-hover:text-samsung-blue">
+                  {item.icon}
+                </div>
+                <span className="samsung-body group-hover:translate-x-1 transition-transform">{item.name}</span>
               </Link>
             ))}
             {isAdmin && (
               <>
-                <div className="border-t border-gray-200 my-6" />
-                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <div className="border-t-2 border-samsung-gray-100 my-8" />
+                <div className="px-5 py-3 samsung-heading text-xs text-samsung-gray-500 uppercase tracking-wider">
                   Admin Panel
                 </div>
                 {adminNavigation.map((item, index) => (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className="group flex items-center px-4 py-3 text-sm font-medium text-indigo-700 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all duration-200 animate-fade-in-up"
+                    className="group flex items-center gap-4 px-5 py-4 samsung-body text-samsung-blue rounded-2xl hover:bg-samsung-blue/5 transition-all duration-500 animate-fade-in-up border-2 border-transparent hover:border-samsung-blue/10"
                     style={{ animationDelay: `${(navigation.length + index) * 0.1}s` }}
                   >
-                    <span className="mr-3 text-lg group-hover:scale-110 transition-transform">{item.icon}</span>
-                    <span className="group-hover:translate-x-1 transition-transform">{item.name}</span>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-samsung-blue/10 flex items-center justify-center transition-all duration-500 group-hover:scale-110 [&>svg]:text-samsung-blue [&>svg]:group-hover:text-samsung-blue">
+                      {item.icon}
+                    </div>
+                    <span className="samsung-body group-hover:translate-x-1 transition-transform">{item.name}</span>
                   </Link>
                 ))}
               </>
@@ -254,7 +363,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       {/* Main content */}
       <div className="lg:pl-64 flex flex-col flex-1">
         {/* Mobile header */}
-        <div className="lg:hidden flex items-center justify-between px-4 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 shadow-sm">
+        <div className="lg:hidden flex items-center justify-between px-6 py-5 bg-samsung-gray-50 shadow-samsung-card border-b-2 border-samsung-gray-200">
           <button
             onClick={() => setSidebarOpen(true)}
             className="text-gray-600 hover:text-gray-900"
@@ -305,26 +414,25 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
   )
 }
 
-// Global styles for a subtle, nice-looking scrollbar on scrollable sidebar areas
-// Uses styled-jsx to keep it self-contained without requiring a global CSS file
-// Applied via the `nice-scroll` class above
+// Global styles for Samsung-styled scrollbar on sidebar
 <style jsx global>{`
   .nice-scroll {
     scrollbar-width: thin; /* Firefox */
-    scrollbar-color: #c7d2fe #f8fafc; /* thumb, track */
+    scrollbar-color: #1428A0 #f8fafc; /* Samsung Blue thumb, light track */
   }
   .nice-scroll::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   .nice-scroll::-webkit-scrollbar-track {
     background: #f8fafc;
-    border-radius: 8px;
+    border-radius: 12px;
   }
   .nice-scroll::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #a78bfa, #8b5cf6); /* violet-400 -> violet-500 */
-    border-radius: 8px;
+    background: rgba(20, 40, 160, 0.3); /* Samsung Blue 30% */
+    border-radius: 12px;
+    transition: background 0.3s ease;
   }
   .nice-scroll::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #8b5cf6, #7c3aed); /* violet-500 -> violet-600 */
+    background: #1428A0; /* Samsung Blue */
   }
 `}</style>
