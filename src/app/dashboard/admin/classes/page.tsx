@@ -46,7 +46,6 @@ export default function AdminClassesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingClass, setEditingClass] = useState<Class | null>(null)
   const [showEnrollModal, setShowEnrollModal] = useState(false)
-  const [showCoursesModal, setShowCoursesModal] = useState(false)
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)
   const [creating, setCreating] = useState(false)
 
@@ -61,7 +60,10 @@ export default function AdminClassesPage() {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([])
   const [selectedCourses, setSelectedCourses] = useState<string[]>([])
   const [enrolledStudents, setEnrolledStudents] = useState<Student[]>([])
+  const [assignedCourses, setAssignedCourses] = useState<Course[]>([])
   const [showManageEnrollmentsModal, setShowManageEnrollmentsModal] = useState(false)
+  const [showManageCoursesModal, setShowManageCoursesModal] = useState(false)
+  const [showAssignCoursesModal, setShowAssignCoursesModal] = useState(false)
 
   useEffect(() => {
     if (profile?.role === 'admin') {
@@ -248,6 +250,26 @@ export default function AdminClassesPage() {
     }
   }
 
+  const fetchAssignedCourses = async (classId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('class_courses')
+        .select('course_id')
+        .eq('class_id', classId)
+
+      if (error) throw error
+
+      const courseIds = (data || []).map(assignment => assignment.course_id)
+      const assigned = courses.filter(c => courseIds.includes(c.id))
+      setAssignedCourses(assigned)
+      setSelectedCourses(courseIds)
+    } catch (error) {
+      console.error('Error fetching assigned courses:', error)
+      setAssignedCourses([])
+      setSelectedCourses([])
+    }
+  }
+
   const handleEnrollStudents = async () => {
     if (!selectedClass || selectedStudents.length === 0) return
 
@@ -324,7 +346,7 @@ export default function AdminClassesPage() {
       if (error) throw error
 
       await fetchClasses()
-      setShowCoursesModal(false)
+      setShowAssignCoursesModal(false)
       setSelectedCourses([])
       showSuccess('Success', 'Courses assigned successfully!')
     } catch (error) {
@@ -333,6 +355,35 @@ export default function AdminClassesPage() {
     } finally {
       setCreating(false)
     }
+  }
+
+  const handleUnassignCourse = async (courseId: string, courseTitle: string) => {
+    if (!selectedClass) return
+
+    showConfirm({
+      title: 'Unassign Course',
+      message: `Are you sure you want to unassign "${courseTitle}" from this class?`,
+      confirmText: 'Unassign',
+      type: 'danger',
+      onConfirm: async () => {
+        try {
+          const { error } = await supabase
+            .from('class_courses')
+            .delete()
+            .eq('class_id', selectedClass.id)
+            .eq('course_id', courseId)
+
+          if (error) throw error
+
+          await fetchClasses()
+          await fetchAssignedCourses(selectedClass.id)
+          showSuccess('Success', 'Course unassigned successfully!')
+        } catch (error) {
+          console.error('Error unassigning course:', error)
+          showError('Error', 'Failed to unassign course')
+        }
+      }
+    })
   }
 
   const handleEditClass = (cls: Class) => {
@@ -522,13 +573,14 @@ export default function AdminClassesPage() {
                           Manage Students
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             setSelectedClass(cls)
-                            setShowCoursesModal(true)
+                            await fetchAssignedCourses(cls.id)
+                            setShowManageCoursesModal(true)
                           }}
                           className="px-4 py-2 rounded-xl text-sm samsung-body bg-samsung-teal/10 text-samsung-teal hover:bg-samsung-teal hover:text-white transition-all duration-300"
                         >
-                          Assign Courses
+                          Manage Courses
                         </button>
                         <button
                           onClick={() => handleEditClass(cls)}
@@ -726,6 +778,8 @@ export default function AdminClassesPage() {
                     <div className="mb-4">
                       <button
                         onClick={() => {
+                          // Pre-select already enrolled students
+                          setSelectedStudents(enrolledStudents.map(s => s.id))
                           setShowManageEnrollmentsModal(false)
                           setShowEnrollModal(true)
                         }}
@@ -878,17 +932,17 @@ export default function AdminClassesPage() {
             )}
           </AnimatePresence>
 
-          {/* Assign Courses Modal */}
+          {/* Manage Courses Modal */}
           <AnimatePresence>
-            {showCoursesModal && selectedClass && (
+            {showManageCoursesModal && selectedClass && (
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
                 onClick={() => {
-                  setShowCoursesModal(false)
-                  setSelectedCourses([])
+                  setShowManageCoursesModal(false)
+                  setAssignedCourses([])
                 }}
               >
                 <motion.div
@@ -900,8 +954,113 @@ export default function AdminClassesPage() {
                 >
                   <div className="px-8 py-6 border-b-2 border-samsung-gray-100">
                     <h3 className="text-xl samsung-heading text-gray-900">
-                      Assign Courses to {selectedClass.name}
+                      Manage Courses - {selectedClass.name}
                     </h3>
+                    <p className="text-sm samsung-body text-gray-600 mt-1">
+                      {assignedCourses.length} course{assignedCourses.length !== 1 ? 's' : ''} assigned
+                    </p>
+                  </div>
+
+                  <div className="px-8 py-6">
+                    <div className="mb-4">
+                      <button
+                        onClick={() => {
+                          // Pre-select already assigned courses
+                          setSelectedCourses(assignedCourses.map(c => c.id))
+                          setShowManageCoursesModal(false)
+                          setShowAssignCoursesModal(true)
+                        }}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Assign Courses
+                      </button>
+                    </div>
+
+                    {assignedCourses.length > 0 ? (
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                        {assignedCourses.map((course) => (
+                          <div
+                            key={course.id}
+                            className="flex items-center justify-between p-3 rounded-xl bg-samsung-blue/5 hover:bg-samsung-blue/10 transition-colors duration-300"
+                          >
+                            <span className="samsung-body text-gray-900">{course.title}</span>
+                            <button
+                              onClick={() => handleUnassignCourse(course.id, course.title)}
+                              className="px-3 py-1.5 rounded-lg text-xs samsung-body text-red-600 bg-red-50 hover:bg-red-100 transition-all duration-300"
+                            >
+                              Unassign
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-samsung-blue/10 flex items-center justify-center">
+                          <svg className="w-6 h-6 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                          </svg>
+                        </div>
+                        <p className="samsung-body text-gray-600">No courses assigned yet</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="px-8 py-6 border-t-2 border-samsung-gray-100 flex justify-end">
+                    <button
+                      onClick={() => {
+                        setShowManageCoursesModal(false)
+                        setAssignedCourses([])
+                      }}
+                      className="px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20 transition-all duration-300"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Assign Courses Modal */}
+          <AnimatePresence>
+            {showAssignCoursesModal && selectedClass && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+                onClick={() => {
+                  setShowAssignCoursesModal(false)
+                  setSelectedCourses([])
+                }}
+              >
+                <motion.div
+                  initial={{ scale: 0.95, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.95, opacity: 0 }}
+                  onClick={(e) => e.stopPropagation()}
+                  className="glass-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                >
+                  <div className="px-8 py-6 border-b-2 border-samsung-gray-100">
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => {
+                          setShowAssignCoursesModal(false)
+                          setShowManageCoursesModal(true)
+                        }}
+                        className="w-8 h-8 rounded-lg bg-samsung-blue/10 flex items-center justify-center hover:bg-samsung-blue/20 transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                      <h3 className="text-xl samsung-heading text-gray-900">
+                        Assign Courses to {selectedClass.name}
+                      </h3>
+                    </div>
                   </div>
 
                   <div className="px-8 py-6">
@@ -932,15 +1091,23 @@ export default function AdminClassesPage() {
                   <div className="px-8 py-6 border-t-2 border-samsung-gray-100 flex justify-end space-x-3">
                     <button
                       onClick={() => {
-                        setShowCoursesModal(false)
+                        setShowAssignCoursesModal(false)
+                        setShowManageCoursesModal(true)
                         setSelectedCourses([])
                       }}
                       className="px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20 transition-all duration-300"
                     >
-                      Cancel
+                      Back
                     </button>
                     <button
-                      onClick={handleAssignCourses}
+                      onClick={async () => {
+                        await handleAssignCourses()
+                        if (selectedClass) {
+                          await fetchAssignedCourses(selectedClass.id)
+                          setShowAssignCoursesModal(false)
+                          setShowManageCoursesModal(true)
+                        }
+                      }}
                       disabled={selectedCourses.length === 0 || creating}
                       className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300 disabled:opacity-50"
                     >
