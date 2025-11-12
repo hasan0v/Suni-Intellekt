@@ -123,7 +123,7 @@ export default function ClassAttendancePage() {
 
     if (data) {
       const coursesList = data.map(cc => {
-        const course = cc.courses as any
+        const course = cc.courses as unknown as { id: string; title: string }
         return {
           id: course?.id || '',
           title: course?.title || ''
