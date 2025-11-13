@@ -2,6 +2,8 @@
  * Parse text content and return array of text and link elements
  * Detects URLs starting with http://, https://, www., etc.
  */
+import React from 'react'
+
 export function parseContentWithLinks(text: string): (string | { type: 'link'; url: string; text: string })[] {
   if (!text) return []
 
@@ -49,14 +51,11 @@ export function parseContentWithLinks(text: string): (string | { type: 'link'; u
 /**
  * React component to render parsed content with clickable links
  */
-import React from 'react'
-
 interface RenderContentWithLinksProps {
   content: string
-  className?: string
 }
 
-export function RenderContentWithLinks({ content, className = '' }: RenderContentWithLinksProps) {
+export function RenderContentWithLinks({ content }: RenderContentWithLinksProps) {
   const parsed = parseContentWithLinks(content)
 
   return (
