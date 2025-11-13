@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useNotifications } from '@/components/ui/NotificationSystem'
 import { supabase, Course, Module, Topic, Task, Submission } from '@/lib/supabase'
 import { uploadTaskFile } from '@/lib/storage'
+import { RenderContentWithLinks } from '@/lib/content-parser'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import FileAttachmentLink from '@/components/FileAttachmentLink'
@@ -499,11 +500,11 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
                           <div className="prose prose-sm max-w-none mb-6 text-gray-800 leading-relaxed">
                             {task.content && (
                               <div className="mb-4 whitespace-pre-line bg-white/60 rounded-lg p-4 border border-gray-200">
-                                {task.content}
+                                <RenderContentWithLinks content={task.content} />
                               </div>
                             )}
                             <div className="whitespace-pre-line bg-indigo-50/60 rounded-lg p-4 border border-indigo-100">
-                              {task.instructions}
+                              <RenderContentWithLinks content={task.instructions || ''} />
                             </div>
                           </div>
 

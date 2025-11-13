@@ -6,6 +6,7 @@ import { useNotifications } from '@/components/ui/NotificationSystem'
 import { useConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { supabase } from '@/lib/supabase'
 import { uploadTaskFile } from '@/lib/storage'
+import { RenderContentWithLinks } from '@/lib/content-parser'
 import { useEffect, useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ClipboardIcon, Check as CheckIcon, Clock as ClockIcon, TrendingUp as TrendingUpIcon, ArrowRight as ArrowRightIcon } from 'lucide-react'
@@ -811,7 +812,9 @@ export default function UserTasksPage() {
                     {selectedTask.description && (
                       <div>
                         <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Description</h4>
-                        <p className="samsung-body text-samsung-gray-700 bg-samsung-gray-50 rounded-2xl p-4 border border-samsung-gray-100 leading-relaxed">{selectedTask.description}</p>
+                        <p className="samsung-body text-samsung-gray-700 bg-samsung-gray-50 rounded-2xl p-4 border border-samsung-gray-100 leading-relaxed">
+                          <RenderContentWithLinks content={selectedTask.description} />
+                        </p>
                       </div>
                     )}
 
@@ -821,7 +824,7 @@ export default function UserTasksPage() {
                         <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Content</h4>
                         <div className="prose max-w-none">
                           <div className="whitespace-pre-wrap samsung-body text-samsung-gray-700 bg-samsung-gray-50 rounded-2xl p-5 border border-samsung-gray-100 leading-relaxed">
-                            {selectedTask.content}
+                            <RenderContentWithLinks content={selectedTask.content} />
                           </div>
                         </div>
                       </div>
@@ -833,7 +836,7 @@ export default function UserTasksPage() {
                         <h4 className="samsung-heading text-base text-samsung-gray-900 mb-3">Instructions</h4>
                         <div className="prose max-w-none">
                           <div className="whitespace-pre-wrap samsung-body text-samsung-gray-700 bg-samsung-blue/5 rounded-2xl p-5 border-l-4 border-samsung-blue leading-relaxed">
-                            {selectedTask.instructions}
+                            <RenderContentWithLinks content={selectedTask.instructions} />
                           </div>
                         </div>
                       </div>
