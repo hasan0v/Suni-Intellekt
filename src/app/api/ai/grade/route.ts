@@ -485,7 +485,7 @@ export async function POST(request: NextRequest) {
     let notebookData
     try {
       notebookData = typeof content === 'string' ? JSON.parse(content) : content
-    } catch (e) {
+    } catch {
       return NextResponse.json(
         { error: 'Invalid notebook format. Expected .ipynb JSON structure.' },
         { status: 400 }
