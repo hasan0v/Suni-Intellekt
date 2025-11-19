@@ -80,6 +80,10 @@ export default function AdminGradingPage() {
   // Form states for grading
   const [points, setPoints] = useState('')
   const [feedback, setFeedback] = useState('')
+  
+  // AI Grading states
+  const [aiGrading, setAiGrading] = useState(false)
+  const [aiSuggestedScore, setAiSuggestedScore] = useState<number | null>(null)
 
   useEffect(() => {
     if (!profile) return
@@ -295,12 +299,54 @@ export default function AdminGradingPage() {
 
   const selectSubmission = (submission: SubmissionWithDetails) => {
     setSelectedSubmission(submission)
+    setAiSuggestedScore(null) // Reset AI suggestion when selecting new submission
     if (submission.status === 'graded') {
       setPoints(submission.points !== null ? submission.points.toString() : '')
       setFeedback(submission.feedback || '')
     } else {
       setPoints('')
       setFeedback('')
+    }
+  }
+
+  const handleAIGrade = async (submission: SubmissionWithDetails) => {
+    if (!submission.file_url && !submission.content) {
+      showError('No submission content', 'No submission content to grade')
+      return
+    }
+
+    setAiGrading(true)
+    try {
+      const response = await fetch('/api/ai/grade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          notebookContent: submission.content,
+          fileUrl: submission.file_url,
+          studentName: submission.student?.full_name || 'Unknown Student'
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to get AI grading')
+      }
+
+      const data = await response.json()
+      
+      // Set the AI feedback and suggested score
+      setFeedback(data.feedback)
+      if (data.suggestedScore !== null) {
+        setPoints(data.suggestedScore.toString())
+        setAiSuggestedScore(data.suggestedScore)
+      }
+      
+      showSuccess('AI Grading Complete', 'AI grading complete! Review and adjust before saving.')
+    } catch (error) {
+      console.error('AI grading error:', error)
+      showError('AI Grading Failed', error instanceof Error ? error.message : 'Failed to get AI grading')
+    } finally {
+      setAiGrading(false)
     }
   }
 
@@ -685,6 +731,50 @@ export default function AdminGradingPage() {
                       <h4 className="text-sm samsung-heading text-gray-900 mb-4">
                         {selectedSubmission.status === 'graded' ? 'Update Grade' : 'Grade Assignment'}
                       </h4>
+                      
+                      {/* AI Grading Button */}
+                      <motion.button
+                        whileHover={{ scale: aiGrading ? 1 : 1.02 }}
+                        whileTap={{ scale: aiGrading ? 1 : 0.98 }}
+                        onClick={() => selectedSubmission && handleAIGrade(selectedSubmission)}
+                        disabled={aiGrading || !selectedSubmission}
+                        className="w-full mb-4 px-4 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+                      >
+                        {aiGrading ? (
+                          <>
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            AI Qiymətləndirir...
+                          </>
+                        ) : (
+                          <>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                            AI ilə Qiymətləndir
+                          </>
+                        )}
+                      </motion.button>
+
+                      {aiSuggestedScore !== null && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="mb-4 p-3 bg-purple-50 border-2 border-purple-200 rounded-xl"
+                        >
+                          <div className="flex items-center gap-2">
+                            <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <p className="text-sm text-purple-800 font-semibold">
+                              AI Tövsiyə olunan bal: <span className="text-purple-900">{aiSuggestedScore}/{selectedSubmission.task.max_score}</span>
+                            </p>
+                          </div>
+                        </motion.div>
+                      )}
+                      
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm samsung-body text-gray-700 mb-2">
