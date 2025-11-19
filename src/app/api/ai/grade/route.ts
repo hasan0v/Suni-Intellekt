@@ -501,7 +501,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize Gemini model
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' })
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
     // Prepare the grading request
     const prompt = `${GRADING_PROMPT}
