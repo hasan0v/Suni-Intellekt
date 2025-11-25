@@ -9,6 +9,8 @@ import { supabase } from '@/lib/supabase'
 import { useEffect, useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 // Utility function to extract file path from public URL
 function extractFilePathFromUrl(url: string, bucket: string): string | null {
@@ -795,13 +797,25 @@ export default function AdminGradingPage() {
                           <label className="block text-sm samsung-body text-gray-700 mb-2">
                             Feedback
                           </label>
-                          <textarea
-                            rows={4}
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                            className="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-samsung-blue/20 focus:border-samsung-blue sm:text-sm text-gray-900"
-                            placeholder="Provide feedback to the student..."
-                          />
+                          <div className="space-y-2">
+                            <textarea
+                              rows={8}
+                              value={feedback}
+                              onChange={(e) => setFeedback(e.target.value)}
+                              className="block w-full border-gray-300 rounded-xl shadow-sm focus:ring-samsung-blue/20 focus:border-samsung-blue sm:text-sm text-gray-900 font-mono"
+                              placeholder="Provide feedback to the student..."
+                            />
+                            {feedback && (
+                              <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+                                <p className="text-xs text-gray-500 mb-2 font-semibold">Preview:</p>
+                                <div className="prose prose-sm max-w-none">
+                                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                    {feedback}
+                                  </ReactMarkdown>
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         </div>
 
                         <div className="flex justify-end">
@@ -845,9 +859,11 @@ export default function AdminGradingPage() {
                           {selectedSubmission.feedback && (
                             <div>
                               <span className="text-sm text-green-700">Feedback:</span>
-                              <p className="text-sm text-green-900 mt-1 whitespace-pre-wrap">
-                                {selectedSubmission.feedback}
-                              </p>
+                              <div className="text-sm text-green-900 mt-1 prose prose-sm max-w-none prose-green">
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                  {selectedSubmission.feedback}
+                                </ReactMarkdown>
+                              </div>
                             </div>
                           )}
                         </div>

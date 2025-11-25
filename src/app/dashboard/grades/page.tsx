@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { FileText, CheckCircle, Star, Calendar, MessageSquare, TrendingUp, Users } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface GradeWithDetails {
   id: string
@@ -732,9 +734,11 @@ export default function StudentGradesPage() {
                       </p>
                     </div>
                     <div className="pl-10">
-                      <p className="samsung-body text-sm text-gray-700 leading-loose whitespace-pre-wrap">
-                        {grade.feedback}
-                      </p>
+                      <div className="samsung-body text-sm text-gray-700 leading-loose prose prose-sm max-w-none">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {grade.feedback}
+                        </ReactMarkdown>
+                      </div>
                     </div>
                   </div>
                 )}
