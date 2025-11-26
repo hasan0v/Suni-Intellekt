@@ -52,7 +52,8 @@ interface Course {
 interface Topic {
   id: string
   title: string
-  course_id: string
+  module_id: string
+  course_id?: string // derived from module's course
 }
 
 export default function ClassAttendancePage() {
@@ -159,19 +160,43 @@ export default function ClassAttendancePage() {
       
       if (coursesList.length > 0) {
         const courseIds = coursesList.map(c => c.id)
-        const { data: topicsData, error: topicsError } = await supabase
-          .from('topics')
-          .select('id, title, course_id')
+        
+        // First fetch modules for these courses
+        const { data: modulesData, error: modulesError } = await supabase
+          .from('modules')
+          .select('id, course_id')
           .in('course_id', courseIds)
-          .order('order_index', { ascending: true })
 
-        if (topicsError) {
-          console.error('Error fetching topics:', topicsError)
+        if (modulesError) {
+          console.error('Error fetching modules:', modulesError)
           return
         }
 
-        if (topicsData) {
-          setTopics(topicsData)
+        if (modulesData && modulesData.length > 0) {
+          const moduleIds = modulesData.map(m => m.id)
+          const moduleToCoursemap = new Map<string, string>()
+          modulesData.forEach(m => moduleToCoursemap.set(m.id, m.course_id))
+          
+          // Then fetch topics for these modules
+          const { data: topicsData, error: topicsError } = await supabase
+            .from('topics')
+            .select('id, title, module_id, position')
+            .in('module_id', moduleIds)
+            .order('position', { ascending: true })
+
+          if (topicsError) {
+            console.error('Error fetching topics:', topicsError)
+            return
+          }
+
+          if (topicsData) {
+            // Add course_id to each topic based on its module
+            const topicsWithCourse = topicsData.map(topic => ({
+              ...topic,
+              course_id: moduleToCoursemap.get(topic.module_id) || ''
+            }))
+            setTopics(topicsWithCourse)
+          }
         }
       }
     }
@@ -180,7 +205,7 @@ export default function ClassAttendancePage() {
   const fetchLessons = async (topicsList?: Topic[]) => {
     const { data, error } = await supabase
       .from('class_attendance')
-      .select('lesson_date, lesson_number, lesson_title, topic_id, status')
+      .select('lesson_date, lesson_number, lesson_title, status')
       .eq('class_id', classId)
       .order('lesson_date', { ascending: false })
       .order('lesson_number', { ascending: false })
@@ -201,7 +226,7 @@ export default function ClassAttendancePage() {
             lesson_date: record.lesson_date,
             lesson_number: record.lesson_number,
             lesson_title: record.lesson_title,
-            topic_id: record.topic_id,
+            topic_id: null, // Column doesn't exist yet in DB
             total_students: 0,
             present_count: 0,
             absent_count: 0,
@@ -377,7 +402,7 @@ export default function ClassAttendancePage() {
           lesson_date: selectedDate,
           lesson_number: lessonNumber,
           lesson_title: lessonTitle || null,
-          topic_id: selectedTopicId || null,
+          // topic_id: selectedTopicId || null, // Column doesn't exist yet in DB
           status: record.status,
           notes: record.notes,
           marked_by: profile?.id
@@ -390,7 +415,7 @@ export default function ClassAttendancePage() {
           lesson_date: selectedDate,
           lesson_number: lessonNumber,
           lesson_title: lessonTitle || null,
-          topic_id: selectedTopicId || null,
+          // topic_id: selectedTopicId || null, // Column doesn't exist yet in DB
           status: 'absent' as const,
           notes: null,
           marked_by: profile?.id
