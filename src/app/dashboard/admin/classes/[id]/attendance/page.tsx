@@ -8,10 +8,13 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/contexts/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 
+type StudyMode = 'offline' | 'online' | 'self_study'
+
 interface Student {
   id: string
   full_name: string
   profile_image_url?: string
+  study_mode?: StudyMode
 }
 
 interface AttendanceRecord {
@@ -78,6 +81,7 @@ export default function ClassAttendancePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [studyModeFilter, setStudyModeFilter] = useState<'all' | StudyMode>('all')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
 
   useEffect(() => {
@@ -233,10 +237,10 @@ export default function ClassAttendancePage() {
   const fetchStudents = async () => {
     setLoading(true)
     try {
-      // First, get enrolled user IDs
+      // First, get enrolled user IDs with study_mode
       const { data: enrollments, error: enrollError } = await supabase
         .from('class_enrollments')
-        .select('user_id')
+        .select('user_id, study_mode')
         .eq('class_id', classId)
         .eq('status', 'active')
 
@@ -254,6 +258,12 @@ export default function ClassAttendancePage() {
       }
 
       const userIds = enrollments.map(e => e.user_id)
+      
+      // Create a map of user_id to study_mode
+      const studyModeMap = new Map<string, StudyMode>()
+      enrollments.forEach(e => {
+        studyModeMap.set(e.user_id, (e.study_mode as StudyMode) || 'offline')
+      })
 
       // Then, get user profiles
       const { data: profiles, error: profilesError } = await supabase
@@ -269,7 +279,24 @@ export default function ClassAttendancePage() {
         return
       }
 
-      setStudents(profiles || [])
+      // Merge profiles with study_mode and sort by study_mode
+      const studentsWithMode: Student[] = (profiles || []).map(p => ({
+        ...p,
+        study_mode: studyModeMap.get(p.id) || 'offline'
+      }))
+
+      // Sort: offline first, then online, then self_study
+      const modeOrder: Record<StudyMode, number> = { offline: 0, online: 1, self_study: 2 }
+      studentsWithMode.sort((a, b) => {
+        const modeA = a.study_mode || 'offline'
+        const modeB = b.study_mode || 'offline'
+        if (modeOrder[modeA] !== modeOrder[modeB]) {
+          return modeOrder[modeA] - modeOrder[modeB]
+        }
+        return a.full_name.localeCompare(b.full_name)
+      })
+
+      setStudents(studentsWithMode)
     } catch (error) {
       console.error('Error in fetchStudents:', error)
       setStudents([])
@@ -455,7 +482,45 @@ export default function ClassAttendancePage() {
     return { total, present, absent, excused, notMarked }
   }
 
+  const getStudyModeStats = () => {
+    const offline = students.filter(s => (s.study_mode || 'offline') === 'offline').length
+    const online = students.filter(s => s.study_mode === 'online').length
+    const selfStudy = students.filter(s => s.study_mode === 'self_study').length
+    return { offline, online, selfStudy }
+  }
+
+  const getStudyModeBadge = (mode: StudyMode | undefined) => {
+    switch (mode) {
+      case 'online':
+        return (
+          <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-lg text-xs font-semibold">
+            💻 Online
+          </span>
+        )
+      case 'self_study':
+        return (
+          <span className="px-2 py-0.5 bg-purple-100 text-purple-700 rounded-lg text-xs font-semibold">
+            📚 Sərbəst
+          </span>
+        )
+      case 'offline':
+      default:
+        return (
+          <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-lg text-xs font-semibold">
+            🏫 Əyani
+          </span>
+        )
+    }
+  }
+
+  // Filter students based on study mode
+  const filteredStudents = students.filter(student => {
+    if (studyModeFilter === 'all') return true
+    return (student.study_mode || 'offline') === studyModeFilter
+  })
+
   const stats = getStats()
+  const studyModeStats = getStudyModeStats()
   const selectedTopic = topics.find(t => t.id === selectedTopicId)
   const selectedCourse = selectedTopic ? courses.find(c => c.id === selectedTopic.course_id) : null
 
@@ -781,11 +846,64 @@ export default function ClassAttendancePage() {
                       </div>
                     ) : (
                       <div>
-                        <h3 className="text-lg samsung-heading text-gray-900 mb-4">
-                          Tələbələr ({students.length})
-                        </h3>
+                        {/* Study Mode Filter Tabs */}
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-lg samsung-heading text-gray-900">
+                            Tələbələr ({filteredStudents.length}/{students.length})
+                          </h3>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 samsung-body mr-2">
+                              🏫 {studyModeStats.offline} | 💻 {studyModeStats.online} | 📚 {studyModeStats.selfStudy}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Filter Buttons */}
+                        <div className="flex flex-wrap gap-2 mb-4 p-2 bg-gray-100 rounded-xl">
+                          <button
+                            onClick={() => setStudyModeFilter('all')}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                              studyModeFilter === 'all'
+                                ? 'bg-white text-samsung-blue shadow'
+                                : 'text-gray-600 hover:bg-gray-50'
+                            }`}
+                          >
+                            Hamısı ({students.length})
+                          </button>
+                          <button
+                            onClick={() => setStudyModeFilter('offline')}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                              studyModeFilter === 'offline'
+                                ? 'bg-green-500 text-white shadow'
+                                : 'text-gray-600 hover:bg-green-50'
+                            }`}
+                          >
+                            🏫 Əyani ({studyModeStats.offline})
+                          </button>
+                          <button
+                            onClick={() => setStudyModeFilter('online')}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                              studyModeFilter === 'online'
+                                ? 'bg-blue-500 text-white shadow'
+                                : 'text-gray-600 hover:bg-blue-50'
+                            }`}
+                          >
+                            💻 Online ({studyModeStats.online})
+                          </button>
+                          <button
+                            onClick={() => setStudyModeFilter('self_study')}
+                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition ${
+                              studyModeFilter === 'self_study'
+                                ? 'bg-purple-500 text-white shadow'
+                                : 'text-gray-600 hover:bg-purple-50'
+                            }`}
+                          >
+                            📚 Sərbəst ({studyModeStats.selfStudy})
+                          </button>
+                        </div>
+
                         <div className="space-y-3">
-                          {students.map((student) => {
+                          {filteredStudents.map((student) => {
                             const record = attendance[student.id]
                             const status = record?.status
 
@@ -796,9 +914,12 @@ export default function ClassAttendancePage() {
                                     <div className="w-10 h-10 bg-samsung-blue text-white rounded-full flex items-center justify-center samsung-body font-bold">
                                       {student.full_name.charAt(0).toUpperCase()}
                                     </div>
-                                    <h4 className="font-semibold text-gray-900 samsung-body text-lg">
-                                      {student.full_name}
-                                    </h4>
+                                    <div className="flex flex-col">
+                                      <h4 className="font-semibold text-gray-900 samsung-body text-lg">
+                                        {student.full_name}
+                                      </h4>
+                                      {getStudyModeBadge(student.study_mode)}
+                                    </div>
                                   </div>
 
                                   {/* Status Buttons */}
