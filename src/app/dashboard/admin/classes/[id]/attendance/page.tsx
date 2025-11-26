@@ -87,8 +87,8 @@ export default function ClassAttendancePage() {
     }
     fetchClassInfo()
     fetchStudents()
-    fetchCourses()
-    fetchLessons()
+    // Load courses first, then lessons (to fix race condition with topics)
+    fetchCourses().then(() => fetchLessons())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, profile])
 
@@ -98,6 +98,23 @@ export default function ClassAttendancePage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate, lessonNumber, students])
+
+  // Update lesson topic titles when topics are loaded
+  useEffect(() => {
+    if (topics.length > 0 && lessons.length > 0) {
+      setLessons(prevLessons => 
+        prevLessons.map(lesson => {
+          if (lesson.topic_id && !lesson.topic_title) {
+            const topic = topics.find(t => t.id === lesson.topic_id)
+            if (topic) {
+              return { ...lesson, topic_title: topic.title }
+            }
+          }
+          return lesson
+        })
+      )
+    }
+  }, [topics, lessons.length])
 
   const fetchClassInfo = async () => {
     const { data } = await supabase
@@ -110,7 +127,7 @@ export default function ClassAttendancePage() {
   }
 
   const fetchCourses = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('class_courses')
       .select(`
         course_id,
@@ -120,6 +137,11 @@ export default function ClassAttendancePage() {
         )
       `)
       .eq('class_id', classId)
+
+    if (error) {
+      console.error('Error fetching courses:', error)
+      return
+    }
 
     if (data) {
       const coursesList = data.map(cc => {
@@ -133,11 +155,16 @@ export default function ClassAttendancePage() {
       
       if (coursesList.length > 0) {
         const courseIds = coursesList.map(c => c.id)
-        const { data: topicsData } = await supabase
+        const { data: topicsData, error: topicsError } = await supabase
           .from('topics')
           .select('id, title, course_id')
           .in('course_id', courseIds)
           .order('order_index', { ascending: true })
+
+        if (topicsError) {
+          console.error('Error fetching topics:', topicsError)
+          return
+        }
 
         if (topicsData) {
           setTopics(topicsData)
@@ -146,13 +173,18 @@ export default function ClassAttendancePage() {
     }
   }
 
-  const fetchLessons = async () => {
-    const { data } = await supabase
+  const fetchLessons = async (topicsList?: Topic[]) => {
+    const { data, error } = await supabase
       .from('class_attendance')
       .select('lesson_date, lesson_number, lesson_title, topic_id, status')
       .eq('class_id', classId)
       .order('lesson_date', { ascending: false })
       .order('lesson_number', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching lessons:', error)
+      return
+    }
 
     if (data) {
       const lessonsMap = new Map<string, Lesson>()
@@ -183,10 +215,11 @@ export default function ClassAttendancePage() {
       
       const lessonsArray = Array.from(lessonsMap.values())
       
-      // Add topic titles
+      // Add topic titles - use passed topicsList or current topics state
+      const availableTopics = topicsList || topics
       lessonsArray.forEach(lesson => {
-        if (lesson.topic_id) {
-          const topic = topics.find(t => t.id === lesson.topic_id)
+        if (lesson.topic_id && availableTopics.length > 0) {
+          const topic = availableTopics.find(t => t.id === lesson.topic_id)
           if (topic) {
             lesson.topic_title = topic.title
           }
@@ -275,16 +308,20 @@ export default function ClassAttendancePage() {
   }
 
   const updateAttendance = (studentId: string, status: 'present' | 'absent' | 'excused') => {
-    setAttendance(prev => ({
-      ...prev,
-      [studentId]: {
-        ...prev[studentId],
-        student_id: studentId,
-        lesson_date: selectedDate,
-        lesson_number: lessonNumber,
-        status
+    setAttendance(prev => {
+      const existingRecord = prev[studentId]
+      return {
+        ...prev,
+        [studentId]: {
+          id: existingRecord?.id,
+          student_id: studentId,
+          lesson_date: selectedDate,
+          lesson_number: lessonNumber,
+          status,
+          notes: existingRecord?.notes || ''
+        }
       }
-    }))
+    })
   }
 
   const updateNotes = (studentId: string, notes: string) => {
@@ -342,7 +379,7 @@ export default function ClassAttendancePage() {
       if (error) throw error
 
       setMessage({ type: 'success', text: hasAttendance ? 'Davamiyyət uğurla yadda saxlanıldı!' : 'Dərs uğurla yaradıldı!' })
-      await fetchLessons()
+      await fetchLessons(topics)
       setShowLessonModal(false)
       setTimeout(() => setMessage(null), 3000)
     } catch (error) {
@@ -379,7 +416,7 @@ export default function ClassAttendancePage() {
         setShowLessonModal(false)
       }
       
-      fetchLessons()
+      fetchLessons(topics)
       setTimeout(() => setMessage(null), 3000)
     } catch (error) {
       console.error('Error deleting lesson:', error)

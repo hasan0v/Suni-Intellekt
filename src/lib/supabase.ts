@@ -93,6 +93,7 @@ export interface ClassEnrollment {
   class_id: string
   user_id: string
   status: 'active' | 'completed' | 'dropped'
+  study_mode: 'offline' | 'online' | 'self_study'
   enrolled_at: string
   updated_at: string
 }

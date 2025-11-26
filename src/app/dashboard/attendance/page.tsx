@@ -35,33 +35,48 @@ export default function StudentAttendancePage() {
   const [stats, setStats] = useState<ClassStats[]>([])
   const [selectedClass, setSelectedClass] = useState<string>('all')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchAttendance = async () => {
+    if (!profile?.id) return
+    
     setLoading(true)
+    setError(null)
     
-    const { data } = await supabase
-      .from('class_attendance')
-      .select(`
-        id,
-        lesson_date,
-        lesson_number,
-        lesson_title,
-        status,
-        notes,
-        classes (
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('class_attendance')
+        .select(`
           id,
-          name
-        )
-      `)
-      .eq('student_id', profile?.id)
-      .order('lesson_date', { ascending: false })
+          lesson_date,
+          lesson_number,
+          lesson_title,
+          status,
+          notes,
+          classes (
+            id,
+            name
+          )
+        `)
+        .eq('student_id', profile.id)
+        .order('lesson_date', { ascending: false })
 
-    if (data) {
-      setAttendance(data as unknown as AttendanceRecord[])
-      calculateStats(data as unknown as AttendanceRecord[])
+      if (fetchError) {
+        console.error('Error fetching attendance:', fetchError)
+        setError('Davamiyyət məlumatları yüklənə bilmədi. Zəhmət olmasa yenidən cəhd edin.')
+        return
+      }
+
+      if (data) {
+        setAttendance(data as unknown as AttendanceRecord[])
+        calculateStats(data as unknown as AttendanceRecord[])
+      }
+    } catch (err) {
+      console.error('Error in fetchAttendance:', err)
+      setError('Xəta baş verdi. Zəhmət olmasa səhifəni yeniləyin.')
+    } finally {
+      setLoading(false)
     }
-    
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -142,6 +157,24 @@ export default function StudentAttendancePage() {
             <h1 className="text-3xl samsung-heading text-gray-900">Davamiyyət</h1>
             <p className="text-gray-600 samsung-body mt-1">Dərslərdəki iştirakınızı izləyin</p>
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-red-800 samsung-body font-semibold">{error}</p>
+                <button 
+                  onClick={fetchAttendance}
+                  className="ml-auto px-4 py-1.5 bg-red-600 text-white rounded-lg text-sm samsung-body font-semibold hover:bg-red-700 transition"
+                >
+                  Yenidən cəhd et
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Class Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

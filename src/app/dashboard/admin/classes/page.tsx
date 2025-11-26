@@ -33,6 +33,23 @@ interface Student {
   id: string
   full_name: string
   email?: string
+  study_mode?: 'offline' | 'online' | 'self_study'
+}
+
+// Study mode order for sorting: offline first, then online, then self_study
+const STUDY_MODE_ORDER = { offline: 0, online: 1, self_study: 2 }
+
+const getStudyModeBadge = (mode: string) => {
+  switch (mode) {
+    case 'offline':
+      return { label: 'Offline', color: 'bg-green-100 text-green-800', icon: '🏫' }
+    case 'online':
+      return { label: 'Online', color: 'bg-blue-100 text-blue-800', icon: '💻' }
+    case 'self_study':
+      return { label: 'Self Study', color: 'bg-purple-100 text-purple-800', icon: '📚' }
+    default:
+      return { label: 'Unknown', color: 'bg-gray-100 text-gray-800', icon: '❓' }
+  }
 }
 
 export default function AdminClassesPage() {
@@ -64,6 +81,8 @@ export default function AdminClassesPage() {
   const [showManageEnrollmentsModal, setShowManageEnrollmentsModal] = useState(false)
   const [showManageCoursesModal, setShowManageCoursesModal] = useState(false)
   const [showAssignCoursesModal, setShowAssignCoursesModal] = useState(false)
+  const [newStudentStudyMode, setNewStudentStudyMode] = useState<'offline' | 'online' | 'self_study'>('offline')
+  const [studyModeFilter, setStudyModeFilter] = useState<'all' | 'offline' | 'online' | 'self_study'>('all')
 
   useEffect(() => {
     if (profile?.role === 'admin') {
@@ -235,14 +254,27 @@ export default function AdminClassesPage() {
     try {
       const { data, error } = await supabase
         .from('class_enrollments')
-        .select('user_id')
+        .select('user_id, study_mode')
         .eq('class_id', classId)
         .eq('status', 'active')
 
       if (error) throw error
 
+      // Map enrollments to include study_mode
+      const enrollmentMap = new Map(data?.map(e => [e.user_id, e.study_mode || 'offline']) || [])
       const enrolledIds = data?.map(e => e.user_id) || []
-      const enrolled = students.filter(s => enrolledIds.includes(s.id))
+      
+      // Get enrolled students with their study modes and sort by study mode
+      const enrolled = students
+        .filter(s => enrolledIds.includes(s.id))
+        .map(s => ({ ...s, study_mode: enrollmentMap.get(s.id) as 'offline' | 'online' | 'self_study' }))
+        .sort((a, b) => {
+          const orderA = STUDY_MODE_ORDER[a.study_mode || 'offline']
+          const orderB = STUDY_MODE_ORDER[b.study_mode || 'offline']
+          if (orderA !== orderB) return orderA - orderB
+          return a.full_name.localeCompare(b.full_name)
+        })
+      
       setEnrolledStudents(enrolled)
     } catch (error) {
       console.error('Error fetching enrolled students:', error)
@@ -278,7 +310,8 @@ export default function AdminClassesPage() {
       const enrollments = selectedStudents.map(studentId => ({
         class_id: selectedClass.id,
         user_id: studentId,
-        status: 'active'
+        status: 'active',
+        study_mode: newStudentStudyMode
       }))
 
       const { error } = await supabase
@@ -290,12 +323,33 @@ export default function AdminClassesPage() {
       await fetchClasses()
       setShowEnrollModal(false)
       setSelectedStudents([])
+      setNewStudentStudyMode('offline')
       showSuccess('Success', 'Students enrolled successfully!')
     } catch (error) {
       console.error('Error enrolling students:', error)
       showError('Error', 'Failed to enroll students')
     } finally {
       setCreating(false)
+    }
+  }
+
+  const handleUpdateStudyMode = async (studentId: string, newMode: 'offline' | 'online' | 'self_study') => {
+    if (!selectedClass) return
+
+    try {
+      const { error } = await supabase
+        .from('class_enrollments')
+        .update({ study_mode: newMode })
+        .eq('class_id', selectedClass.id)
+        .eq('user_id', studentId)
+
+      if (error) throw error
+
+      await fetchEnrolledStudents(selectedClass.id)
+      showSuccess('Success', 'Study mode updated!')
+    } catch (error) {
+      console.error('Error updating study mode:', error)
+      showError('Error', 'Failed to update study mode')
     }
   }
 
@@ -756,6 +810,7 @@ export default function AdminClassesPage() {
                 onClick={() => {
                   setShowManageEnrollmentsModal(false)
                   setEnrolledStudents([])
+                  setStudyModeFilter('all')
                 }}
               >
                 <motion.div
@@ -763,22 +818,36 @@ export default function AdminClassesPage() {
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.95, opacity: 0 }}
                   onClick={(e) => e.stopPropagation()}
-                  className="glass-card rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                  className="glass-card rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
                 >
                   <div className="px-8 py-6 border-b-2 border-samsung-gray-100">
                     <h3 className="text-xl samsung-heading text-gray-900">
                       Manage Students - {selectedClass.name}
                     </h3>
-                    <p className="text-sm samsung-body text-gray-600 mt-1">
-                      {enrolledStudents.length} student{enrolledStudents.length !== 1 ? 's' : ''} enrolled
-                    </p>
+                    <div className="flex items-center gap-4 mt-2">
+                      <p className="text-sm samsung-body text-gray-600">
+                        {enrolledStudents.length} student{enrolledStudents.length !== 1 ? 's' : ''} enrolled
+                      </p>
+                      {/* Study Mode Stats */}
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-green-100 text-green-800">
+                          🏫 {enrolledStudents.filter(s => s.study_mode === 'offline').length}
+                        </span>
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-blue-100 text-blue-800">
+                          💻 {enrolledStudents.filter(s => s.study_mode === 'online').length}
+                        </span>
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-800">
+                          📚 {enrolledStudents.filter(s => s.study_mode === 'self_study').length}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="px-8 py-6">
-                    <div className="mb-4">
+                    {/* Action buttons and filter */}
+                    <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
                       <button
                         onClick={() => {
-                          // Pre-select already enrolled students
                           setSelectedStudents(enrolledStudents.map(s => s.id))
                           setShowManageEnrollmentsModal(false)
                           setShowEnrollModal(true)
@@ -790,24 +859,61 @@ export default function AdminClassesPage() {
                         </svg>
                         Add Students
                       </button>
+                      
+                      {/* Filter by Study Mode */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm samsung-body text-gray-600">Filter:</span>
+                        <select
+                          value={studyModeFilter}
+                          onChange={(e) => setStudyModeFilter(e.target.value as 'all' | 'offline' | 'online' | 'self_study')}
+                          className="px-3 py-1.5 text-sm border-2 border-samsung-gray-100 rounded-lg samsung-body focus:border-samsung-blue focus:outline-none"
+                        >
+                          <option value="all">All Students</option>
+                          <option value="offline">🏫 Offline Only</option>
+                          <option value="online">💻 Online Only</option>
+                          <option value="self_study">📚 Self Study Only</option>
+                        </select>
+                      </div>
                     </div>
 
                     {enrolledStudents.length > 0 ? (
                       <div className="space-y-2 max-h-96 overflow-y-auto">
-                        {enrolledStudents.map((student) => (
-                          <div
-                            key={student.id}
-                            className="flex items-center justify-between p-3 rounded-xl bg-samsung-blue/5 hover:bg-samsung-blue/10 transition-colors duration-300"
-                          >
-                            <span className="samsung-body text-gray-900">{student.full_name}</span>
-                            <button
-                              onClick={() => handleUnenrollStudent(student.id, student.full_name)}
-                              className="px-3 py-1.5 rounded-lg text-xs samsung-body text-red-600 bg-red-50 hover:bg-red-100 transition-all duration-300"
-                            >
-                              Unenroll
-                            </button>
-                          </div>
-                        ))}
+                        {enrolledStudents
+                          .filter(s => studyModeFilter === 'all' || s.study_mode === studyModeFilter)
+                          .map((student) => {
+                            const badge = getStudyModeBadge(student.study_mode || 'offline')
+                            return (
+                              <div
+                                key={student.id}
+                                className="flex items-center justify-between p-4 rounded-xl bg-samsung-blue/5 hover:bg-samsung-blue/10 transition-colors duration-300"
+                              >
+                                <div className="flex items-center gap-3">
+                                  <span className="samsung-body text-gray-900 font-medium">{student.full_name}</span>
+                                  <span className={`px-2 py-0.5 text-xs rounded-full ${badge.color}`}>
+                                    {badge.icon} {badge.label}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  {/* Study Mode Selector */}
+                                  <select
+                                    value={student.study_mode || 'offline'}
+                                    onChange={(e) => handleUpdateStudyMode(student.id, e.target.value as 'offline' | 'online' | 'self_study')}
+                                    className="px-2 py-1 text-xs border border-gray-200 rounded-lg samsung-body focus:border-samsung-blue focus:outline-none bg-white"
+                                  >
+                                    <option value="offline">🏫 Offline</option>
+                                    <option value="online">💻 Online</option>
+                                    <option value="self_study">📚 Self Study</option>
+                                  </select>
+                                  <button
+                                    onClick={() => handleUnenrollStudent(student.id, student.full_name)}
+                                    className="px-3 py-1.5 rounded-lg text-xs samsung-body text-red-600 bg-red-50 hover:bg-red-100 transition-all duration-300"
+                                  >
+                                    Unenroll
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          })}
                       </div>
                     ) : (
                       <div className="text-center py-8">
@@ -826,6 +932,7 @@ export default function AdminClassesPage() {
                       onClick={() => {
                         setShowManageEnrollmentsModal(false)
                         setEnrolledStudents([])
+                        setStudyModeFilter('all')
                       }}
                       className="px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20 transition-all duration-300"
                     >
@@ -848,6 +955,7 @@ export default function AdminClassesPage() {
                 onClick={() => {
                   setShowEnrollModal(false)
                   setSelectedStudents([])
+                  setNewStudentStudyMode('offline')
                 }}
               >
                 <motion.div
@@ -863,6 +971,7 @@ export default function AdminClassesPage() {
                         onClick={() => {
                           setShowEnrollModal(false)
                           setShowManageEnrollmentsModal(true)
+                          setNewStudentStudyMode('offline')
                         }}
                         className="w-8 h-8 rounded-lg bg-samsung-blue/10 flex items-center justify-center hover:bg-samsung-blue/20 transition-colors"
                       >
@@ -877,7 +986,50 @@ export default function AdminClassesPage() {
                   </div>
 
                   <div className="px-8 py-6">
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {/* Study Mode Selection */}
+                    <div className="mb-6 p-4 bg-samsung-blue/5 rounded-xl">
+                      <label className="block text-sm samsung-body text-gray-700 mb-3 font-medium">
+                        Select Study Mode for New Students
+                      </label>
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setNewStudentStudyMode('offline')}
+                          className={`px-4 py-2.5 rounded-xl text-sm samsung-body font-medium transition-all duration-300 flex items-center gap-2 ${
+                            newStudentStudyMode === 'offline'
+                              ? 'bg-green-500 text-white shadow-lg'
+                              : 'bg-green-100 text-green-800 hover:bg-green-200'
+                          }`}
+                        >
+                          🏫 Offline
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNewStudentStudyMode('online')}
+                          className={`px-4 py-2.5 rounded-xl text-sm samsung-body font-medium transition-all duration-300 flex items-center gap-2 ${
+                            newStudentStudyMode === 'online'
+                              ? 'bg-blue-500 text-white shadow-lg'
+                              : 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                          }`}
+                        >
+                          💻 Online
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNewStudentStudyMode('self_study')}
+                          className={`px-4 py-2.5 rounded-xl text-sm samsung-body font-medium transition-all duration-300 flex items-center gap-2 ${
+                            newStudentStudyMode === 'self_study'
+                              ? 'bg-purple-500 text-white shadow-lg'
+                              : 'bg-purple-100 text-purple-800 hover:bg-purple-200'
+                          }`}
+                        >
+                          📚 Self Study
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Students List */}
+                    <div className="space-y-2 max-h-72 overflow-y-auto">
                       {students.map((student) => (
                         <label
                           key={student.id}
@@ -907,6 +1059,7 @@ export default function AdminClassesPage() {
                         setShowEnrollModal(false)
                         setShowManageEnrollmentsModal(true)
                         setSelectedStudents([])
+                        setNewStudentStudyMode('offline')
                       }}
                       className="px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20 transition-all duration-300"
                     >
@@ -924,7 +1077,7 @@ export default function AdminClassesPage() {
                       disabled={selectedStudents.length === 0 || creating}
                       className="inline-flex items-center px-5 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue text-white hover:bg-samsung-blue-dark shadow-samsung-card transition-all duration-300 disabled:opacity-50"
                     >
-                      {creating ? 'Enrolling...' : `Enroll ${selectedStudents.length} Student${selectedStudents.length !== 1 ? 's' : ''}`}
+                      {creating ? 'Enrolling...' : `Enroll ${selectedStudents.length} as ${getStudyModeBadge(newStudentStudyMode).label}`}
                     </button>
                   </div>
                 </motion.div>
