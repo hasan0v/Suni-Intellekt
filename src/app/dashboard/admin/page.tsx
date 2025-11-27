@@ -1,361 +1,324 @@
 'use client'
 
+import DashboardLayout from '@/components/DashboardLayout'
 import { useAuth } from '@/contexts/AuthContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
-import { useEffect, useState } from 'react'
-import DashboardLayout from '@/components/DashboardLayout'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import {
+  AdminPageHeader,
+  AdminStatCard,
+  AdminQuickAction,
+  AdminLoadingSpinner,
+  AdminIcons,
+} from '@/components/admin/AdminComponents'
+import { 
+  LayoutDashboard, 
+  TrendingUp, 
+  AlertCircle,
+  Sparkles 
+} from 'lucide-react'
 
-interface AdminStats {
+interface DashboardStats {
   totalCourses: number
   totalTasks: number
   totalSubmissions: number
-  pendingSubmissions: number
+  pendingGrading: number
   totalStudents: number
+  totalClasses: number
+  activeClasses: number
+  recentSubmissions: number
 }
 
-// Enhanced Icon Components
-const AdminIcon = ({ className = "w-8 h-8" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-  </svg>
-)
-
-const CoursesIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-  </svg>
-)
-
-const TasksIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-  </svg>
-)
-
-const GradingIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-  </svg>
-)
-
-const UsersIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-  </svg>
-)
-
-const RankingsIcon = ({ className = "w-6 h-6" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-  </svg>
-)
-
-const ArrowRightIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
-  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-  </svg>
-)
-
-// Animated Stat Card Component
-const StatCard = ({ 
-  title, 
-  value, 
-  icon: Icon, 
-  color, 
-  loading, 
-  delay = 0 
-}: { 
-  title: string
-  value: number
-  icon: React.ComponentType<{ className?: string }>
-  color: string
-  loading: boolean
-  delay?: number
-}) => (
-  <div 
-    className="glass-card group hover:scale-[1.02] transition-all duration-500 hover:shadow-samsung-float"
-    style={{ animationDelay: `${delay}ms` }}
-  >
-    <div className="p-6">
-      <div className="flex items-center">
-        <div className="flex-shrink-0">
-          <div className={`w-12 h-12 rounded-2xl ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
-            <Icon className="w-6 h-6 text-white" />
-          </div>
-        </div>
-        <div className="ml-5 w-0 flex-1">
-          <dt className="text-sm samsung-body text-gray-600 truncate">{title}</dt>
-          <dd className="text-2xl samsung-heading text-gray-900 mt-1">
-            {loading ? (
-              <div className="animate-pulse bg-samsung-gray-100 h-8 w-16 rounded-xl"></div>
-            ) : (
-              <span className="count-up">{value}</span>
-            )}
-          </dd>
-        </div>
-      </div>
-    </div>
-  </div>
-)
-
-// Loading Skeleton Component
-const ActionCardSkeleton = () => (
-  <div className="glass-card p-6 animate-pulse">
-    <div className="flex items-start space-x-4">
-      <div className="w-14 h-14 bg-gray-200 rounded-xl"></div>
-      <div className="flex-1">
-        <div className="h-6 bg-gray-200 rounded mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-3/4 mb-3"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-      </div>
-    </div>
-  </div>
-)
-
 export default function AdminDashboard() {
-  const { user, profile } = useAuth()
-  const [stats, setStats] = useState<AdminStats>({
+  const { profile } = useAuth()
+  const [stats, setStats] = useState<DashboardStats>({
     totalCourses: 0,
     totalTasks: 0,
     totalSubmissions: 0,
-    pendingSubmissions: 0,
-    totalStudents: 0
+    pendingGrading: 0,
+    totalStudents: 0,
+    totalClasses: 0,
+    activeClasses: 0,
+    recentSubmissions: 0,
   })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (profile?.id) {
-      fetchAdminStats()
+    if (profile?.role === 'admin') {
+      fetchStats()
     }
-  }, [profile?.id])
+  }, [profile])
 
-  const fetchAdminStats = async () => {
+  const fetchStats = async () => {
     try {
-      setLoading(true)
-
-      const [coursesRes, tasksRes, submissionsRes, pendingRes, studentsRes] = await Promise.all([
+      const [
+        coursesResult,
+        tasksResult,
+        submissionsResult,
+        pendingResult,
+        studentsResult,
+        classesResult,
+        activeClassesResult,
+        recentSubmissionsResult,
+      ] = await Promise.all([
         supabase.from('courses').select('*', { count: 'exact', head: true }),
         supabase.from('tasks').select('*', { count: 'exact', head: true }),
-        supabase.from('submissions').select('*', { count: 'exact', head: true }),
-        supabase.from('submissions').select('*', { count: 'exact', head: true }).eq('status', 'submitted'),
-        supabase.from('user_profiles').select('*', { count: 'exact', head: true }).eq('role', 'student'),
+        supabase.from('task_submissions').select('*', { count: 'exact', head: true }),
+        supabase.from('task_submissions')
+          .select('*', { count: 'exact', head: true })
+          .is('grade', null),
+        supabase.from('user_profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('role', 'student'),
+        supabase.from('classes').select('*', { count: 'exact', head: true }),
+        supabase.from('classes')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'active'),
+        supabase.from('task_submissions')
+          .select('*', { count: 'exact', head: true })
+          .gte('submitted_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
       ])
 
       setStats({
-        totalCourses: coursesRes.count || 0,
-        totalTasks: tasksRes.count || 0,
-        totalSubmissions: submissionsRes.count || 0,
-        pendingSubmissions: pendingRes.count || 0,
-        totalStudents: studentsRes.count || 0,
+        totalCourses: coursesResult.count || 0,
+        totalTasks: tasksResult.count || 0,
+        totalSubmissions: submissionsResult.count || 0,
+        pendingGrading: pendingResult.count || 0,
+        totalStudents: studentsResult.count || 0,
+        totalClasses: classesResult.count || 0,
+        activeClasses: activeClassesResult.count || 0,
+        recentSubmissions: recentSubmissionsResult.count || 0,
       })
     } catch (error) {
-      console.error('Error fetching admin stats:', error)
+      console.error('Error fetching stats:', error)
     } finally {
       setLoading(false)
     }
   }
 
-  if (!user || !profile) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-samsung-blue"></div>
-      </div>
+      <DashboardLayout>
+        <AdminLoadingSpinner size="lg" />
+      </DashboardLayout>
     )
   }
-
-  const adminActions = [
-    {
-      title: 'Manage Courses',
-      description: 'Create, edit, and organize comprehensive course content and materials',
-      href: '/dashboard/admin/courses',
-      icon: CoursesIcon,
-      color: 'bg-samsung-blue',
-      stat: `${stats.totalCourses} courses`
-    },
-    {
-      title: 'Manage Tasks',
-      description: 'Create and organize assignments, projects, and learning activities',
-      href: '/dashboard/admin/tasks',
-      icon: TasksIcon,
-      color: 'bg-samsung-cyan',
-      stat: `${stats.totalTasks} tasks`
-    },
-    {
-      title: 'Student Rankings',
-      description: 'View detailed student performance metrics, rankings, and analytics',
-      href: '/dashboard/admin/rankings',
-      icon: RankingsIcon,
-      color: 'bg-samsung-teal',
-      stat: `${stats.totalStudents} students`
-    },
-    {
-      title: 'Grading Queue',
-      description: 'Review, evaluate, and provide feedback on student submissions',
-      href: '/dashboard/grading',
-      icon: GradingIcon,
-      color: 'bg-samsung-purple',
-      stat: `${stats.pendingSubmissions} pending`
-    },
-    {
-      title: 'User Management',
-      description: 'Monitor student progress and manage user accounts and permissions',
-      href: '/dashboard/admin/users',
-      icon: UsersIcon,
-      color: 'bg-samsung-blue',
-      stat: `${stats.totalStudents} students`
-    }
-  ]
 
   return (
     <ProtectedRoute requiredRole="admin">
       <DashboardLayout>
         <div className="space-y-8">
-          {/* Enhanced Header */}
-          <div className="glass-card p-8 flex items-center gap-6">
-            <div className="flex-shrink-0">
-              <div className="w-14 h-14 rounded-2xl bg-samsung-blue flex items-center justify-center">
-                <AdminIcon className="w-7 h-7 text-white" />
-              </div>
-            </div>
-            <div className="flex-1">
-              <h1 className="text-2xl samsung-heading text-gray-900">
-                Admin Dashboard
-              </h1>
-              <p className="mt-1 samsung-body text-gray-600">
-                Welcome back, <span className="font-semibold text-samsung-blue">{profile.full_name || 'Admin'}</span>! 
-                Manage your Süni İntellekt platform with powerful administrative tools.
-              </p>
-            </div>
-          </div>
+          {/* Header */}
+          <AdminPageHeader
+            title="Admin Dashboard"
+            description="Welcome back! Here's an overview of your learning management system."
+            icon={LayoutDashboard}
+            iconColor="bg-gradient-to-br from-amber-500 to-orange-600"
+            showAdminBadge={true}
+          />
 
-          {/* Enhanced Stats Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-            <StatCard
+          {/* Quick Stats Overview */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            <AdminStatCard
               title="Total Courses"
               value={stats.totalCourses}
-              icon={CoursesIcon}
-              color="bg-samsung-blue"
-              loading={loading}
+              subtitle="Available courses"
+              icon={AdminIcons.courses}
+              iconColor="bg-gradient-to-br from-samsung-blue to-blue-600"
               delay={0}
             />
-            <StatCard
+            <AdminStatCard
               title="Total Tasks"
               value={stats.totalTasks}
-              icon={TasksIcon}
-              color="bg-samsung-cyan"
-              loading={loading}
-              delay={100}
+              subtitle="Assignments created"
+              icon={AdminIcons.tasks}
+              iconColor="bg-gradient-to-br from-samsung-cyan to-teal-600"
+              delay={1}
             />
-            <StatCard
-              title="Total Submissions"
+            <AdminStatCard
+              title="Submissions"
               value={stats.totalSubmissions}
-              icon={() => <span className="text-white">📝</span>}
-              color="bg-samsung-teal"
-              loading={loading}
-              delay={200}
+              subtitle={`${stats.recentSubmissions} this week`}
+              icon={AdminIcons.file}
+              iconColor="bg-gradient-to-br from-samsung-purple to-purple-600"
+              delay={2}
             />
-            <StatCard
+            <AdminStatCard
               title="Pending Grading"
-              value={stats.pendingSubmissions}
-              icon={GradingIcon}
-              color="bg-samsung-purple"
-              loading={loading}
-              delay={300}
+              value={stats.pendingGrading}
+              subtitle={stats.pendingGrading > 0 ? 'Needs attention' : 'All caught up!'}
+              icon={AdminIcons.pending}
+              iconColor={stats.pendingGrading > 0 
+                ? "bg-gradient-to-br from-amber-500 to-orange-600" 
+                : "bg-gradient-to-br from-green-500 to-emerald-600"
+              }
+              delay={3}
             />
-            <StatCard
-              title="Students"
+          </motion.div>
+
+          {/* Secondary Stats Row */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            <AdminStatCard
+              title="Total Students"
               value={stats.totalStudents}
-              icon={UsersIcon}
-              color="bg-samsung-blue"
-              loading={loading}
-              delay={400}
+              subtitle="Registered students"
+              icon={AdminIcons.students}
+              iconColor="bg-gradient-to-br from-indigo-500 to-indigo-600"
+              delay={4}
             />
+            <AdminStatCard
+              title="Classes"
+              value={stats.totalClasses}
+              subtitle={`${stats.activeClasses} active`}
+              icon={AdminIcons.classes}
+              iconColor="bg-gradient-to-br from-pink-500 to-rose-600"
+              delay={5}
+            />
+            <AdminStatCard
+              title="Recent Activity"
+              value={stats.recentSubmissions}
+              subtitle="Submissions in 7 days"
+              icon={AdminIcons.activity}
+              iconColor="bg-gradient-to-br from-green-500 to-emerald-600"
+              delay={6}
+            />
+          </motion.div>
+
+          {/* Alert Banner (if pending grading) */}
+          {stats.pendingGrading > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-2xl p-5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                  <AlertCircle className="w-6 h-6 text-amber-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="samsung-heading text-amber-800">
+                    You have {stats.pendingGrading} submission{stats.pendingGrading !== 1 ? 's' : ''} waiting for review
+                  </h3>
+                  <p className="text-sm samsung-body text-amber-700 mt-0.5">
+                    Students are waiting for feedback. Check the Tasks section to grade submissions.
+                  </p>
+                </div>
+                <motion.a
+                  href="/dashboard/admin/tasks"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl samsung-body font-medium shadow-lg hover:shadow-xl transition-all"
+                >
+                  Grade Now
+                </motion.a>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Quick Actions Section */}
+          <div>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+              className="flex items-center gap-3 mb-6"
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-samsung-blue/10 to-samsung-cyan/10 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-samsung-blue" />
+              </div>
+              <div>
+                <h2 className="text-xl samsung-heading text-gray-900">Quick Actions</h2>
+                <p className="text-sm samsung-body text-gray-500">Jump to frequently used sections</p>
+              </div>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <AdminQuickAction
+                title="Manage Users"
+                description="View and manage student and admin accounts"
+                icon={AdminIcons.users}
+                iconColor="bg-gradient-to-br from-blue-500 to-blue-600"
+                href="/dashboard/admin/users"
+                badge={stats.totalStudents}
+                delay={0}
+              />
+              <AdminQuickAction
+                title="Manage Courses"
+                description="Create, edit, and organize course content"
+                icon={AdminIcons.courses}
+                iconColor="bg-gradient-to-br from-samsung-cyan to-teal-500"
+                href="/dashboard/admin/courses"
+                badge={stats.totalCourses}
+                delay={1}
+              />
+              <AdminQuickAction
+                title="Manage Tasks"
+                description="Create assignments and grade submissions"
+                icon={AdminIcons.tasks}
+                iconColor="bg-gradient-to-br from-samsung-purple to-purple-600"
+                href="/dashboard/admin/tasks"
+                badge={stats.pendingGrading > 0 ? `${stats.pendingGrading} pending` : undefined}
+                delay={2}
+              />
+              <AdminQuickAction
+                title="Student Rankings"
+                description="View performance leaderboards and statistics"
+                icon={AdminIcons.rankings}
+                iconColor="bg-gradient-to-br from-amber-500 to-orange-500"
+                href="/dashboard/admin/rankings"
+                delay={3}
+              />
+              <AdminQuickAction
+                title="Class Management"
+                description="Manage classes, enrollments, and schedules"
+                icon={AdminIcons.classes}
+                iconColor="bg-gradient-to-br from-pink-500 to-rose-500"
+                href="/dashboard/admin/classes"
+                badge={stats.activeClasses}
+                delay={4}
+              />
+              <AdminQuickAction
+                title="Storage Setup"
+                description="Configure Supabase storage for file uploads"
+                icon={AdminIcons.database}
+                iconColor="bg-gradient-to-br from-gray-600 to-gray-700"
+                href="/dashboard/admin/setup-storage"
+                delay={5}
+              />
+            </div>
           </div>
 
-          {/* Enhanced Quick Actions */}
-          <div>
-            <div className="glass-card p-6 mb-6">
-              <h2 className="text-xl samsung-heading text-gray-900 mb-1">Quick Actions</h2>
-              <p className="samsung-body text-gray-600">Access the most important administrative functions</p>
-            </div>
-            
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(5)].map((_, index) => (
-                  <ActionCardSkeleton key={index} />
-                ))}
+          {/* System Status Footer */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+            className="glass-card p-6 rounded-2xl"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+                <span className="samsung-body text-gray-600">System Status: <span className="text-green-600 font-medium">All systems operational</span></span>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {adminActions.map((action, index) => (
-                  <Link
-                    key={index}
-                    href={action.href}
-                    className="group glass-card p-6 hover:scale-[1.02] transition-all duration-500 hover:shadow-samsung-float"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="flex items-start space-x-4">
-                      <div className={`w-14 h-14 ${action.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-500`}>
-                        <action.icon className="w-7 h-7 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg samsung-heading text-gray-900 group-hover:text-samsung-blue transition-colors duration-300 mb-2">
-                          {action.title}
-                        </h3>
-                        <p className="samsung-body text-gray-600 text-sm mb-3 leading-relaxed">
-                          {action.description}
-                        </p>
-                        <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs samsung-body bg-samsung-blue/10 text-samsung-blue">
-                          {action.stat}
-                        </div>
-                      </div>
-                      <div className="text-gray-400 group-hover:text-samsung-blue transition-all duration-300 group-hover:translate-x-1">
-                        <ArrowRightIcon />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Enhanced Recent Activity Section */}
-          <div>
-            <div className="glass-card p-6 mb-6">
-              <h2 className="text-xl samsung-heading text-gray-900 mb-1">System Overview</h2>
-              <p className="samsung-body text-gray-600">Monitor platform activity and performance</p>
-            </div>
-            
-            <div className="glass-card p-8">
-              <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-samsung-blue/10 rounded-2xl mb-4">
-                  <svg className="w-8 h-8 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl samsung-heading text-gray-900 mb-2">Analytics Dashboard</h3>
-                <p className="samsung-body text-gray-600 mb-4 max-w-md mx-auto">
-                  Comprehensive analytics and activity tracking features are being developed to provide detailed insights into platform usage.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm samsung-body text-gray-500">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-samsung-cyan rounded-full animate-pulse"></div>
-                    <span>Real-time monitoring</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-samsung-blue rounded-full animate-pulse"></div>
-                    <span>Performance metrics</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-samsung-purple rounded-full animate-pulse"></div>
-                    <span>User engagement data</span>
-                  </div>
-                </div>
+              <div className="flex items-center gap-2 text-sm samsung-body text-gray-500">
+                <TrendingUp className="w-4 h-4" />
+                <span>Last updated: {new Date().toLocaleTimeString()}</span>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </DashboardLayout>
     </ProtectedRoute>

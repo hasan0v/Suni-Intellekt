@@ -5,8 +5,17 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { motion } from 'framer-motion'
+import {
+  AdminPageHeader,
+  AdminStatCard,
+  AdminFilterTabs,
+  AdminSearchInput,
+  AdminLoadingSpinner,
+  AdminEmptyState,
+} from '@/components/admin/AdminComponents'
+import { Users, GraduationCap, Shield, UserPlus, Phone, Calendar } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -22,10 +31,11 @@ export default function UserManagement() {
   const router = useRouter()
   const [users, setUsers] = useState<UserProfile[]>([])
   const [loading, setLoading] = useState(true)
-  const [filter, setFilter] = useState<'all' | 'student' | 'admin'>('all')
+  const [filter, setFilter] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
-  if (!user || !profile) return
+    if (!user || !profile) return
     fetchUsers()
   }, [user, profile, router])
 
@@ -51,25 +61,30 @@ export default function UserManagement() {
     }
   }
 
-  if (!user || !profile) {
-    return <div>Loading...</div>
+  if (loading) {
+    return (
+      <DashboardLayout>
+        <AdminLoadingSpinner size="lg" />
+      </DashboardLayout>
+    )
   }
 
-  const filteredUsers = users.filter(user => {
-    if (filter === 'all') return true
-    return user.role === filter
+  const filteredUsers = users.filter(u => {
+    const matchesFilter = filter === 'all' || u.role === filter
+    const matchesSearch = !searchQuery || 
+      u.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.phone_number?.includes(searchQuery)
+    return matchesFilter && matchesSearch
   })
 
-  const getRoleColor = (role: string) => {
-    switch (role) {
-      case 'admin':
-        return 'bg-samsung-purple/10 text-samsung-purple'
-      case 'student':
-        return 'bg-samsung-blue/10 text-samsung-blue'
-      default:
-        return 'bg-samsung-gray-100 text-gray-800'
-    }
-  }
+  const studentCount = users.filter(u => u.role === 'student').length
+  const adminCount = users.filter(u => u.role === 'admin').length
+
+  const filterTabs = [
+    { key: 'all', label: 'All Users', count: users.length },
+    { key: 'student', label: 'Students', count: studentCount },
+    { key: 'admin', label: 'Admins', count: adminCount },
+  ]
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -82,240 +97,204 @@ export default function UserManagement() {
   return (
     <ProtectedRoute requiredRole="admin">
       <DashboardLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="glass-card p-6 flex items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-2xl bg-samsung-blue flex items-center justify-center">
-              <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
-            </div>
-            <div>
-              <h1 className="text-2xl samsung-heading text-gray-900">User Management</h1>
-              <p className="mt-1 samsung-body text-gray-600">
-                Manage student and admin accounts
-              </p>
-            </div>
-          </div>
-          <Link
-            href="/dashboard/admin"
-            className="inline-flex items-center px-4 py-2.5 rounded-xl text-sm samsung-body bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue hover:text-white transition-all duration-300"
+        <div className="space-y-6">
+          {/* Header */}
+          <AdminPageHeader
+            title="User Management"
+            description="View and manage student and admin accounts across your platform."
+            icon={Users}
+            iconColor="bg-gradient-to-br from-blue-500 to-indigo-600"
+            breadcrumbs={[{ label: 'Users' }]}
+          />
+
+          {/* Stats Cards */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
           >
-            ← Back to Admin
-          </Link>
-        </div>
+            <AdminStatCard
+              title="Total Users"
+              value={users.length}
+              subtitle="All registered accounts"
+              icon={Users}
+              iconColor="bg-gradient-to-br from-samsung-blue to-blue-600"
+              delay={0}
+            />
+            <AdminStatCard
+              title="Students"
+              value={studentCount}
+              subtitle="Active learners"
+              icon={GraduationCap}
+              iconColor="bg-gradient-to-br from-samsung-cyan to-teal-600"
+              delay={1}
+            />
+            <AdminStatCard
+              title="Administrators"
+              value={adminCount}
+              subtitle="Platform managers"
+              icon={Shield}
+              iconColor="bg-gradient-to-br from-samsung-purple to-purple-600"
+              delay={2}
+            />
+          </motion.div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-samsung-blue rounded-2xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm samsung-body text-gray-600 truncate">Total Users</dt>
-                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">
-                      {loading ? '...' : users.length}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
+          {/* Filters and Search */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="glass-card p-5 rounded-2xl"
+          >
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <AdminFilterTabs
+                tabs={filterTabs}
+                activeTab={filter}
+                onChange={setFilter}
+              />
+              <AdminSearchInput
+                value={searchQuery}
+                onChange={setSearchQuery}
+                placeholder="Search by name or phone..."
+                className="md:w-72"
+              />
             </div>
-          </div>
-
-          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-samsung-cyan rounded-2xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm samsung-body text-gray-600 truncate">Students</dt>
-                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">
-                      {loading ? '...' : users.filter(u => u.role === 'student').length}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card hover:shadow-samsung-float transition-all duration-500">
-            <div className="p-6">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-samsung-purple rounded-2xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm samsung-body text-gray-600 truncate">Admins</dt>
-                    <dd className="text-2xl samsung-heading text-gray-900 mt-1">
-                      {loading ? '...' : users.filter(u => u.role === 'admin').length}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Filters */}
-        <div className="glass-card">
-          <div className="px-6 py-4 border-b-2 border-samsung-gray-100">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm samsung-body text-gray-700">Filter by role:</span>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setFilter('all')}
-                  className={`px-4 py-2 rounded-xl text-xs samsung-body transition-all duration-300 ${
-                    filter === 'all'
-                      ? 'bg-samsung-blue text-white'
-                      : 'bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20'
-                  }`}
-                >
-                  All ({users.length})
-                </button>
-                <button
-                  onClick={() => setFilter('student')}
-                  className={`px-4 py-2 rounded-xl text-xs samsung-body transition-all duration-300 ${
-                    filter === 'student'
-                      ? 'bg-samsung-blue text-white'
-                      : 'bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20'
-                  }`}
-                >
-                  Students ({users.filter(u => u.role === 'student').length})
-                </button>
-                <button
-                  onClick={() => setFilter('admin')}
-                  className={`px-4 py-2 rounded-xl text-xs samsung-body transition-all duration-300 ${
-                    filter === 'admin'
-                      ? 'bg-samsung-blue text-white'
-                      : 'bg-samsung-blue/10 text-samsung-blue hover:bg-samsung-blue/20'
-                  }`}
-                >
-                  Admins ({users.filter(u => u.role === 'admin').length})
-                </button>
-              </div>
-            </div>
-          </div>
+          </motion.div>
 
           {/* Users Table */}
-          <div className="overflow-hidden">
-            {loading ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-samsung-blue mx-auto"></div>
-                <p className="mt-3 samsung-body text-gray-500">Loading users...</p>
-              </div>
-            ) : filteredUsers.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                <div className="text-5xl mb-3">👤</div>
-                <p className="samsung-body">No users found</p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="glass-card rounded-2xl overflow-hidden"
+          >
+            {filteredUsers.length === 0 ? (
+              <AdminEmptyState
+                icon={Users}
+                title="No users found"
+                description={searchQuery ? "Try adjusting your search criteria." : "No users match the selected filter."}
+              />
             ) : (
-              <table className="min-w-full divide-y divide-samsung-gray-100">
-                <thead className="bg-samsung-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs samsung-heading text-gray-600 uppercase tracking-wider">
-                      User
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs samsung-heading text-gray-600 uppercase tracking-wider">
-                      Role
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs samsung-heading text-gray-600 uppercase tracking-wider">
-                      Contact
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs samsung-heading text-gray-600 uppercase tracking-wider">
-                      Joined
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-samsung-gray-100">
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-samsung-blue/5 transition-colors duration-300">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="flex-shrink-0 h-10 w-10">
-                            <div className="h-10 w-10 rounded-xl bg-samsung-blue flex items-center justify-center">
-                              <span className="text-white samsung-heading text-sm">
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        User
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Role
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Contact
+                      </th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Joined
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {filteredUsers.map((user, index) => (
+                      <motion.tr
+                        key={user.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.05 }}
+                        className="hover:bg-samsung-blue/5 transition-colors duration-200"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-4">
+                            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-samsung-blue to-samsung-cyan flex items-center justify-center shadow-lg">
+                              <span className="text-white font-semibold text-sm">
                                 {user.full_name ? user.full_name.charAt(0).toUpperCase() : '?'}
                               </span>
                             </div>
-                          </div>
-                          <div className="ml-4">
-                            <div className="text-sm samsung-body text-gray-900">
-                              {user.full_name || 'No Name'}
+                            <div>
+                              <p className="text-sm font-medium text-gray-900">
+                                {user.full_name || 'No Name'}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                ID: {user.id.substring(0, 8)}...
+                              </p>
                             </div>
-                            <div className="text-xs samsung-body text-gray-500">
-                              ID: {user.id.substring(0, 8)}...
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full ${
+                            user.role === 'admin' 
+                              ? 'bg-gradient-to-r from-amber-100 to-orange-100 text-amber-700 ring-1 ring-amber-200' 
+                              : 'bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 ring-1 ring-blue-200'
+                          }`}>
+                            {user.role === 'admin' ? (
+                              <Shield className="w-3 h-3" />
+                            ) : (
+                              <GraduationCap className="w-3 h-3" />
+                            )}
+                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {user.phone_number ? (
+                            <div className="flex items-center gap-2 text-sm text-gray-700">
+                              <Phone className="w-4 h-4 text-gray-400" />
+                              {user.phone_number}
                             </div>
+                          ) : (
+                            <span className="text-sm text-gray-400 italic">Not provided</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <Calendar className="w-4 h-4 text-gray-400" />
+                            {formatDate(user.created_at)}
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-3 py-1.5 text-xs samsung-body rounded-xl ${getRoleColor(user.role)}`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm samsung-body text-gray-900">
-                        {user.phone_number ? (
-                          <div>
-                            <div>{user.phone_number}</div>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">Not provided</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm samsung-body text-gray-500">
-                        {formatDate(user.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
-          </div>
-        </div>
+          </motion.div>
 
-        {/* Future Enhancement Notice */}
-        <div className="glass-card p-6 border-2 border-samsung-blue/20">
-          <div className="flex items-start gap-3">
-            <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-samsung-blue/10 flex items-center justify-center">
-                <svg className="w-5 h-5 text-samsung-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+          {/* Coming Soon Features */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="glass-card p-6 rounded-2xl border-2 border-dashed border-samsung-blue/30"
+          >
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-samsung-blue/10 to-samsung-cyan/10 flex items-center justify-center">
+                <UserPlus className="w-6 h-6 text-samsung-blue" />
+              </div>
+              <div>
+                <h3 className="text-lg samsung-heading text-gray-900 mb-1">
+                  More Features Coming Soon
+                </h3>
+                <p className="text-sm samsung-body text-gray-600 mb-3">
+                  We&apos;re working on powerful user management capabilities to help you manage your platform more effectively.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 text-xs font-medium bg-samsung-blue/10 text-samsung-blue rounded-full">
+                    Role Management
+                  </span>
+                  <span className="px-3 py-1 text-xs font-medium bg-samsung-cyan/10 text-samsung-cyan rounded-full">
+                    Bulk Actions
+                  </span>
+                  <span className="px-3 py-1 text-xs font-medium bg-samsung-purple/10 text-samsung-purple rounded-full">
+                    Account Status
+                  </span>
+                  <span className="px-3 py-1 text-xs font-medium bg-samsung-teal/10 text-samsung-teal rounded-full">
+                    Email Notifications
+                  </span>
+                </div>
               </div>
             </div>
-            <div>
-              <h3 className="text-sm samsung-heading text-samsung-blue mb-2">
-                Future Enhancements
-              </h3>
-              <p className="text-sm samsung-body text-gray-700">
-                Coming soon: User role management, account activation/deactivation, and bulk actions.
-              </p>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </div>
-  </DashboardLayout>
-  </ProtectedRoute>
+      </DashboardLayout>
+    </ProtectedRoute>
   )
 }
