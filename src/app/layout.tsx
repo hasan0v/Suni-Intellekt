@@ -18,11 +18,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="az" style={{ backgroundColor: '#ffffff' }}>
+    <html lang="az">
       <head>
-        {/* Critical performance optimizations */}
-        <meta name="color-scheme" content="light" />
-        <meta name="theme-color" content="#ffffff" />
         <meta httpEquiv="x-dns-prefetch-control" content="on" />
         
         {/* PWA Manifest */}
@@ -41,87 +38,12 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/favicon.png" />
         
-    {/* Preload critical resources (removed explicit favicon/logo preloads to avoid unused-preload warnings).
-      Favicons and small site icons are handled by the browser via the icon links above, and
-      hero/LCP images should be preloaded from the page that actually renders them (or via
-      Next/Image priority) to avoid the "preloaded but not used" warning. */}
-        
         {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//api.supabase.co" />
-        
-        {/* Prefetch likely next pages */}
-        <link rel="prefetch" href="/dashboard" />
-        <link rel="prefetch" href="/auth/signin" />
-        
-        {/* Critical inline CSS for FOUC prevention and blazing fast rendering */}
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            html, body { 
-              background-color: #ffffff !important; 
-              color: #171717 !important;
-              margin: 0;
-              padding: 0;
-              font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-              -webkit-font-smoothing: antialiased;
-              -moz-osx-font-smoothing: grayscale;
-            }
-            
-            /* Loading optimization for blazing fast perceived performance */
-            .loading-skeleton {
-              background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-              background-size: 200% 100%;
-              animation: loading 1.5s infinite;
-            }
-            
-            @keyframes loading {
-              0% { background-position: 200% 0; }
-              100% { background-position: -200% 0; }
-            }
-            
-            /* Prevent layout shift for stable performance */
-            .container-fixed {
-              min-height: 100vh;
-              width: 100%;
-            }
-            
-            /* Optimized transitions */
-            * {
-              box-sizing: border-box;
-            }
-            
-            img {
-              max-width: 100%;
-              height: auto;
-            }
-            
-            /* Loading indicator for instant feedback */
-            .global-loading {
-              position: fixed;
-              top: 0;
-              left: 0;
-              right: 0;
-              height: 3px;
-              background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-              z-index: 9999;
-              opacity: 0;
-              transition: opacity 0.3s ease;
-            }
-            
-            .global-loading.active {
-              opacity: 1;
-            }
-          `
-        }} />
       </head>
-      <body
-        className={`${inter.className} antialiased bg-white container-fixed`}
-        style={{ backgroundColor: '#ffffff' }}
-      >
-        {/* Global loading indicator */}
-        <div id="global-loading" className="global-loading" />
-        
+      <body className={`${inter.className} antialiased`}>
         <ErrorBoundary resetOnPropsChange={true}>
           <AuthProvider>
             <ToastProvider>

@@ -185,30 +185,39 @@
 /* Base Styles - Samsung Design Foundation */
 * {
   scroll-behavior: smooth;
+  box-sizing: border-box;
 }
 
 html {
-  background-color: var(--samsung-white) !important;
   font-size: 16px;
+  background-color: var(--samsung-gray-50);
 }
 
 body {
-  color: var(--foreground) !important;
-  background: var(--background) !important;
-  background-color: var(--samsung-gray-50) !important;
+  color: var(--foreground);
+  background-color: var(--samsung-gray-50);
   font-family: 'Samsung Sharp Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.01em;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
-/* Ensure all containers use soft backgrounds */
-#__next, 
-main, 
-.app-container,
-[data-theme] {
-  background-color: var(--samsung-gray-50) !important;
+/* Landing Page Dark Theme - High specificity override */
+html:has(.landing-dark-theme),
+html:has(.landing-dark-theme) body {
+  background: #030712 !important;
+  background-color: #030712 !important;
+}
+
+.landing-dark-theme {
+  background: linear-gradient(to bottom right, #030712, #111827, #030712) !important;
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+  min-height: 100vh;
 }
 
 /* Samsung-Style Scrollbars */
@@ -1044,6 +1053,83 @@ main,
 
 .rich-text-content .hl-builtin {
   color: #569cd6 !important;
+}
+
+/* ========================================
+   Landing Page Dark Theme Override
+   ======================================== */
+
+/* Dark theme for landing pages - applied via data attribute on html */
+html[data-landing-dark="true"],
+html[data-landing-dark="true"] body {
+  background: #030712 !important;
+  background-color: #030712 !important;
+}
+
+.landing-dark-theme,
+.course-details-dark,
+.apply-dark-theme {
+  --background: #030712 !important;
+  --foreground: #f9fafb !important;
+  background: linear-gradient(to bottom right, #030712, #111827, #030712) !important;
+  background-color: #030712 !important;
+  color: #f9fafb !important;
+  min-height: 100vh;
+}
+
+.landing-dark-theme *,
+.course-details-dark *,
+.apply-dark-theme * {
+  --background: #030712;
+  --foreground: #f9fafb;
+}
+
+/* Landing page navigation */
+.landing-dark-theme nav,
+.course-details-dark nav,
+.apply-dark-theme nav {
+  background: rgba(3, 7, 18, 0.8) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+
+/* Landing page sections */
+.landing-dark-theme section,
+.course-details-dark section,
+.apply-dark-theme section {
+  background: transparent !important;
+}
+
+/* Landing page cards */
+.landing-dark-theme .landing-card,
+.course-details-dark .landing-card {
+  background: rgba(17, 24, 39, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.landing-dark-theme .landing-card:hover,
+.course-details-dark .landing-card:hover {
+  background: rgba(17, 24, 39, 0.8) !important;
+  border-color: rgba(139, 92, 246, 0.3) !important;
+}
+
+/* Landing page text colors */
+.landing-dark-theme h1,
+.landing-dark-theme h2,
+.landing-dark-theme h3,
+.course-details-dark h1,
+.course-details-dark h2,
+.course-details-dark h3,
+.apply-dark-theme h1,
+.apply-dark-theme h2,
+.apply-dark-theme h3 {
+  color: #ffffff !important;
+}
+
+.landing-dark-theme p,
+.course-details-dark p,
+.apply-dark-theme p {
+  color: #9ca3af !important;
 }
 
 /* Responsive Design Helpers */
