@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -39,8 +39,24 @@ export default function SignInPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
+  const [registrationEnabled, setRegistrationEnabled] = useState(false)
   const { signIn } = useAuth()
   const router = useRouter()
+
+  // Check registration status
+  useEffect(() => {
+    const checkRegistration = async () => {
+      try {
+        const res = await fetch('/api/settings?key=registration_enabled')
+        const data = await res.json()
+        setRegistrationEnabled(data.value?.enabled === true)
+      } catch (error) {
+        console.error('Error checking registration status:', error)
+        setRegistrationEnabled(false)
+      }
+    }
+    checkRegistration()
+  }, [])
 
   // Email validation function
   const validateEmail = (email: string): boolean => {
@@ -114,10 +130,12 @@ export default function SignInPage() {
                 <Logo size="md" uppercase showText />
               </div>
               <div className="flex items-center gap-3">
-                <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Daxil ol</Link>
-                <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
-                  <span>⚡</span> Qeydiyyat
-                </Link>
+                <Link href="/" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Ana Səhifə</Link>
+                {registrationEnabled && (
+                  <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
+                    <span>⚡</span> Qeydiyyat
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -134,12 +152,14 @@ export default function SignInPage() {
             <p className="samsung-body text-gray-700 text-lg">
               Öyrənmə səyahətinə davam etmək üçün daxil olun
             </p>
-            <p className="mt-6 samsung-body text-gray-600">
-              Hesabınız yoxdur?{' '}
-              <Link href="/auth/signup" className="font-semibold text-samsung-blue hover:text-samsung-blue-dark transition-colors hover:underline">
-                Burada yaradın
-              </Link>
-            </p>
+            {registrationEnabled && (
+              <p className="mt-6 samsung-body text-gray-600">
+                Hesabınız yoxdur?{' '}
+                <Link href="/auth/signup" className="font-semibold text-samsung-blue hover:text-samsung-blue-dark transition-colors hover:underline">
+                  Burada yaradın
+                </Link>
+              </p>
+            )}
           </div>
           
           {/* Enhanced Form */}

@@ -1,8 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { supabaseAdmin, supabaseServiceKey } from '@/lib/supabase'
 
 export async function GET(request: Request) {
   try {
@@ -15,8 +12,6 @@ export async function GET(request: Request) {
         { status: 500 }
       )
     }
-
-    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
 
     // Get all policies for the bucket
     const { data: policies, error } = await supabaseAdmin

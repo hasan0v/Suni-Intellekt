@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Süni İntellekt Kursu - Ətraflı Sillabus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #030712;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.6);
+      --bg-card-hover: rgba(17, 24, 39, 0.8);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-hover: rgba(139, 92, 246, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --purple-500: #8b5cf6;
+      --purple-600: #7c3aed;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --cyan-500: #06b6d4;
+      --green-500: #22c55e;
+      --green-400: #4ade80;
+      --orange-500: #f97316;
+      --red-500: #ef4444;
+      --indigo-500: #6366f1;
+      --pink-500: #ec4899;
+      --yellow-500: #eab308;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(to bottom right, var(--bg-primary), var(--bg-secondary), var(--bg-primary));
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      background: rgba(3, 7, 18, 0.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--purple-500), var(--blue-500), var(--green-500));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2));
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      color: var(--purple-500);
+    }
+
+    /* Hero Section */
+    .hero {
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--purple-500), var(--blue-500), var(--cyan-500));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .hero p {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--purple-500), var(--blue-500));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Week Section */
+    .week-section {
+      margin-bottom: 3rem;
+    }
+
+    .week-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .week-number {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: white;
+    }
+
+    .week-info h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.25rem;
+    }
+
+    .week-info p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Lessons Grid */
+    .lessons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 500px) {
+      .lessons-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Lesson Card */
+    .lesson-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lesson-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .lesson-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -20px rgba(139, 92, 246, 0.3);
+    }
+
+    .lesson-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .lesson-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .lesson-meta {
+      flex: 1;
+    }
+
+    .lesson-number {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .lesson-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+
+    .lesson-description {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    /* Topics List */
+    .topics-list {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+
+    .topics-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      padding: 0.375rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .topics-list li:last-child {
+      border-bottom: none;
+    }
+
+    .topics-list li::before {
+      content: '→';
+      color: var(--purple-500);
+      font-weight: 600;
+    }
+
+    /* Lesson Footer */
+    .lesson-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .lesson-type {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.375rem 0.75rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .type-theory {
+      background: rgba(59, 130, 246, 0.2);
+      color: var(--blue-500);
+    }
+
+    .type-practice {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--green-500);
+    }
+
+    .type-project {
+      background: rgba(249, 115, 22, 0.2);
+      color: var(--orange-500);
+    }
+
+    .type-exam {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--red-500);
+    }
+
+    .lesson-duration {
+      display: flex;
+      align-items: center;
+      gap: 0.375rem;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Color Themes for Weeks */
+    .week-1 .week-number { background: linear-gradient(135deg, var(--purple-500), var(--purple-600)); }
+    .week-1 .lesson-card::before { background: linear-gradient(90deg, var(--purple-500), var(--purple-600)); }
+    .week-1 .lesson-icon { background: rgba(139, 92, 246, 0.2); }
+    .week-1 .lesson-number { color: var(--purple-500); }
+
+    .week-2 .week-number { background: linear-gradient(135deg, var(--blue-500), var(--blue-600)); }
+    .week-2 .lesson-card::before { background: linear-gradient(90deg, var(--blue-500), var(--blue-600)); }
+    .week-2 .lesson-icon { background: rgba(59, 130, 246, 0.2); }
+    .week-2 .lesson-number { color: var(--blue-500); }
+
+    .week-3 .week-number { background: linear-gradient(135deg, var(--cyan-500), #0891b2); }
+    .week-3 .lesson-card::before { background: linear-gradient(90deg, var(--cyan-500), #0891b2); }
+    .week-3 .lesson-icon { background: rgba(6, 182, 212, 0.2); }
+    .week-3 .lesson-number { color: var(--cyan-500); }
+
+    .week-4 .week-number { background: linear-gradient(135deg, var(--green-500), #16a34a); }
+    .week-4 .lesson-card::before { background: linear-gradient(90deg, var(--green-500), #16a34a); }
+    .week-4 .lesson-icon { background: rgba(34, 197, 94, 0.2); }
+    .week-4 .lesson-number { color: var(--green-500); }
+
+    .week-5 .week-number { background: linear-gradient(135deg, var(--orange-500), #ea580c); }
+    .week-5 .lesson-card::before { background: linear-gradient(90deg, var(--orange-500), #ea580c); }
+    .week-5 .lesson-icon { background: rgba(249, 115, 22, 0.2); }
+    .week-5 .lesson-number { color: var(--orange-500); }
+
+    .week-6 .week-number { background: linear-gradient(135deg, var(--pink-500), #db2777); }
+    .week-6 .lesson-card::before { background: linear-gradient(90deg, var(--pink-500), #db2777); }
+    .week-6 .lesson-icon { background: rgba(236, 72, 153, 0.2); }
+    .week-6 .lesson-number { color: var(--pink-500); }
+
+    .week-7 .week-number { background: linear-gradient(135deg, var(--indigo-500), #4f46e5); }
+    .week-7 .lesson-card::before { background: linear-gradient(90deg, var(--indigo-500), #4f46e5); }
+    .week-7 .lesson-icon { background: rgba(99, 102, 241, 0.2); }
+    .week-7 .lesson-number { color: var(--indigo-500); }
+
+    .week-8 .week-number { background: linear-gradient(135deg, var(--yellow-500), #ca8a04); }
+    .week-8 .lesson-card::before { background: linear-gradient(90deg, var(--yellow-500), #ca8a04); }
+    .week-8 .lesson-icon { background: rgba(234, 179, 8, 0.2); }
+    .week-8 .lesson-number { color: var(--yellow-500); }
+
+    .week-exam .week-number { background: linear-gradient(135deg, var(--red-500), #dc2626); }
+    .week-exam .lesson-card::before { background: linear-gradient(90deg, var(--red-500), #dc2626); }
+    .week-exam .lesson-icon { background: rgba(239, 68, 68, 0.2); }
+    .week-exam .lesson-number { color: var(--red-500); }
+
+    /* Exam Section */
+    .exam-section {
+      margin-top: 4rem;
+      padding-top: 3rem;
+      border-top: 2px solid var(--border-color);
+    }
+
+    .exam-card {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+      border: 2px solid rgba(239, 68, 68, 0.3);
+      border-radius: 24px;
+      padding: 2.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exam-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--red-500), var(--orange-500));
+    }
+
+    .exam-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem;
+      background: rgba(239, 68, 68, 0.2);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+    }
+
+    .exam-card h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .exam-card > p {
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    .exam-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .exam-detail {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    .exam-detail-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--red-500);
+    }
+
+    .exam-detail-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .exam-topics {
+      text-align: left;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .exam-topics h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .exam-topics ul {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .exam-topics li {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .exam-topics li::before {
+      content: '✓';
+      color: var(--green-500);
+      font-weight: 600;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 3rem 2rem;
+      border-top: 1px solid var(--border-color);
+      margin-top: 4rem;
+    }
+
+    .footer p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Distribution Bar */
+    .distribution-section {
+      margin: 3rem 0;
+      padding: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+    }
+
+    .distribution-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .distribution-bar {
+      display: flex;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 40px;
+      margin-bottom: 1rem;
+    }
+
+    .distribution-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .distribution-segment.theory {
+      background: var(--blue-500);
+      width: 20%;
+    }
+
+    .distribution-segment.practice {
+      background: var(--green-500);
+      width: 40%;
+    }
+
+    .distribution-segment.project {
+      background: var(--orange-500);
+      width: 40%;
+    }
+
+    .distribution-legend {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+
+    .legend-dot.theory { background: var(--blue-500); }
+    .legend-dot.practice { background: var(--green-500); }
+    .legend-dot.project { background: var(--orange-500); }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+      
+      .header {
+        position: static;
+      }
+      
+      .lesson-card:hover {
+        transform: none;
+        box-shadow: none;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .hero {
+        padding: 2rem 1rem;
+      }
+
+      .hero-stats {
+        gap: 1.5rem;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+      }
+
+      .week-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .exam-details {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .distribution-legend {
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">SÜNİ İNTELLEKT</div>
+      <div class="header-badge">
+        <span>📚</span>
+        <span>Ətraflı Sillabus</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Praktiki Süni İntellekt Kursu</h1>
+      <p>8 həftə ərzində AI alətlərini praktiki şəkildə öyrənin. Hər həftə 2 dərs, cəmi 16 dərs + final imtahanı.</p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-value">8</div>
+          <div class="stat-label">Həftə</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">16</div>
+          <div class="stat-label">Dərs</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">1</div>
+          <div class="stat-label">İmtahan</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">7+</div>
+          <div class="stat-label">AI Alət</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Distribution Section -->
+  <div class="main-content">
+    <div class="distribution-section">
+      <div class="distribution-title">Kurs Strukturu</div>
+      <div class="distribution-bar">
+        <div class="distribution-segment theory">20%</div>
+        <div class="distribution-segment practice">40%</div>
+        <div class="distribution-segment project">40%</div>
+      </div>
+      <div class="distribution-legend">
+        <div class="legend-item">
+          <div class="legend-dot theory"></div>
+          <span>Nəzəri</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot practice"></div>
+          <span>Praktiki</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot project"></div>
+          <span>Layihə</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Week 1 -->
+    <section class="week-section week-1">
+      <div class="week-header">
+        <div class="week-number">1</div>
+        <div class="week-info">
+          <h2>Həftə 1: AI Əsasları və GitHub Copilot</h2>
+          <p>Süni intellektə giriş və kodlaşdırmada AI köməkçisi</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎯</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 1</div>
+              <div class="lesson-title">Süni İntellektə Giriş və AI Alətləri</div>
+            </div>
+          </div>
+          <p class="lesson-description">AI-ın əsas anlayışları, müasir AI alətləri ekosistemi və kursa ümumi baxış.</p>
+          <ul class="topics-list">
+            <li>Süni intellekt nədir? Tarix və inkişaf</li>
+            <li>Generativ AI və LLM-lər</li>
+            <li>AI alətlərinin kateqoriyaları</li>
+            <li>Kurs strukturu və qiymətləndirmə</li>
+            <li>İş mühitinin qurulması</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-theory">📖 Nəzəri</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">💻</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 2</div>
+              <div class="lesson-title">GitHub Copilot - Əsaslar</div>
+            </div>
+          </div>
+          <p class="lesson-description">GitHub Copilot quraşdırılması, ilk addımlar və əsas istifadə üsulları.</p>
+          <ul class="topics-list">
+            <li>GitHub Copilot quraşdırılması</li>
+            <li>VS Code inteqrasiyası</li>
+            <li>İlk kod təklifləri və qəbulu</li>
+            <li>Copilot Chat ilə tanışlıq</li>
+            <li>Praktiki tapşırıq: Sadə proqram yazılması</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 2 -->
+    <section class="week-section week-2">
+      <div class="week-header">
+        <div class="week-number">2</div>
+        <div class="week-info">
+          <h2>Həftə 2: GitHub Copilot İrəliləyiş</h2>
+          <p>Qabaqcıl Copilot texnikaları və layihə strukturları</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">⚡</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 3</div>
+              <div class="lesson-title">Copilot Qabaqcıl Texnikalar</div>
+            </div>
+          </div>
+          <p class="lesson-description">Effektiv prompt yazımı, kod refaktorinqi və debugging ilə Copilot.</p>
+          <ul class="topics-list">
+            <li>Prompt mühəndisliyi əsasları</li>
+            <li>Kontekst idarəetməsi</li>
+            <li>Kod refaktorinqi avtomatlaşdırması</li>
+            <li>Bug axtarışı və düzəltmə</li>
+            <li>Unit test generasiyası</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🏗️</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 4</div>
+              <div class="lesson-title">Copilot ilə Layihə - Mini Proqram</div>
+            </div>
+          </div>
+          <p class="lesson-description">Copilot istifadə edərək tam funksional mini layihə yaratmaq.</p>
+          <ul class="topics-list">
+            <li>Layihə planlaması və strukturu</li>
+            <li>Copilot ilə sürətli prototipləmə</li>
+            <li>API inteqrasiyası</li>
+            <li>Error handling</li>
+            <li>Kod dokumentasiyası avtomatlaşdırması</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-project">🚀 Layihə</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 3 -->
+    <section class="week-section week-3">
+      <div class="week-header">
+        <div class="week-number">3</div>
+        <div class="week-info">
+          <h2>Həftə 3: MCP (Model Context Protocol)</h2>
+          <p>AI modellərinin kontekst idarəetməsi və inteqrasiyası</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🔗</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 5</div>
+              <div class="lesson-title">MCP Əsasları və Arxitektura</div>
+            </div>
+          </div>
+          <p class="lesson-description">Model Context Protocol-un əsasları, arxitekturası və istifadə sahələri.</p>
+          <ul class="topics-list">
+            <li>MCP nədir və niyə lazımdır?</li>
+            <li>Protokol arxitekturası</li>
+            <li>Server və Client anlayışları</li>
+            <li>Əsas MCP serverləri</li>
+            <li>Claude Desktop inteqrasiyası</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-theory">📖 Nəzəri</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🛠️</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 6</div>
+              <div class="lesson-title">MCP Server Yaratmaq</div>
+            </div>
+          </div>
+          <p class="lesson-description">Öz MCP serverinizi yaratmaq və konfiqurasiya etmək.</p>
+          <ul class="topics-list">
+            <li>MCP server qurulumu</li>
+            <li>Tools və Resources yaratmaq</li>
+            <li>Prompts implementasiyası</li>
+            <li>Error handling və logging</li>
+            <li>Praktiki tapşırıq: Xüsusi MCP server</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 4 -->
+    <section class="week-section week-4">
+      <div class="week-header">
+        <div class="week-number">4</div>
+        <div class="week-info">
+          <h2>Həftə 4: Pinokio və Lokal AI</h2>
+          <p>Yerli kompüterdə AI modellərinin işlədilməsi</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🤖</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 7</div>
+              <div class="lesson-title">Pinokio Platforması</div>
+            </div>
+          </div>
+          <p class="lesson-description">Pinokio ilə lokal AI modelləri quraşdırma və idarəetmə.</p>
+          <ul class="topics-list">
+            <li>Pinokio quraşdırılması</li>
+            <li>Populyar AI alətlərinin yüklənməsi</li>
+            <li>Stable Diffusion inteqrasiyası</li>
+            <li>ComfyUI əsasları</li>
+            <li>Resurs idarəetməsi (GPU/RAM)</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🖼️</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 8</div>
+              <div class="lesson-title">Şəkil Generasiyası Layihəsi</div>
+            </div>
+          </div>
+          <p class="lesson-description">Lokal AI ilə şəkil generasiyası workflow yaratmaq.</p>
+          <ul class="topics-list">
+            <li>Prompt yazımı şəkil üçün</li>
+            <li>Model seçimi və parametrlər</li>
+            <li>Batch prosessing</li>
+            <li>Şəkil postprosessinqi</li>
+            <li>Layihə: Şəkil generasiya pipeline</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-project">🚀 Layihə</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 5 -->
+    <section class="week-section week-5">
+      <div class="week-header">
+        <div class="week-number">5</div>
+        <div class="week-info">
+          <h2>Həftə 5: Audio AI Alətləri</h2>
+          <p>Səs sintezi, tanıma və redaktəsi</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎤</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 9</div>
+              <div class="lesson-title">Səs Sintezi və TTS</div>
+            </div>
+          </div>
+          <p class="lesson-description">Text-to-Speech alətləri və səs klonlaşdırma texnologiyaları.</p>
+          <ul class="topics-list">
+            <li>TTS texnologiyalarına baxış</li>
+            <li>ElevenLabs istifadəsi</li>
+            <li>Lokal TTS alətləri</li>
+            <li>Səs klonlaşdırma əsasları</li>
+            <li>Çoxdilli səs sintezi</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎧</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 10</div>
+              <div class="lesson-title">Audio Redaktə və STT</div>
+            </div>
+          </div>
+          <p class="lesson-description">Səsdən mətnə çevirmə və audio redaktə alətləri.</p>
+          <ul class="topics-list">
+            <li>Whisper modeli və istifadəsi</li>
+            <li>Real-time transkripsiya</li>
+            <li>Audio təmizləmə AI ilə</li>
+            <li>Musiqi generasiyası əsasları</li>
+            <li>Layihə: Podcast transkripsiya sistemi</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-project">🚀 Layihə</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 6 -->
+    <section class="week-section week-6">
+      <div class="week-header">
+        <div class="week-number">6</div>
+        <div class="week-info">
+          <h2>Həftə 6: AI Prezentasiyalar</h2>
+          <p>Genspark, Manus və Google Gemini ilə prezentasiyalar</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">📊</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 11</div>
+              <div class="lesson-title">Genspark və Manus AI</div>
+            </div>
+          </div>
+          <p class="lesson-description">Genspark və Manus ilə peşəkar prezentasiyalar yaratmaq.</p>
+          <ul class="topics-list">
+            <li>Genspark platforması və imkanları</li>
+            <li>Manus AI ilə slayd generasiyası</li>
+            <li>AI ilə məzmun strukturlaşdırması</li>
+            <li>Vizual elementlərin avtomatik əlavəsi</li>
+            <li>Export formatları və paylaşım</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎨</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 12</div>
+              <div class="lesson-title">Google Gemini ilə Prezentasiya Layihəsi</div>
+            </div>
+          </div>
+          <p class="lesson-description">Google Gemini və AI alətləri ilə tam prezentasiya paketi yaratmaq.</p>
+          <ul class="topics-list">
+            <li>Google Gemini prezentasiya funksiyaları</li>
+            <li>Google Slides AI inteqrasiyası</li>
+            <li>Gemini ilə məzmun və dizayn</li>
+            <li>Multi-modal prezentasiya yaratmaq</li>
+            <li>Layihə: Tam biznes prezentasiyası</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-project">🚀 Layihə</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 7 -->
+    <section class="week-section week-7">
+      <div class="week-header">
+        <div class="week-number">7</div>
+        <div class="week-info">
+          <h2>Həftə 7: Video AI</h2>
+          <p>Kling, Veo 3 və Wan 2.2 ilə video yaratma</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎬</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 13</div>
+              <div class="lesson-title">Kling və Veo 3 Video Generasiya</div>
+            </div>
+          </div>
+          <p class="lesson-description">Kling AI və Google Veo 3 ilə professional video yaratma.</p>
+          <ul class="topics-list">
+            <li>Kling AI platforması və imkanları</li>
+            <li>Google Veo 3 istifadəsi</li>
+            <li>Text-to-Video generasiya</li>
+            <li>Image-to-Video çevirmə</li>
+            <li>Video uzatma və keyframe nəzarəti</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎥</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 14</div>
+              <div class="lesson-title">Wan 2.2 Lokal Video və Layihə</div>
+            </div>
+          </div>
+          <p class="lesson-description">Wan 2.2 lokal video modeli və tam video məzmun yaratmaq.</p>
+          <ul class="topics-list">
+            <li>Wan 2.2 modeli quraşdırılması</li>
+            <li>Lokal video generasiya workflow</li>
+            <li>Pinokio ilə Wan inteqrasiyası</li>
+            <li>Video skript və voiceover əlavəsi</li>
+            <li>Layihə: Qısa promo video</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-project">🚀 Layihə</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Week 8 -->
+    <section class="week-section week-8">
+      <div class="week-header">
+        <div class="week-number">8</div>
+        <div class="week-info">
+          <h2>Həftə 8: Akademik Yazı və Final</h2>
+          <p>Gemini Deep Research və Genspark ilə tezis yazma</p>
+        </div>
+      </div>
+      <div class="lessons-grid">
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">📝</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 15</div>
+              <div class="lesson-title">Gemini Deep Research</div>
+            </div>
+          </div>
+          <p class="lesson-description">Google Gemini Deep Research ilə dərin tədqiqat aparmaq.</p>
+          <ul class="topics-list">
+            <li>Gemini Deep Research funksiyaları</li>
+            <li>Avtomatik mənbə axtarma və analiz</li>
+            <li>Tədqiqat hesabatı generasiyası</li>
+            <li>Mənbələrin doğrulanması və sitatlar</li>
+            <li>Akademik məlumat toplama workflow</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-practice">🔧 Praktiki</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+
+        <div class="lesson-card">
+          <div class="lesson-header">
+            <div class="lesson-icon">🎓</div>
+            <div class="lesson-meta">
+              <div class="lesson-number">Dərs 16</div>
+              <div class="lesson-title">Genspark ilə Tam Tezis Yazma</div>
+            </div>
+          </div>
+          <p class="lesson-description">Genspark platforması ilə tam akademik tezis hazırlamaq.</p>
+          <ul class="topics-list">
+            <li>Genspark akademik yazı funksiyaları</li>
+            <li>Tezis strukturu və planlaşdırma</li>
+            <li>Avtomatik bölmə generasiyası</li>
+            <li>Sitat və biblioqrafiya idarəsi</li>
+            <li>Layihə: Tam akademik tezis</li>
+          </ul>
+          <div class="lesson-footer">
+            <span class="lesson-type type-project">🚀 Layihə</span>
+            <span class="lesson-duration">⏱️ 2 saat</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final Exam Section -->
+    <section class="exam-section week-exam">
+      <div class="exam-card">
+        <div class="exam-icon">📋</div>
+        <h2>Final İmtahanı</h2>
+        <p>Kursun sonunda bilik və bacarıqların qiymətləndirilməsi</p>
+        
+        <div class="exam-details">
+          <div class="exam-detail">
+            <div class="exam-detail-value">90</div>
+            <div class="exam-detail-label">Dəqiqə</div>
+          </div>
+          <div class="exam-detail">
+            <div class="exam-detail-value">50</div>
+            <div class="exam-detail-label">Sual</div>
+          </div>
+          <div class="exam-detail">
+            <div class="exam-detail-value">60%</div>
+            <div class="exam-detail-label">Keçid balı</div>
+          </div>
+          <div class="exam-detail">
+            <div class="exam-detail-value">30%</div>
+            <div class="exam-detail-label">Final çəkisi</div>
+          </div>
+        </div>
+
+        <div class="exam-topics">
+          <h3>📚 İmtahan Mövzuları</h3>
+          <ul>
+            <li>GitHub Copilot və prompt mühəndisliyi</li>
+            <li>MCP protokolu və server yaratmaq</li>
+            <li>Pinokio və lokal AI modelləri</li>
+            <li>Audio AI: TTS və STT</li>
+            <li>Genspark, Manus və Gemini</li>
+            <li>Kling, Veo 3 və Wan 2.2 video</li>
+            <li>Gemini Deep Research və Genspark tezis</li>
+            <li>AI etikası və best practices</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>© 2025 SÜNİ İNTELLEKT Kursu. Bütün hüquqlar qorunur.</p>
+    <p style="margin-top: 0.5rem; color: var(--purple-500);">Gələcəyin texnologiyasını bu gün öyrənin! 🚀</p>
+  </footer>
+</body>
+</html>

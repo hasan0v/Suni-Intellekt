@@ -1,16 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
   "framework": "nextjs",
-  "functions": {
-    "src/app/**/*.ts": {
-      "maxDuration": 30
-    },
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
+  "regions": ["fra1"],
+  "build": {
+    "env": {
+      "NODE_VERSION": "20"
     }
-  },
-  "regions": ["fra1"]
+  }
 }

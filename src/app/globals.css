@@ -1155,6 +1155,71 @@ html[data-landing-dark="true"] body {
   }
 }
 
+/* ========================================
+   Performance-Optimized Animations
+   ======================================== */
+
+/* Simple fade-in animation - GPU accelerated */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+  will-change: opacity, transform;
+}
+
+/* Slide down for mobile menu */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideDown {
+  animation: slideDown 0.2s ease-out forwards;
+}
+
+/* Scroll indicator animation - simple CSS */
+@keyframes scrollIndicator {
+  0%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(12px);
+    opacity: 0.8;
+  }
+}
+
+.animate-scrollIndicator {
+  animation: scrollIndicator 1.5s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Reduced motion alternatives */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fadeIn,
+  .animate-slideDown,
+  .animate-scrollIndicator {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
 /* Focus Styles */
 *:focus-visible {
   outline: 2px solid var(--primary-500);

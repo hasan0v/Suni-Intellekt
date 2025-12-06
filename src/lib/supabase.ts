@@ -1,10 +1,31 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Sanitize environment variables to remove any non-ASCII characters
+// This fixes "Failed to execute 'set' on 'Headers': String contains non ISO-8859-1 code point" errors
+export function sanitizeEnvVar(value: string | undefined): string {
+  if (!value) return ''
+  // Remove any non-ASCII characters (invisible unicode, smart quotes, etc.)
+  return value.replace(/[^\x00-\x7F]/g, '').trim()
+}
+
 // Create Supabase client with fallback for build time
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder'
+// Export sanitized values for use in other modules
+export const supabaseUrl = sanitizeEnvVar(process.env.NEXT_PUBLIC_SUPABASE_URL) || 'https://placeholder.supabase.co'
+export const supabaseAnonKey = sanitizeEnvVar(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) || 'placeholder'
+export const supabaseServiceKey = sanitizeEnvVar(process.env.SUPABASE_SERVICE_ROLE_KEY) || ''
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+// Admin client for server-side operations that bypass RLS
+// Only use this in API routes, never expose to client
+export const supabaseAdmin = supabaseServiceKey 
+  ? createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : supabase // fallback to regular client if no service key
 
 // Type definitions for our database schema
 export interface UserProfile {

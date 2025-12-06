@@ -1,72 +1,39 @@
 "use client"
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { useAuth } from '@/contexts/AuthContext'
 import { usePathname, useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Sparkles, ChevronRight, Brain, Cpu, Zap, Play, ArrowRight,
-  Headphones, Presentation, Video, GraduationCap, Code, Menu, X
+  Headphones, Presentation, Video, GraduationCap, Code, Menu, X, Clock
 } from 'lucide-react'
 
-// Floating Particle Component
-const FloatingParticle: React.FC<{ emoji: string; delay: number; index: number }> = ({ emoji, delay, index }) => {
-  const positions = [
-    { x: '10%', y: '20%' },
-    { x: '85%', y: '15%' },
-    { x: '75%', y: '70%' },
-    { x: '15%', y: '75%' },
-    { x: '50%', y: '10%' }
-  ]
-  
-  const pos = positions[index % positions.length]
-  
-  return (
-    <motion.div
-      className="absolute text-3xl md:text-4xl opacity-20 pointer-events-none select-none"
-      style={{ left: pos.x, top: pos.y }}
-      initial={{ opacity: 0, scale: 0 }}
-      animate={{ 
-        opacity: [0.1, 0.3, 0.1],
-        scale: [0.8, 1.2, 0.8],
-        y: [0, -20, 0],
-        rotate: [0, 10, -10, 0]
-      }}
-      transition={{
-        duration: 4,
-        delay: delay,
-        repeat: Infinity,
-        ease: "easeInOut"
-      }}
-    >
-      {emoji}
-    </motion.div>
-  )
-}
-
-// Glowing Orb Component
-const GlowingOrb: React.FC<{ color: string; size: string; position: { x: string; y: string }; delay: number }> = ({ 
-  color, size, position, delay 
+// Static Orb Component - CSS only, no JS animations
+const StaticOrb: React.FC<{ color: string; size: string; position: { x: string; y: string }; className?: string }> = ({ 
+  color, size, position, className = ''
 }) => (
-  <motion.div
-    className={`absolute ${size} rounded-full blur-3xl opacity-30 pointer-events-none`}
+  <div
+    className={`absolute ${size} rounded-full blur-3xl opacity-20 pointer-events-none ${className}`}
     style={{ 
       left: position.x, 
       top: position.y,
-      background: `radial-gradient(circle, ${color} 0%, transparent 70%)`
-    }}
-    animate={{
-      scale: [1, 1.2, 1],
-      opacity: [0.2, 0.4, 0.2]
-    }}
-    transition={{
-      duration: 5,
-      delay,
-      repeat: Infinity,
-      ease: "easeInOut"
+      background: `radial-gradient(circle, ${color} 0%, transparent 70%)`,
+      willChange: 'opacity',
     }}
   />
+)
+
+// Simple fade-in animation using CSS
+const FadeIn: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ 
+  children, delay = 0, className = '' 
+}) => (
+  <div 
+    className={`animate-fadeIn ${className}`}
+    style={{ animationDelay: `${delay}ms`, animationFillMode: 'both' }}
+  >
+    {children}
+  </div>
 )
 
 export default function Home() {
@@ -76,48 +43,81 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [showSignUp, setShowSignUp] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [registrationEnabled, setRegistrationEnabled] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  // Check for reduced motion preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
 
   useEffect(() => setMounted(true), [])
+  
+  // Force dark mode on mount
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#030712'
+    document.documentElement.style.colorScheme = 'dark'
+    document.body.style.backgroundColor = '#030712'
+    document.body.style.color = '#f9fafb'
+    document.documentElement.classList.add('dark')
+  }, [])
+  
   useEffect(() => { 
     if (!loading && user && pathname !== '/dashboard') router.replace('/dashboard') 
   }, [user, loading, router, pathname])
 
-  // Apply dark theme to html/body for landing page
+  // Check if registration is enabled
   useEffect(() => {
-    // Set data attribute and inline styles to override global CSS
-    document.documentElement.setAttribute('data-landing-dark', 'true')
-    document.documentElement.style.setProperty('background-color', '#030712', 'important')
-    document.body.style.setProperty('background-color', '#030712', 'important')
-    document.body.style.setProperty('background', 'linear-gradient(to bottom right, #030712, #111827, #030712)', 'important')
-    
-    return () => {
-      document.documentElement.removeAttribute('data-landing-dark')
-      document.documentElement.style.removeProperty('background-color')
-      document.body.style.removeProperty('background-color')
-      document.body.style.removeProperty('background')
+    const checkRegistration = async () => {
+      try {
+        const res = await fetch('/api/settings?key=registration_enabled')
+        const data = await res.json()
+        setRegistrationEnabled(data.value?.enabled === true)
+      } catch (error) {
+        console.error('Error checking registration status:', error)
+        setRegistrationEnabled(false)
+      }
     }
+    checkRegistration()
   }, [])
 
-  // Reveal sign up button after delay
+  // Reveal sign up button after delay - reduced delay
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSignUp(true)
-    }, 3000)
+    }, 1500)
     return () => clearTimeout(timer)
   }, [])
 
-  const particles = ['✨', '🤖', '💡', '🚀', '⚡']
+  // Memoize static course modules to prevent re-renders
+  const courseModules = useMemo(() => [
+    { name: 'Copilot', icon: <Code className="w-6 h-6" />, color: 'from-purple-500 to-purple-600', desc: 'AI-destəkli kodlaşdırma' },
+    { name: 'MCP', icon: <Cpu className="w-6 h-6" />, color: 'from-blue-500 to-blue-600', desc: 'Model Context Protocol' },
+    { name: 'Pinokio', icon: <Brain className="w-6 h-6" />, color: 'from-cyan-500 to-cyan-600', desc: 'Yerli AI modelləri' },
+    { name: 'Audio AI', icon: <Headphones className="w-6 h-6" />, color: 'from-green-500 to-green-600', desc: 'Səs yaratma və redaktə' },
+    { name: 'Slides', icon: <Presentation className="w-6 h-6" />, color: 'from-orange-500 to-orange-600', desc: 'AI prezentasiyalar' },
+    { name: 'Video AI', icon: <Video className="w-6 h-6" />, color: 'from-red-500 to-red-600', desc: 'Video istehsalı' },
+    { name: 'Academic', icon: <GraduationCap className="w-6 h-6" />, color: 'from-indigo-500 to-indigo-600', desc: 'Akademik yazı' }
+  ], [])
+
+  const steps = useMemo(() => [
+    { step: '01', title: 'Müraciət Edin', description: 'Onlayn formu doldurun. Ad, email və motivasiyanızı qeyd edin.' },
+    { step: '02', title: 'Təsdiq Alın', description: '24 saat ərzində email vasitəsilə nəticənizi öyrənin.' },
+    { step: '03', title: 'Öyrənməyə Başlayın', description: 'Kursa qoşulun və AI dünyasını kəşf etməyə başlayın.' }
+  ], [])
 
   if (loading || !mounted) {
     return (
-      <div className="landing-dark-theme min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)', backgroundColor: '#030712' }}>
         <div className="relative">
-          <div className="animate-spin rounded-full h-32 w-32 border-4 border-purple-500/20" />
-          <div className="animate-spin rounded-full h-32 w-32 border-4 border-purple-500 border-t-transparent absolute top-0 left-0" />
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-purple-500/20" style={{ animationDuration: '1.5s' }} />
+          <div className="animate-spin rounded-full h-24 w-24 border-4 border-purple-500 border-t-transparent absolute top-0 left-0" style={{ animationDuration: '1s' }} />
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="animate-pulse">
-              <Logo size="lg" showText uppercase={false} />
-            </div>
+            <Logo size="md" showText uppercase={false} />
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function Home() {
   }
 
   return (
-    <div className="landing-dark-theme min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)', backgroundColor: '#030712', color: '#f9fafb' }}>
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
@@ -136,85 +136,72 @@ export default function Home() {
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/course-details"
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-300"
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200"
               >
                 Kurs Haqqında
               </Link>
               <Link
                 href="/auth/signin"
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-300"
+                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-colors duration-200"
               >
                 Daxil ol
               </Link>
-              <AnimatePresence>
-                {showSignUp && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                  >
-                    <Link
-                      href="/auth/signup"
-                      className="px-6 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25 transition-all duration-300"
-                    >
-                      Qeydiyyat
-                    </Link>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {showSignUp && registrationEnabled && (
+                <Link
+                  href="/auth/signup"
+                  className="px-6 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25 transition-colors duration-200 animate-fadeIn"
+                >
+                  Qeydiyyat
+                </Link>
+              )}
             </div>
 
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all"
+              className="md:hidden p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-colors"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
 
-          {/* Mobile Menu */}
-          <AnimatePresence>
-            {mobileMenuOpen && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="md:hidden overflow-hidden"
-              >
-                <div className="py-4 space-y-2 border-t border-white/5">
-                  <Link
-                    href="/course-details"
-                    className="block px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 transition-all"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Kurs Haqqında
-                  </Link>
-                  <Link
-                    href="/auth/signin"
-                    className="block px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 transition-all"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Daxil ol
-                  </Link>
+          {/* Mobile Menu - Simple transition */}
+          {mobileMenuOpen && (
+            <div className="md:hidden animate-slideDown">
+              <div className="py-4 space-y-2 border-t border-white/5">
+                <Link
+                  href="/course-details"
+                  className="block px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Kurs Haqqında
+                </Link>
+                <Link
+                  href="/auth/signin"
+                  className="block px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Daxil ol
+                </Link>
+                {registrationEnabled && (
                   <Link
                     href="/auth/signup"
-                    className="block px-4 py-3 rounded-xl text-white bg-gradient-to-r from-purple-600 to-blue-600 transition-all"
+                    className="block px-4 py-3 rounded-xl text-white bg-gradient-to-r from-purple-600 to-blue-600 transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Qeydiyyat
                   </Link>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
       <main className="pt-20">
-        {/* Hero Section - Course Advertisement Carousel */}
+        {/* Hero Section - Optimized for performance */}
         <section className="relative min-h-[85vh] flex items-center overflow-hidden">
-          {/* Animated Background */}
+          {/* Static Background - No JS animations */}
           <div className="absolute inset-0">
             {/* Grid Pattern */}
             <div 
@@ -228,117 +215,76 @@ export default function Home() {
               }}
             />
             
-            {/* Glowing Orbs */}
-            <GlowingOrb color="#8B5CF6" size="w-96 h-96" position={{ x: '10%', y: '20%' }} delay={0} />
-            <GlowingOrb color="#3B82F6" size="w-80 h-80" position={{ x: '70%', y: '60%' }} delay={1} />
-            <GlowingOrb color="#06B6D4" size="w-64 h-64" position={{ x: '80%', y: '10%' }} delay={2} />
-            <GlowingOrb color="#8B5CF6" size="w-72 h-72" position={{ x: '5%', y: '70%' }} delay={1.5} />
-
-            {/* Floating Particles */}
-            {particles.map((emoji, i) => (
-              <FloatingParticle key={i} emoji={emoji} delay={i * 0.5} index={i} />
-            ))}
+            {/* Static Orbs - CSS only, no JS animations */}
+            <StaticOrb color="#8B5CF6" size="w-96 h-96" position={{ x: '10%', y: '20%' }} />
+            <StaticOrb color="#3B82F6" size="w-80 h-80" position={{ x: '70%', y: '60%' }} />
+            <StaticOrb color="#06B6D4" size="w-64 h-64" position={{ x: '80%', y: '10%' }} className="hidden md:block" />
           </div>
 
           {/* Main Content */}
           <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-20">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               {/* Left Content */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="space-y-8"
-              >
-                {/* Badge */}
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 backdrop-blur-sm"
-                >
-                  <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-                  <span className="text-sm font-medium text-purple-300">🎓 Qeydiyyat Açıqdır</span>
-                </motion.div>
+              <FadeIn className="space-y-8">
+                {/* Badge - Only show when registration is enabled */}
+                {registrationEnabled && (
+                  <FadeIn delay={100}>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 backdrop-blur-sm">
+                      <Sparkles className="w-4 h-4 text-purple-400" />
+                      <span className="text-sm font-medium text-purple-300">🎓 Qeydiyyat Açıqdır</span>
+                    </div>
+                  </FadeIn>
+                )}
 
                 {/* Title */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight"
-                >
-                  <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                    Süni İntellekt Dərsinə Qeydiyyat Başladı
-                  </span>
-                </motion.h1>
+                <FadeIn delay={200}>
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                    <span className="bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                      {registrationEnabled ? 'Süni İntellekt Dərsinə Qeydiyyat Başladı' : 'Süni İntellekt Praktiki Kurs'}
+                    </span>
+                  </h1>
+                </FadeIn>
 
                 {/* Subtitle */}
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-xl md:text-2xl text-gray-400 font-medium"
-                >
-                  Gələcəyin Texnologiyasını Bu Gün Öyrənin
-                </motion.p>
+                <FadeIn delay={300}>
+                  <p className="text-xl md:text-2xl text-gray-400 font-medium">
+                    Gələcəyin Texnologiyasını Bu Gün Öyrənin
+                  </p>
+                </FadeIn>
 
                 {/* Description */}
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="text-lg text-gray-500 leading-relaxed max-w-xl"
-                >
-                  Copilot, MCP, Pinokio, Audio AI, Video AI və daha çoxunu əhatə edən praktiki kurs. 
-                  7 həftə, 40% praktika, 40% layihə, 20% nəzəri.
-                </motion.p>
+                <FadeIn delay={400}>
+                  <p className="text-lg text-gray-500 leading-relaxed max-w-xl">
+                    Copilot, MCP, Pinokio, Audio AI, Video AI və daha çoxunu əhatə edən praktiki kurs. 
+                    7 həftə, 40% praktika, 40% layihə, 20% nəzəri.
+                  </p>
+                </FadeIn>
 
                 {/* CTAs */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="flex flex-col sm:flex-row gap-4"
-                >
+                <FadeIn delay={500} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                   <Link
                     href="/course-details"
-                    className="group relative inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 overflow-hidden"
+                    className="group relative inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-200 overflow-hidden text-sm sm:text-base"
                   >
                     <span className="relative z-10 flex items-center gap-2">
                       Ətraflı Məlumat
-                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-200" />
                     </span>
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl" />
                   </Link>
 
-                  <AnimatePresence>
-                    {showSignUp && (
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.4 }}
-                      >
-                        <Link
-                          href="/apply"
-                          className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-300"
-                        >
-                          <span>İndi Müraciət Et</span>
-                          <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                  {showSignUp && registrationEnabled && (
+                    <Link
+                      href="/apply"
+                      className="group inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 backdrop-blur-sm transition-all duration-200 text-sm sm:text-base animate-fadeIn"
+                    >
+                      <span>İndi Müraciət Et</span>
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform duration-200" />
+                    </Link>
+                  )}
+                </FadeIn>
 
                 {/* Quick Stats */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7 }}
-                  className="flex flex-wrap gap-6 pt-4"
-                >
+                <FadeIn delay={600} className="flex flex-wrap gap-6 pt-4">
                   {[
                     { icon: <Cpu className="w-4 h-4" />, label: '7 Həftə' },
                     { icon: <Brain className="w-4 h-4" />, label: '7 AI Alət' },
@@ -351,18 +297,13 @@ export default function Home() {
                       <span className="text-sm font-medium">{stat.label}</span>
                     </div>
                   ))}
-                </motion.div>
-              </motion.div>
+                </FadeIn>
+              </FadeIn>
 
-              {/* Right Visual - Course Preview Card */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.4, duration: 0.6 }}
-                className="relative hidden lg:block"
-              >
+              {/* Right Visual - Course Preview Card - Static, no animations */}
+              <FadeIn delay={300} className="relative hidden lg:block">
                 {/* Glow Effect */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-3xl blur-2xl" />
+                <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-3xl blur-2xl opacity-50" />
                 
                 {/* Card Content */}
                 <div className="relative bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
@@ -382,20 +323,17 @@ export default function Home() {
                     </div>
                   </div>
 
-                  {/* Course Preview Grid */}
+                  {/* Course Preview Grid - Static */}
                   <div className="grid grid-cols-2 gap-4 mb-6">
                     {[
                       { name: 'Copilot', icon: <Code className="w-4 h-4" />, color: 'from-purple-500 to-purple-600' },
                       { name: 'MCP', icon: <Cpu className="w-4 h-4" />, color: 'from-blue-500 to-blue-600' },
                       { name: 'Pinokio', icon: <Brain className="w-4 h-4" />, color: 'from-cyan-500 to-cyan-600' },
                       { name: 'Audio AI', icon: <Headphones className="w-4 h-4" />, color: 'from-green-500 to-green-600' }
-                    ].map((course, i) => (
-                      <motion.div
+                    ].map((course) => (
+                      <div
                         key={course.name}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.6 + i * 0.1 }}
-                        className="bg-white/5 rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors"
+                        className="bg-white/5 rounded-xl p-4 border border-white/5 hover:border-white/10 transition-colors duration-200"
                       >
                         <div className="flex items-center gap-2 mb-2">
                           <div className={`p-1.5 rounded-lg bg-gradient-to-br ${course.color} text-white`}>
@@ -404,14 +342,9 @@ export default function Home() {
                           <span className="text-sm font-medium text-white">{course.name}</span>
                         </div>
                         <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-                          <motion.div
-                            className={`h-full bg-gradient-to-r ${course.color} rounded-full`}
-                            initial={{ width: 0 }}
-                            animate={{ width: '100%' }}
-                            transition={{ delay: 0.8 + i * 0.1, duration: 0.8 }}
-                          />
+                          <div className={`h-full w-full bg-gradient-to-r ${course.color} rounded-full`} />
                         </div>
-                      </motion.div>
+                      </div>
                     ))}
                   </div>
 
@@ -446,12 +379,8 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Floating Elements */}
-                <motion.div
-                  className="absolute -right-4 top-1/4 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl"
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                >
+                {/* Floating Elements - Static positioning, CSS hover only */}
+                <div className="absolute -right-4 top-1/4 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
                       <Play className="w-5 h-5 text-white fill-white" />
@@ -461,13 +390,9 @@ export default function Home() {
                       <p className="text-xs text-gray-400">HD Keyfiyyət</p>
                     </div>
                   </div>
-                </motion.div>
+                </div>
 
-                <motion.div
-                  className="absolute -left-4 bottom-1/4 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl"
-                  animate={{ y: [0, 10, 0] }}
-                  transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-                >
+                <div className="absolute -left-4 bottom-1/4 bg-gray-900/90 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-xl">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-500 flex items-center justify-center">
                       <Brain className="w-5 h-5 text-white" />
@@ -477,95 +402,61 @@ export default function Home() {
                       <p className="text-xs text-gray-400">7+ Platform</p>
                     </div>
                   </div>
-                </motion.div>
-              </motion.div>
+                </div>
+              </FadeIn>
             </div>
           </div>
 
-          {/* Scroll Indicator */}
-          <motion.div
-            className="absolute bottom-8 left-1/2 -translate-x-1/2"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            <div className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-1">
-              <motion.div
-                className="w-1.5 h-3 rounded-full bg-white/40"
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
+          {/* Scroll Indicator - Simple CSS animation */}
+          {!prefersReducedMotion && (
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce" style={{ animationDuration: '2s' }}>
+              <div className="w-6 h-10 rounded-full border-2 border-white/20 flex items-start justify-center p-1">
+                <div className="w-1.5 h-3 rounded-full bg-white/40 animate-scrollIndicator" />
+              </div>
             </div>
-          </motion.div>
+          )}
         </section>
 
-        {/* Course Modules Preview */}
+        {/* Course Modules Preview - Optimized */}
         <section className="py-20 px-6 sm:px-8 lg:px-12">
           <div className="max-w-7xl mx-auto">
             <div className="text-center mb-16">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="text-3xl md:text-4xl font-bold text-white mb-4"
-              >
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                 Kurs Modulları
-              </motion.h2>
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="text-gray-400 max-w-2xl mx-auto"
-              >
+              </h2>
+              <p className="text-gray-400 max-w-2xl mx-auto">
                 7 həftə ərzində ən populyar AI alətlərini praktiki şəkildə öyrənəcəksiniz
-              </motion.p>
+              </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[
-                { name: 'Copilot', icon: <Code className="w-6 h-6" />, color: 'from-purple-500 to-purple-600', desc: 'AI-destəkli kodlaşdırma' },
-                { name: 'MCP', icon: <Cpu className="w-6 h-6" />, color: 'from-blue-500 to-blue-600', desc: 'Model Context Protocol' },
-                { name: 'Pinokio', icon: <Brain className="w-6 h-6" />, color: 'from-cyan-500 to-cyan-600', desc: 'Yerli AI modelləri' },
-                { name: 'Audio AI', icon: <Headphones className="w-6 h-6" />, color: 'from-green-500 to-green-600', desc: 'Səs yaratma və redaktə' },
-                { name: 'Slides', icon: <Presentation className="w-6 h-6" />, color: 'from-orange-500 to-orange-600', desc: 'AI prezentasiyalar' },
-                { name: 'Video AI', icon: <Video className="w-6 h-6" />, color: 'from-red-500 to-red-600', desc: 'Video istehsalı' },
-                { name: 'Academic', icon: <GraduationCap className="w-6 h-6" />, color: 'from-indigo-500 to-indigo-600', desc: 'Akademik yazı' }
-              ].map((module, i) => (
-                <motion.div
+              {courseModules.map((module) => (
+                <div
                   key={module.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="bg-gray-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/30 transition-all group"
+                  className="bg-gray-900/50 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:border-purple-500/30 transition-colors duration-200 group"
                 >
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${module.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform`}>
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${module.color} flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform duration-200`}>
                     {module.icon}
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{module.name}</h3>
                   <p className="text-sm text-gray-400">{module.desc}</p>
-                </motion.div>
+                </div>
               ))}
             </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mt-12"
-            >
+            <div className="text-center mt-12">
               <Link
                 href="/course-details"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-colors duration-200"
               >
                 Tam Sillabusu Gör
                 <ChevronRight className="w-5 h-5" />
               </Link>
-            </motion.div>
+            </div>
           </div>
         </section>
 
-        {/* How It Works */}
+        {/* How It Works - Optimized */}
         <section className="py-20 px-6 sm:px-8 lg:px-12 border-t border-white/5">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
@@ -578,31 +469,8 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-3 gap-12">
-              {[
-                {
-                  step: '01',
-                  title: 'Müraciət Edin',
-                  description: 'Onlayn formu doldurun. Ad, email və motivasiyanızı qeyd edin.'
-                },
-                {
-                  step: '02',
-                  title: 'Təsdiq Alın',
-                  description: '24 saat ərzində email vasitəsilə nəticənizi öyrənin.'
-                },
-                {
-                  step: '03',
-                  title: 'Öyrənməyə Başlayın',
-                  description: 'Kursa qoşulun və AI dünyasını kəşf etməyə başlayın.'
-                }
-              ].map((step, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.2 }}
-                  className="relative"
-                >
+              {steps.map((step, index) => (
+                <div key={index} className="relative">
                   <div className="text-6xl font-bold bg-gradient-to-br from-purple-500/20 to-blue-500/20 bg-clip-text text-transparent mb-4">
                     {step.step}
                   </div>
@@ -615,87 +483,91 @@ export default function Home() {
                       </svg>
                     </div>
                   )}
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* CTA Section - Optimized */}
         <section className="py-20 px-6 sm:px-8 lg:px-12">
           <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-3xl blur-2xl" />
+            <div className="relative">
+              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-3xl blur-2xl opacity-50" />
               <div className="relative bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 text-center">
                 <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
                   Gələcəyə Hazır Olun
                 </h2>
                 <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-                  AI gələcəyin texnologiyasıdır. Bu kursu keçərək gələcəyinizə investisiya edin.
-                  Qeydiyyat məhduddur!
+                  {registrationEnabled 
+                    ? 'AI gələcəyin texnologiyasıdır. Bu kursu keçərək gələcəyinizə investisiya edin. Qeydiyyat məhduddur!'
+                    : 'AI gələcəyin texnologiyasıdır. Qeydiyyat tezliklə açılacaq. Kurs haqqında ətraflı məlumat alın!'
+                  }
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link
-                    href="/apply"
-                    className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
-                  >
-                    İndi Müraciət Et
-                    <ChevronRight className="w-5 h-5" />
-                  </Link>
+                  {registrationEnabled ? (
+                    <Link
+                      href="/apply"
+                      className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-colors duration-200"
+                    >
+                      İndi Müraciət Et
+                      <ChevronRight className="w-5 h-5" />
+                    </Link>
+                  ) : (
+                    <div className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-gray-400 bg-gray-800 border border-gray-700 cursor-not-allowed">
+                      <Clock className="w-5 h-5" />
+                      Qeydiyyat Tezliklə
+                    </div>
+                  )}
                   <Link
                     href="/course-details"
-                    className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
+                    className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 transition-colors duration-200"
                   >
                     Ətraflı Məlumat
                   </Link>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="border-t border-white/10 py-12 px-6 sm:px-8 lg:px-12">
+        <footer className="border-t border-white/10 py-8 sm:py-12 px-4 sm:px-6 lg:px-12">
           <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-4 gap-12 mb-8">
-              <div className="space-y-4">
-                <Logo size="md" uppercase showText />
-                <p className="text-gray-400 text-sm leading-relaxed">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-8">
+              <div className="col-span-2 md:col-span-1 space-y-4">
+                <Logo size="sm" uppercase showText />
+                <p className="text-gray-400 text-xs sm:text-sm leading-relaxed">
                   Praktiki süni intellekt kursu - AI alətlərini öyrən, gələcəyini qur.
                 </p>
               </div>
               
               <div>
-                <h4 className="font-semibold text-white mb-4">Kurs</h4>
-                <ul className="space-y-2 text-sm">
+                <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Kurs</h4>
+                <ul className="space-y-2 text-xs sm:text-sm">
                   <li><Link href="/course-details" className="text-gray-400 hover:text-white transition">Sillabus</Link></li>
                   <li><Link href="/apply" className="text-gray-400 hover:text-white transition">Müraciət</Link></li>
                 </ul>
               </div>
 
               <div>
-                <h4 className="font-semibold text-white mb-4">Platform</h4>
-                <ul className="space-y-2 text-sm">
+                <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Platform</h4>
+                <ul className="space-y-2 text-xs sm:text-sm">
                   <li><Link href="/auth/signup" className="text-gray-400 hover:text-white transition">Qeydiyyat</Link></li>
                   <li><Link href="/auth/signin" className="text-gray-400 hover:text-white transition">Giriş</Link></li>
                 </ul>
               </div>
 
-              <div>
-                <h4 className="font-semibold text-white mb-4">Əlaqə</h4>
-                <ul className="space-y-2 text-sm text-gray-400">
+              <div className="col-span-2 md:col-span-1">
+                <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Əlaqə</h4>
+                <ul className="space-y-2 text-xs sm:text-sm text-gray-400">
                   <li>WhatsApp Dəstəyi</li>
                   <li>Email</li>
                 </ul>
               </div>
             </div>
 
-            <div className="border-t border-white/10 pt-8 text-center text-sm text-gray-500">
+            <div className="border-t border-white/10 pt-6 sm:pt-8 text-center text-xs sm:text-sm text-gray-500">
               <p>© {new Date().getFullYear()} SÜNİ İNTELLEKT. Bütün hüquqlar qorunur.</p>
             </div>
           </div>

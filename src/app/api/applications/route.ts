@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabase, supabaseAdmin } from '@/lib/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,16 +33,26 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Motivation length validation
-    if (motivation.length < 100 || motivation.length > 300) {
+    // Phone number validation (Azerbaijani format: +994 XX XXX XX XX)
+    const phoneRegex = /^\+994 \d{2} \d{3} \d{2} \d{2}$/
+    if (!phoneRegex.test(phoneNumber)) {
       return NextResponse.json(
-        { error: 'Motivasiya 100-300 simvol arasında olmalıdır' },
+        { error: 'Telefon nömrəsi formatı: +994 XX XXX XX XX' },
         { status: 400 }
       )
     }
 
+    // Motivation length validation (max only, no minimum)
+    if (motivation.length > 300) {
+      return NextResponse.json(
+        { error: 'Motivasiya maksimum 300 simvol olmalıdır' },
+        { status: 400 }
+      )
+    }
+
+    // Use admin client to bypass RLS for public form submissions
     // Check for duplicate email
-    const { data: existingApplication } = await supabase
+    const { data: existingApplication } = await supabaseAdmin
       .from('course_applications')
       .select('id')
       .eq('email', email.toLowerCase())
@@ -55,8 +65,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Insert application
-    const { data, error } = await supabase
+    // Insert application using admin client (bypasses RLS)
+    const { data, error } = await supabaseAdmin
       .from('course_applications')
       .insert({
         full_name: fullName,

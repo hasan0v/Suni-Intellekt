@@ -16,8 +16,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Only use standalone for production builds
-  ...(process.env.NODE_ENV === 'production' && { output: 'standalone' }),
   // Allow cross-origin requests for development
   allowedDevOrigins: ['127.0.0.1'],
   async headers() {

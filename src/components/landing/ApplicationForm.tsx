@@ -23,11 +23,51 @@ interface FormData {
 const initialFormData: FormData = {
   fullName: '',
   email: '',
-  phoneNumber: '+994',
+  phoneNumber: '+994 ',
   programmingExperience: '',
   developmentEnvironment: '',
   computerType: '',
   motivation: ''
+}
+
+// Format phone number to Azerbaijani standard: +994 XX XXX XX XX
+const formatAzerbaijaniPhone = (value: string): string => {
+  // Remove all non-digit characters except the leading +
+  let digits = value.replace(/[^\d]/g, '')
+  
+  // Ensure it starts with 994
+  if (!digits.startsWith('994')) {
+    digits = '994' + digits.replace(/^994/, '')
+  }
+  
+  // Limit to 12 digits (994 + 9 digits)
+  digits = digits.slice(0, 12)
+  
+  // Format: +994 XX XXX XX XX
+  let formatted = '+994'
+  const remaining = digits.slice(3) // Remove 994 prefix
+  
+  if (remaining.length > 0) {
+    formatted += ' ' + remaining.slice(0, 2) // XX
+  }
+  if (remaining.length > 2) {
+    formatted += ' ' + remaining.slice(2, 5) // XXX
+  }
+  if (remaining.length > 5) {
+    formatted += ' ' + remaining.slice(5, 7) // XX
+  }
+  if (remaining.length > 7) {
+    formatted += ' ' + remaining.slice(7, 9) // XX
+  }
+  
+  return formatted
+}
+
+// Validate Azerbaijani phone number format
+const isValidAzerbaijaniPhone = (phone: string): boolean => {
+  // Should match: +994 XX XXX XX XX (with spaces)
+  const phoneRegex = /^\+994 \d{2} \d{3} \d{2} \d{2}$/
+  return phoneRegex.test(phone)
 }
 
 interface StepIndicatorProps {
@@ -263,8 +303,10 @@ export const ApplicationForm: React.FC = () => {
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
         newErrors.email = 'Düzgün email formatı daxil edin'
       }
-      if (!formData.phoneNumber.trim() || formData.phoneNumber === '+994') {
+      if (!formData.phoneNumber.trim() || formData.phoneNumber === '+994 ') {
         newErrors.phoneNumber = 'Telefon nömrəsi tələb olunur'
+      } else if (!isValidAzerbaijaniPhone(formData.phoneNumber)) {
+        newErrors.phoneNumber = 'Format: +994 XX XXX XX XX'
       }
     }
     
@@ -383,7 +425,7 @@ export const ApplicationForm: React.FC = () => {
                 <Phone className="w-5 h-5 text-purple-400 mt-0.5" />
                 <div>
                   <p className="text-sm font-medium text-white">💬 Suallarınız varsa</p>
-                  <p className="text-sm text-gray-400">WhatsApp: +994 XX XXX XX XX</p>
+                  <p className="text-sm text-gray-400">WhatsApp: +994 55 385 82 20</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
@@ -486,9 +528,9 @@ export const ApplicationForm: React.FC = () => {
                   label="WhatsApp/Telegram nömrəsi"
                   icon={<Phone className="w-4 h-4 text-purple-400" />}
                   type="tel"
-                  placeholder="+994xxxxxxxxx"
+                  placeholder="+994 XX XXX XX XX"
                   value={formData.phoneNumber}
-                  onChange={(v) => updateField('phoneNumber', v)}
+                  onChange={(v) => updateField('phoneNumber', formatAzerbaijaniPhone(v))}
                   error={errors.phoneNumber}
                   required
                 />

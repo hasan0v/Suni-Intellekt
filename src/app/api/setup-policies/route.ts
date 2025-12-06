@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
-
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+import { supabaseServiceKey } from '@/lib/supabase'
 
 export async function POST() {
   try {

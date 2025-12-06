@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
@@ -104,9 +104,34 @@ const courseModules: LessonModule[] = [
 const CourseDetailsPage: React.FC = () => {
   const [activeModule, setActiveModule] = useState<string | null>(null)
   const [, setShowSyllabus] = useState(true)
+  const [registrationEnabled, setRegistrationEnabled] = useState(false)
+
+  // Force dark mode on mount
+  useEffect(() => {
+    document.documentElement.style.backgroundColor = '#030712'
+    document.documentElement.style.colorScheme = 'dark'
+    document.body.style.backgroundColor = '#030712'
+    document.body.style.color = '#f9fafb'
+    document.documentElement.classList.add('dark')
+  }, [])
+
+  // Check registration status
+  useEffect(() => {
+    const checkRegistration = async () => {
+      try {
+        const res = await fetch('/api/settings?key=registration_enabled')
+        const data = await res.json()
+        setRegistrationEnabled(data.value?.enabled === true)
+      } catch (error) {
+        console.error('Error checking registration status:', error)
+        setRegistrationEnabled(false)
+      }
+    }
+    checkRegistration()
+  }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)', backgroundColor: '#030712', color: '#f9fafb' }}>
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
@@ -119,12 +144,14 @@ const CourseDetailsPage: React.FC = () => {
               >
                 Daxil ol
               </Link>
-              <Link
-                href="/apply"
-                className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25 transition-all duration-300"
-              >
-                Müraciət Et
-              </Link>
+              {registrationEnabled && (
+                <Link
+                  href="/apply"
+                  className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white shadow-lg shadow-purple-500/25 transition-all duration-300"
+                >
+                  Müraciət Et
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -215,13 +242,15 @@ const CourseDetailsPage: React.FC = () => {
                   transition={{ delay: 0.4 }}
                   className="flex flex-col sm:flex-row gap-4 pt-4"
                 >
-                  <Link
-                    href="/apply"
-                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
-                  >
-                    İndi Müraciət Et
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Link>
+                  {registrationEnabled && (
+                    <Link
+                      href="/apply"
+                      className="group inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
+                    >
+                      İndi Müraciət Et
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                  )}
                   <button
                     onClick={() => setShowSyllabus(prev => !prev)}
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
@@ -556,16 +585,28 @@ const CourseDetailsPage: React.FC = () => {
                   Hazırsınız?
                 </h2>
                 <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-                  AI gələcəyin texnologiyasıdır. Bu kursu keçərək gələcəyinizə investisiya edin.
-                  Qeydiyyat məhduddur!
+                  {registrationEnabled 
+                    ? 'AI gələcəyin texnologiyasıdır. Bu kursu keçərək gələcəyinizə investisiya edin. Qeydiyyat məhduddur!'
+                    : 'AI gələcəyin texnologiyasıdır. Qeydiyyat tezliklə açılacaq. Daha çox məlumat üçün bizimlə əlaqə saxlayın!'
+                  }
                 </p>
-                <Link
-                  href="/apply"
-                  className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
-                >
-                  İndi Müraciət Et
-                  <ChevronRight className="w-5 h-5" />
-                </Link>
+                {registrationEnabled ? (
+                  <Link
+                    href="/apply"
+                    className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
+                  >
+                    İndi Müraciət Et
+                    <ChevronRight className="w-5 h-5" />
+                  </Link>
+                ) : (
+                  <Link
+                    href="/"
+                    className="inline-flex items-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
+                  >
+                    Ana Səhifəyə Qayıt
+                    <ChevronRight className="w-5 h-5" />
+                  </Link>
+                )}
               </div>
             </motion.div>
           </div>

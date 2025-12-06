@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 
@@ -17,6 +17,22 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const [touchedEmail, setTouchedEmail] = useState(false)
+  const [registrationEnabled, setRegistrationEnabled] = useState(false)
+
+  // Check registration status
+  useEffect(() => {
+    const checkRegistration = async () => {
+      try {
+        const res = await fetch('/api/settings?key=registration_enabled')
+        const data = await res.json()
+        setRegistrationEnabled(data.value?.enabled === true)
+      } catch (error) {
+        console.error('Error checking registration status:', error)
+        setRegistrationEnabled(false)
+      }
+    }
+    checkRegistration()
+  }, [])
 
   // Email validation function
   const validateEmail = (email: string): boolean => {
@@ -81,9 +97,9 @@ export default function ForgotPasswordPage() {
                 <Logo size="md" uppercase showText />
               </div>
               <div className="flex items-center gap-3">
-                <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Daxil ol</Link>
-                <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
-                  <span>⚡</span> Qeydiyyat
+                <Link href="/" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Ana Səhifə</Link>
+                <Link href="/auth/signin" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
+                  Daxil ol
                 </Link>
               </div>
             </div>

@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Logo from '@/components/Logo'
 import { useRouter } from 'next/navigation'
+import { Clock, ArrowLeft } from 'lucide-react'
 
 interface ValidationState {
   isValid: boolean
@@ -35,7 +36,23 @@ export default function SignUpPage() {
     overall: false
   })
   const [touchedFields, setTouchedFields] = useState<Set<string>>(new Set())
+  const [registrationEnabled, setRegistrationEnabled] = useState<boolean | null>(null)
   const router = useRouter()
+
+  // Check registration status
+  useEffect(() => {
+    const checkRegistration = async () => {
+      try {
+        const res = await fetch('/api/settings?key=registration_enabled')
+        const data = await res.json()
+        setRegistrationEnabled(data.value?.enabled === true)
+      } catch (error) {
+        console.error('Error checking registration status:', error)
+        setRegistrationEnabled(false)
+      }
+    }
+    checkRegistration()
+  }, [])
 
   // Email validation function
   const validateEmail = (email: string): boolean => {
@@ -139,6 +156,52 @@ export default function SignUpPage() {
     }
   }
 
+  // Loading state for registration check
+  if (registrationEnabled === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-samsung-gray-50 via-samsung-blue/5 to-samsung-cyan/10">
+        <div className="w-10 h-10 border-4 border-samsung-blue/20 border-t-samsung-blue rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  // Registration disabled
+  if (!registrationEnabled) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-samsung-gray-50 via-samsung-blue/5 to-samsung-cyan/10">
+        <div className="max-w-md w-full bg-white/80 backdrop-blur-xl border border-gray-200 rounded-3xl p-8 text-center shadow-samsung-card">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center">
+            <Clock className="w-10 h-10 text-white" />
+          </div>
+          
+          <h2 className="text-2xl font-bold text-gray-900 mb-3">
+            Qeydiyyat Hazırda Bağlıdır
+          </h2>
+          
+          <p className="text-gray-600 mb-8">
+            Qeydiyyat hazırda aktiv deyil. Zəhmət olmasa daha sonra yenidən yoxlayın və ya kurs haqqında ətraflı məlumat alın.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            <Link
+              href="/course-details"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-samsung-blue hover:bg-samsung-blue-dark transition-all"
+            >
+              Kurs Haqqında
+            </Link>
+            <Link
+              href="/"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-gray-600 hover:text-gray-900 transition-all"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Ana Səhifə
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-samsung-gray-50 via-samsung-blue/5 to-samsung-cyan/10 relative overflow-hidden">
@@ -161,9 +224,9 @@ export default function SignUpPage() {
                   <Logo size="md" uppercase showText />
                 </div>
                 <div className="flex items-center gap-3">
-                  <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Daxil ol</Link>
-                  <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
-                    <span>⚡</span> Qeydiyyat
+                  <Link href="/" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Ana Səhifə</Link>
+                  <Link href="/auth/signin" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
+                    Daxil ol
                   </Link>
                 </div>
               </div>
@@ -210,9 +273,9 @@ export default function SignUpPage() {
                 <Logo size="md" uppercase showText />
               </div>
               <div className="flex items-center gap-3">
-                <Link href="/auth/signin" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Daxil ol</Link>
-                <Link href="/auth/signup" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
-                  <span>⚡</span> Qeydiyyat
+                <Link href="/" className="hidden sm:inline-flex items-center px-5 py-2 rounded-xl samsung-body text-gray-700 hover:text-samsung-blue transition">Ana Səhifə</Link>
+                <Link href="/auth/signin" className="inline-flex items-center gap-2 px-6 py-2 rounded-xl bg-samsung-blue hover:bg-samsung-blue-dark text-white samsung-body shadow-samsung-card hover:shadow-lg transition">
+                  Daxil ol
                 </Link>
               </div>
             </div>

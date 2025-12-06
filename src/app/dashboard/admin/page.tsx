@@ -17,7 +17,11 @@ import {
   LayoutDashboard, 
   TrendingUp, 
   AlertCircle,
-  Sparkles 
+  Sparkles,
+  FileText,
+  ToggleLeft,
+  ToggleRight,
+  Globe
 } from 'lucide-react'
 
 interface DashboardStats {
@@ -29,6 +33,8 @@ interface DashboardStats {
   totalClasses: number
   activeClasses: number
   recentSubmissions: number
+  pendingApplications: number
+  totalApplications: number
 }
 
 export default function AdminDashboard() {
@@ -42,14 +48,51 @@ export default function AdminDashboard() {
     totalClasses: 0,
     activeClasses: 0,
     recentSubmissions: 0,
+    pendingApplications: 0,
+    totalApplications: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [registrationEnabled, setRegistrationEnabled] = useState(false)
+  const [togglingRegistration, setTogglingRegistration] = useState(false)
 
   useEffect(() => {
     if (profile?.role === 'admin') {
       fetchStats()
+      fetchRegistrationStatus()
     }
   }, [profile])
+
+  const fetchRegistrationStatus = async () => {
+    try {
+      const res = await fetch('/api/settings?key=registration_enabled')
+      const data = await res.json()
+      setRegistrationEnabled(data.value?.enabled === true)
+    } catch (error) {
+      console.error('Error fetching registration status:', error)
+    }
+  }
+
+  const toggleRegistration = async () => {
+    setTogglingRegistration(true)
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: 'registration_enabled',
+          value: { enabled: !registrationEnabled }
+        })
+      })
+      
+      if (res.ok) {
+        setRegistrationEnabled(!registrationEnabled)
+      }
+    } catch (error) {
+      console.error('Error toggling registration:', error)
+    } finally {
+      setTogglingRegistration(false)
+    }
+  }
 
   const fetchStats = async () => {
     try {
@@ -62,6 +105,8 @@ export default function AdminDashboard() {
         classesResult,
         activeClassesResult,
         recentSubmissionsResult,
+        pendingApplicationsResult,
+        totalApplicationsResult,
       ] = await Promise.all([
         supabase.from('courses').select('*', { count: 'exact', head: true }),
         supabase.from('tasks').select('*', { count: 'exact', head: true }),
@@ -79,6 +124,10 @@ export default function AdminDashboard() {
         supabase.from('task_submissions')
           .select('*', { count: 'exact', head: true })
           .gte('submitted_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+        supabase.from('course_applications')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'pending'),
+        supabase.from('course_applications').select('*', { count: 'exact', head: true }),
       ])
 
       setStats({
@@ -90,6 +139,8 @@ export default function AdminDashboard() {
         totalClasses: classesResult.count || 0,
         activeClasses: activeClassesResult.count || 0,
         recentSubmissions: recentSubmissionsResult.count || 0,
+        pendingApplications: pendingApplicationsResult.count || 0,
+        totalApplications: totalApplicationsResult.count || 0,
       })
     } catch (error) {
       console.error('Error fetching stats:', error)
@@ -196,6 +247,38 @@ export default function AdminDashboard() {
             />
           </motion.div>
 
+          {/* Alert Banner (if pending applications) */}
+          {stats.pendingApplications > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="bg-gradient-to-r from-purple-50 to-violet-50 border-2 border-purple-200 rounded-2xl p-5"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <FileText className="w-6 h-6 text-purple-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="samsung-heading text-purple-800">
+                    {stats.pendingApplications} yeni kurs müraciəti gözləyir
+                  </h3>
+                  <p className="text-sm samsung-body text-purple-700 mt-0.5">
+                    Namizədlər cavab gözləyir. Müraciətləri nəzərdən keçirin.
+                  </p>
+                </div>
+                <motion.a
+                  href="/dashboard/admin/applications"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-5 py-2.5 bg-gradient-to-r from-purple-500 to-violet-500 text-white rounded-xl samsung-body font-medium shadow-lg hover:shadow-xl transition-all"
+                >
+                  Bax
+                </motion.a>
+              </div>
+            </motion.div>
+          )}
+
           {/* Alert Banner (if pending grading) */}
           {stats.pendingGrading > 0 && (
             <motion.div
@@ -291,15 +374,89 @@ export default function AdminDashboard() {
                 delay={4}
               />
               <AdminQuickAction
+                title="Kurs Mürəciətləri"
+                description="Kursa mürəciət edən namizədləri idarə edin"
+                icon={FileText}
+                iconColor="bg-gradient-to-br from-purple-500 to-purple-600"
+                href="/dashboard/admin/applications"
+                badge={stats.pendingApplications > 0 ? `${stats.pendingApplications} gözləyir` : stats.totalApplications}
+                delay={5}
+              />
+              <AdminQuickAction
                 title="Storage Setup"
                 description="Configure Supabase storage for file uploads"
                 icon={AdminIcons.database}
                 iconColor="bg-gradient-to-br from-gray-600 to-gray-700"
                 href="/dashboard/admin/setup-storage"
-                delay={5}
+                delay={6}
               />
             </div>
           </div>
+
+          {/* Site Settings */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="glass-card p-6 rounded-2xl"
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-xl flex items-center justify-center">
+                <Globe className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h2 className="text-xl samsung-heading text-gray-900">Sayt Parametrləri</h2>
+                <p className="text-sm samsung-body text-gray-500">Landing səhifə tənzimləmələri</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                  registrationEnabled 
+                    ? 'bg-gradient-to-br from-green-500 to-emerald-500' 
+                    : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                }`}>
+                  {registrationEnabled ? (
+                    <ToggleRight className="w-6 h-6 text-white" />
+                  ) : (
+                    <ToggleLeft className="w-6 h-6 text-white" />
+                  )}
+                </div>
+                <div>
+                  <h3 className="samsung-heading text-gray-900">Qeydiyyat Düyməsi</h3>
+                  <p className="text-sm samsung-body text-gray-500">
+                    {registrationEnabled 
+                      ? 'Landing səhifədə qeydiyyat düyməsi görünür' 
+                      : 'Landing səhifədə qeydiyyat düyməsi gizlidir'
+                    }
+                  </p>
+                </div>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={toggleRegistration}
+                disabled={togglingRegistration}
+                className={`px-6 py-3 rounded-xl font-medium transition-all disabled:opacity-50 ${
+                  registrationEnabled
+                    ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                }`}
+              >
+                {togglingRegistration ? (
+                  <span className="flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    Yüklənir...
+                  </span>
+                ) : registrationEnabled ? (
+                  'Deaktiv Et'
+                ) : (
+                  'Aktiv Et'
+                )}
+              </motion.button>
+            </div>
+          </motion.div>
 
           {/* System Status Footer */}
           <motion.div

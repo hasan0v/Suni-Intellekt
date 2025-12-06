@@ -1,20 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
 import { NextRequest, NextResponse } from 'next/server';
+import { supabaseAdmin, supabaseUrl, supabaseServiceKey } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   try {
     // Check if required environment variables are available
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    if (!supabaseUrl || !supabaseServiceKey) {
       return NextResponse.json(
         { error: 'Server configuration error' },
         { status: 500 }
       );
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const supabase = supabaseAdmin;
 
     const { searchParams } = new URL(request.url);
     const templateType = searchParams.get('template') || 'email_verification';

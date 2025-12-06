@@ -1,15 +1,28 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
+// Sanitize environment variables to remove any non-ASCII characters
+function sanitizeEnvVar(value: string | undefined): string {
+  if (!value) return ''
+  return value.replace(/[^\x00-\x7F]/g, '').trim()
+}
+
 // Admin client with service role key for bucket creation
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
+const supabaseUrl = sanitizeEnvVar(process.env.NEXT_PUBLIC_SUPABASE_URL)
+const supabaseServiceKey = sanitizeEnvVar(process.env.SUPABASE_SERVICE_ROLE_KEY)
 
 export async function POST() {
   try {
     if (!supabaseServiceKey) {
       return NextResponse.json(
         { error: 'SUPABASE_SERVICE_ROLE_KEY not configured' },
+        { status: 500 }
+      )
+    }
+
+    if (!supabaseUrl) {
+      return NextResponse.json(
+        { error: 'NEXT_PUBLIC_SUPABASE_URL not configured' },
         { status: 500 }
       )
     }
@@ -86,9 +99,17 @@ export async function POST() {
 
 export async function GET() {
   try {
+    if (!supabaseUrl) {
+      return NextResponse.json(
+        { error: 'NEXT_PUBLIC_SUPABASE_URL not configured' },
+        { status: 500 }
+      )
+    }
+
+    const anonKey = sanitizeEnvVar(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
     const supabase = createClient(
       supabaseUrl,
-      supabaseServiceKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      supabaseServiceKey || anonKey
     )
 
     const { data: buckets, error } = await supabase.storage.listBuckets()
