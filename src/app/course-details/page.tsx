@@ -131,13 +131,57 @@ const CourseDetailsPage: React.FC = () => {
   }, [])
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)', backgroundColor: '#030712', color: '#f9fafb' }}>
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-          <div className="flex justify-between items-center py-3 sm:py-4">
-            <Logo size="sm" uppercase showText />
-            <div className="flex items-center gap-2 sm:gap-3">
+    <>
+      {/* Course Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Course',
+            name: 'Süni İntellekt - AI Praktiki Kurs',
+            description: 'GitHub Copilot, MCP Protocol, Pinokio, Audio AI, Video AI və daha çoxunu əhatə edən 8 həftəlik intensiv praktiki AI kursu',
+            provider: {
+              '@type': 'Organization',
+              name: 'Süni İntellekt',
+              url: 'https://suni-intellekt.com'
+            },
+            courseCode: 'AI-PRAK-2025',
+            hasCourseInstance: {
+              '@type': 'CourseInstance',
+              courseMode: 'blended',
+              duration: 'P8W',
+              inLanguage: 'az',
+              instructor: {
+                '@type': 'Person',
+                name: 'Ali Hasanov',
+                url: 'https://www.linkedin.com/in/ali-hasanov/'
+              }
+            },
+            offers: {
+              '@type': 'Offer',
+              category: 'Paid',
+              availability: 'https://schema.org/InStock'
+            },
+            educationalLevel: 'Beginner to Intermediate',
+            numberOfCredits: 7,
+            timeRequired: 'P8W',
+            syllabusSections: courseModules.map(module => ({
+              '@type': 'Syllabus',
+              name: module.name,
+              description: module.description
+            }))
+          })
+        }}
+      />
+      
+      <div className="min-h-screen" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)', backgroundColor: '#030712', color: '#f9fafb' }}>
+        {/* Navigation */}
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-950/80 backdrop-blur-xl border-b border-white/5">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+            <div className="flex justify-between items-center py-3 sm:py-4">
+              <Logo size="sm" uppercase showText />
+              <div className="flex items-center gap-2 sm:gap-3">
               <Link
                 href="/auth/signin"
                 className="hidden sm:block px-5 py-2.5 rounded-xl text-sm font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition-all duration-300"
@@ -623,6 +667,7 @@ const CourseDetailsPage: React.FC = () => {
         </footer>
       </main>
     </div>
+    </>
   )
 }
 
