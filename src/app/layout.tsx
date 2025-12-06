@@ -1,6 +1,5 @@
-'use client'
-
 import { Inter } from 'next/font/google'
+import type { Metadata } from 'next'
 import './globals.css'
 import { AuthProvider } from '@/contexts/AuthContext'
 import { NotificationProvider } from '@/components/ui/NotificationSystem'
@@ -12,6 +11,73 @@ import PerformanceTracker from '@/components/PerformanceTracker'
 import Script from 'next/script'
 
 const inter = Inter({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  metadataBase: new URL('https://suni-intellekt.com'),
+  title: {
+    default: 'Süni İntellekt - AI Praktiki Kurs | Copilot, MCP, Pinokio',
+    template: '%s | Süni İntellekt'
+  },
+  description: 'Azərbaycanda ən yaxşı Süni İntellekt kursu. GitHub Copilot, MCP Protocol, Pinokio, Audio AI, Video AI və daha çoxunu öyrənin. 8 həftə, 100% praktiki, real layihələr.',
+  keywords: ['süni intellekt kursu', 'AI kurs Azərbaycan', 'GitHub Copilot', 'MCP Protocol', 'Pinokio AI', 'Audio AI', 'Video AI', 'praktiki AI kursu', 'Bakı AI kurs'],
+  authors: [{ name: 'Ali Hasanov' }],
+  creator: 'Ali Hasanov',
+  publisher: 'Süni İntellekt',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'az_AZ',
+    url: 'https://suni-intellekt.com/',
+    title: 'Süni İntellekt - AI Praktiki Kurs',
+    description: 'Azərbaycanda ən yaxşı Süni İntellekt kursu. 8 həftə, 100% praktiki, real layihələr.',
+    siteName: 'Süni İntellekt',
+    images: [{
+      url: '/logo.png',
+      width: 1200,
+      height: 630,
+      alt: 'Süni İntellekt Logo',
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Süni İntellekt - AI Praktiki Kurs',
+    description: 'Azərbaycanda ən yaxşı Süni İntellekt kursu. 8 həftə, 100% praktiki, real layihələr.',
+    creator: '@ali.hasan0v',
+    images: ['/logo.png'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32', type: 'image/x-icon' },
+      { url: '/favicon.png', sizes: '32x32', type: 'image/png' }
+    ],
+    shortcut: '/favicon.ico',
+    apple: '/favicon.png',
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Süni İntellekt',
+  },
+  alternates: {
+    canonical: '/',
+  },
+}
 
 // Structured Data for Organization
 const organizationSchema = {
@@ -44,58 +110,34 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const organizationSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'EducationalOrganization',
+    name: 'Süni İntellekt',
+    alternateName: 'AI Praktiki Kurs',
+    url: 'https://suni-intellekt.com',
+    logo: 'https://suni-intellekt.com/logo.png',
+    description: 'Azərbaycanda ən yaxşı Süni İntellekt praktiki kursu',
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'AZ',
+      addressLocality: 'Bakı'
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+994553858220',
+      contactType: 'customer support',
+      availableLanguage: ['Azerbaijani', 'Russian', 'English']
+    },
+    sameAs: [
+      'https://www.linkedin.com/in/ali-hasanov/',
+      'https://instagram.com/ali.hasan0v'
+    ]
+  }
+
   return (
     <html lang="az">
       <head>
-        {/* Primary Meta Tags */}
-        <title>Süni İntellekt - AI Praktiki Kurs | Copilot, MCP, Pinokio</title>
-        <meta name="title" content="Süni İntellekt - AI Praktiki Kurs | Copilot, MCP, Pinokio" />
-        <meta name="description" content="Azərbaycanda ən yaxşı Süni İntellekt kursu. GitHub Copilot, MCP Protocol, Pinokio, Audio AI, Video AI və daha çoxunu öyrənin. 8 həftə, 100% praktiki, real layihələr." />
-        <meta name="keywords" content="süni intellekt kursu, AI kurs Azərbaycan, GitHub Copilot, MCP Protocol, Pinokio AI, Audio AI, Video AI, praktiki AI kursu, Bakı AI kurs" />
-        <meta name="author" content="Ali Hasanov" />
-        <meta name="robots" content="index, follow" />
-        <meta name="language" content="Azerbaijani" />
-        <meta name="revisit-after" content="7 days" />
-        
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://suni-intellekt.com/" />
-        <meta property="og:title" content="Süni İntellekt - AI Praktiki Kurs" />
-        <meta property="og:description" content="Azərbaycanda ən yaxşı Süni İntellekt kursu. 8 həftə, 100% praktiki, real layihələr." />
-        <meta property="og:image" content="https://suni-intellekt.com/logo.png" />
-        <meta property="og:locale" content="az_AZ" />
-        <meta property="og:site_name" content="Süni İntellekt" />
-
-        {/* Twitter */}
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://suni-intellekt.com/" />
-        <meta property="twitter:title" content="Süni İntellekt - AI Praktiki Kurs" />
-        <meta property="twitter:description" content="Azərbaycanda ən yaxşı Süni İntellekt kursu. 8 həftə, 100% praktiki, real layihələr." />
-        <meta property="twitter:image" content="https://suni-intellekt.com/logo.png" />
-        <meta property="twitter:creator" content="@ali.hasan0v" />
-
-        {/* Canonical */}
-        <link rel="canonical" href="https://suni-intellekt.com/" />
-        
-        <meta httpEquiv="x-dns-prefetch-control" content="on" />
-        
-        {/* PWA Manifest */}
-        <link rel="manifest" href="/manifest.json" />
-        
-        {/* Viewport and device optimization */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="format-detection" content="telephone=no, email=no, address=no" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Süni İntellekt" />
-        <meta name="theme-color" content="#8B5CF6" />
-        
-        {/* Icons */}
-        <link rel="icon" href="/favicon.ico" sizes="32x32" type="image/x-icon" />
-        <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
-        
         {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />

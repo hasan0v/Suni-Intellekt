@@ -279,7 +279,11 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   </div>
 )
 
-export const ApplicationForm: React.FC = () => {
+interface ApplicationFormProps {
+  registrationEnabled?: boolean
+}
+
+export const ApplicationForm: React.FC<ApplicationFormProps> = ({ registrationEnabled = true }) => {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [otherEnvironment, setOtherEnvironment] = useState('')

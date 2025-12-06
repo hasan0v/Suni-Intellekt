@@ -9,6 +9,9 @@ import {
   Headphones, Presentation, Video, GraduationCap, Code, Menu, X, Clock
 } from 'lucide-react'
 
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'
+
 // Static Orb Component - CSS only, no JS animations
 const StaticOrb: React.FC<{ color: string; size: string; position: { x: string; y: string }; className?: string }> = ({ 
   color, size, position, className = ''
