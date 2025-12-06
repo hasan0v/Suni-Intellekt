@@ -74,16 +74,6 @@ export const Logo: React.FC<LogoProps> = ({
       onClick={onClick}
       className={linkClasses}
     >
-      <div className={badgeClasses}>
-        <Image
-          src="/logo.png"
-          alt="Süni Intellekt Logo"
-          width={s.image}
-          height={s.image}
-          className="object-contain filter brightness-0 invert group-hover:scale-110 transition-transform duration-500"
-          priority={size === 'lg'}
-        />
-      </div>
       {showText && (
         <span className={textClasses}>
           {brand}

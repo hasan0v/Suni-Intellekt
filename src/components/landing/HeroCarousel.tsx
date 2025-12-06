@@ -30,7 +30,7 @@ const slides: Slide[] = [
     badge: '🎓 Qeydiyyat Açıqdır',
     title: 'Süni İntellekt Dərsinə Qeydiyyat Başladı',
     subtitle: 'Gələcəyin Texnologiyasını Bu Gün Öyrənin',
-    description: 'Copilot, MCP, Pinokio, Audio AI, Video AI və daha çoxunu əhatə edən praktiki kurs. 7 həftə, 40% praktika, 40% layihə, 20% nəzəri.',
+    description: 'Copilot, MCP, Pinokio, Audio AI, Video AI və daha çoxunu əhatə edən praktiki kurs. 8 həftə, 40% praktika, 40% layihə, 20% nəzəri.',
     cta: {
       text: 'Ətraflı Məlumat',
       href: '/course-details',
@@ -253,7 +253,7 @@ export const HeroCarousel: React.FC = () => {
                 className="flex flex-wrap gap-6 pt-4"
               >
                 {[
-                  { icon: <Cpu className="w-4 h-4" />, label: '7 Həftə' },
+                  { icon: <Cpu className="w-4 h-4" />, label: '8 Həftə' },
                   { icon: <Brain className="w-4 h-4" />, label: '7 AI Alət' },
                   { icon: <Zap className="w-4 h-4" />, label: 'Praktiki Layihələr' }
                 ].map((stat, i) => (

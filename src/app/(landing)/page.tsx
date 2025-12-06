@@ -306,7 +306,7 @@ export default function Home() {
                   className="text-lg text-gray-500 leading-relaxed max-w-xl"
                 >
                   Copilot, MCP, Pinokio, Audio AI, Video AI və daha çoxunu əhatə edən praktiki kurs. 
-                  7 həftə, 40% praktika, 40% layihə, 20% nəzəri.
+                  8 həftə, 40% praktika, 40% layihə, 20% nəzəri.
                 </motion.p>
 
                 {/* CTAs */}
@@ -355,7 +355,7 @@ export default function Home() {
                   className="flex flex-wrap gap-6 pt-4"
                 >
                   {[
-                    { icon: <Cpu className="w-4 h-4" />, label: '7 Həftə' },
+                    { icon: <Cpu className="w-4 h-4" />, label: '8 həftə' },
                     { icon: <Brain className="w-4 h-4" />, label: '7 AI Alət' },
                     { icon: <Zap className="w-4 h-4" />, label: 'Praktiki Layihələr' }
                   ].map((stat, i) => (
@@ -532,7 +532,7 @@ export default function Home() {
                 transition={{ delay: 0.1 }}
                 className="text-gray-400 max-w-2xl mx-auto"
               >
-                7 həftə ərzində ən populyar AI alətlərini praktiki şəkildə öyrənəcəksiniz
+                8 həftə ərzində ən populyar AI alətlərini praktiki şəkildə öyrənəcəksiniz
               </motion.p>
             </div>
 
@@ -637,52 +637,6 @@ export default function Home() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-20 px-6 sm:px-8 lg:px-12">
-          <div className="max-w-4xl mx-auto">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative"
-            >
-              <div className="absolute -inset-4 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-3xl blur-2xl" />
-              <div className="relative bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 md:p-12 text-center">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  Gələcəyə Hazır Olun
-                </h2>
-                <p className="text-gray-400 mb-8 max-w-xl mx-auto">
-                  {registrationEnabled 
-                    ? 'AI gələcəyin texnologiyasıdır. Bu kursu keçərək gələcəyinizə investisiya edin. Qeydiyyat məhduddur!'
-                    : 'AI gələcəyin texnologiyasıdır. Qeydiyyat tezliklə açılacaq. Kurs haqqında ətraflı məlumat alın!'
-                  }
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  {registrationEnabled ? (
-                    <Link
-                      href="/apply"
-                      className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/25 transition-all"
-                    >
-                      İndi Müraciət Et
-                      <ChevronRight className="w-5 h-5" />
-                    </Link>
-                  ) : (
-                    <div className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-gray-400 bg-gray-800 border border-gray-700 cursor-not-allowed">
-                      <Clock className="w-5 h-5" />
-                      Qeydiyyat Tezliklə
-                    </div>
-                  )}
-                  <Link
-                    href="/course-details"
-                    className="inline-flex items-center justify-center gap-2 px-10 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
-                  >
-                    Ətraflı Məlumat
-                  </Link>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
         {/* Footer */}
         <footer className="border-t border-white/10 py-8 sm:py-12 px-4 sm:px-6 lg:px-12">
           <div className="max-w-7xl mx-auto">

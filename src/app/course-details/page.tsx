@@ -185,7 +185,7 @@ const CourseDetailsPage: React.FC = () => {
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/20 border border-purple-500/30"
                 >
                   <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span className="text-sm font-medium text-purple-300">7 Həftəlik İntensiv Proqram</span>
+                  <span className="text-sm font-medium text-purple-300">8 həftəlik İntensiv Proqram</span>
                 </motion.div>
 
                 <motion.h1
@@ -218,7 +218,7 @@ const CourseDetailsPage: React.FC = () => {
                   className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6"
                 >
                   {[
-                    { icon: <Clock className="w-4 h-4 sm:w-5 sm:h-5" />, value: '7', label: 'Həftə' },
+                    { icon: <Clock className="w-4 h-4 sm:w-5 sm:h-5" />, value: '8', label: 'Həftə' },
                     { icon: <BookOpen className="w-4 h-4 sm:w-5 sm:h-5" />, value: '7', label: 'Modul' },
                     { icon: <Users className="w-4 h-4 sm:w-5 sm:h-5" />, value: '20+', label: 'Alət' },
                     { icon: <Award className="w-4 h-4 sm:w-5 sm:h-5" />, value: '100%', label: 'Praktiki' }
@@ -251,13 +251,14 @@ const CourseDetailsPage: React.FC = () => {
                       <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                     </Link>
                   )}
-                  <button
-                    onClick={() => setShowSyllabus(prev => !prev)}
+                  <a
+                    href="/Sillabus.pdf"
+                    download="AI-Kurs-Sillabus.pdf"
                     className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-2xl font-semibold text-white border-2 border-white/20 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all"
                   >
                     <Download className="w-5 h-5" />
                     Sillabus
-                  </button>
+                  </a>
                 </motion.div>
               </div>
 

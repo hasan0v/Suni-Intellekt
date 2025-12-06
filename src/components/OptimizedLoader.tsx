@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Logo } from './Logo'
 
 interface OptimizedLoaderProps {
   text?: string
@@ -12,7 +11,7 @@ interface OptimizedLoaderProps {
 
 export const OptimizedLoader: React.FC<OptimizedLoaderProps> = ({ 
   text = 'Yüklənir...', 
-  showLogo = true,
+  showLogo = false,
   minimal = false,
   timeout = 5000 
 }) => {
@@ -41,43 +40,81 @@ export const OptimizedLoader: React.FC<OptimizedLoaderProps> = ({
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
       <div className="text-center space-y-6 max-w-md mx-auto px-6">
-        {/* Logo with optimized loading */}
-        {showLogo && (
-          <div className="mb-8 animate-pulse">
-            <Logo size="lg" showText={true} />
-          </div>
-        )}
-        
-        {/* Optimized spinner */}
-        <div className="relative">
-          <div className="w-16 h-16 mx-auto">
-            <div className="absolute inset-0 border-4 border-blue-200 rounded-full" />
-            <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          </div>
-          
-          {/* Loading dots */}
-          <div className="flex justify-center items-center space-x-1 mt-6">
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-          </div>
+        {/* 3D Rotating Loader */}
+        <div className="relative w-16 h-16 mx-auto" style={{ perspective: '800px' }}>
+          <div className="loader-inner loader-one" />
+          <div className="loader-inner loader-two" />
+          <div className="loader-inner loader-three" />
         </div>
         
         {/* Loading text */}
         <div className="space-y-2">
-          <p className="text-lg font-medium text-gray-900">{text}</p>
-          <p className="text-sm text-gray-600">
+          <p className="text-lg font-medium text-white">{text}</p>
+          <p className="text-sm text-gray-400">
             Xahiş olunur bir az gözləyin...
           </p>
         </div>
-        
-        {/* Progress indicator */}
-        <div className="w-full bg-gray-200 rounded-full h-1">
-          <div className="bg-blue-600 h-1 rounded-full animate-pulse" style={{ width: '60%' }} />
-        </div>
       </div>
+
+      <style jsx>{`
+        .loader-inner {
+          position: absolute;
+          box-sizing: border-box;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+        }
+
+        .loader-one {
+          left: 0%;
+          top: 0%;
+          animation: rotate-one 1s linear infinite;
+          border-bottom: 3px solid #8B5CF6;
+        }
+
+        .loader-two {
+          right: 0%;
+          top: 0%;
+          animation: rotate-two 1s linear infinite;
+          border-right: 3px solid #3B82F6;
+        }
+
+        .loader-three {
+          right: 0%;
+          bottom: 0%;
+          animation: rotate-three 1s linear infinite;
+          border-top: 3px solid #06B6D4;
+        }
+
+        @keyframes rotate-one {
+          0% {
+            transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+          }
+        }
+
+        @keyframes rotate-two {
+          0% {
+            transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+          }
+        }
+
+        @keyframes rotate-three {
+          0% {
+            transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+          }
+          100% {
+            transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+          }
+        }
+      `}</style>
     </div>
   )
 }

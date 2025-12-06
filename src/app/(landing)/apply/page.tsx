@@ -1,15 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import ApplicationForm from '@/components/landing/ApplicationForm'
-import { Clock, ArrowLeft } from 'lucide-react'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
 
 export default function ApplyPage() {
   const [registrationEnabled, setRegistrationEnabled] = useState<boolean | null>(null)
-  const router = useRouter()
 
   useEffect(() => {
     const checkRegistration = async () => {
@@ -28,52 +23,76 @@ export default function ApplyPage() {
   // Loading state
   if (registrationEnabled === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)' }}>
-        <div className="w-10 h-10 border-4 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950">
+        <div className="text-center space-y-6">
+          {/* 3D Rotating Loader */}
+          <div className="relative w-16 h-16 mx-auto" style={{ perspective: '800px' }}>
+            <div className="loader-inner loader-one" />
+            <div className="loader-inner loader-two" />
+            <div className="loader-inner loader-three" />
+          </div>
+          
+          <style jsx>{`
+            .loader-inner {
+              position: absolute;
+              box-sizing: border-box;
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+            }
+
+            .loader-one {
+              left: 0%;
+              top: 0%;
+              animation: rotate-one 1s linear infinite;
+              border-bottom: 3px solid #8B5CF6;
+            }
+
+            .loader-two {
+              right: 0%;
+              top: 0%;
+              animation: rotate-two 1s linear infinite;
+              border-right: 3px solid #3B82F6;
+            }
+
+            .loader-three {
+              right: 0%;
+              bottom: 0%;
+              animation: rotate-three 1s linear infinite;
+              border-top: 3px solid #06B6D4;
+            }
+
+            @keyframes rotate-one {
+              0% {
+                transform: rotateX(35deg) rotateY(-45deg) rotateZ(0deg);
+              }
+              100% {
+                transform: rotateX(35deg) rotateY(-45deg) rotateZ(360deg);
+              }
+            }
+
+            @keyframes rotate-two {
+              0% {
+                transform: rotateX(50deg) rotateY(10deg) rotateZ(0deg);
+              }
+              100% {
+                transform: rotateX(50deg) rotateY(10deg) rotateZ(360deg);
+              }
+            }
+
+            @keyframes rotate-three {
+              0% {
+                transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg);
+              }
+              100% {
+                transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg);
+              }
+            }
+          `}</style>
+        </div>
       </div>
     )
   }
 
-  // Registration disabled
-  if (!registrationEnabled) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'linear-gradient(to bottom right, #030712, #111827, #030712)' }}>
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-md w-full bg-gray-900/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 text-center"
-        >
-          <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-600 to-gray-700 flex items-center justify-center">
-            <Clock className="w-10 h-10 text-white" />
-          </div>
-          
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Qeydiyyat Hazırda Bağlıdır
-          </h2>
-          
-          <p className="text-gray-400 mb-8">
-            Qeydiyyat hazırda aktiv deyil. Zəhmət olmasa daha sonra yenidən yoxlayın və ya kurs haqqında ətraflı məlumat alın.
-          </p>
-
-          <div className="flex flex-col gap-3">
-            <Link
-              href="/course-details"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 transition-all"
-            >
-              Kurs Haqqında
-            </Link>
-            <Link
-              href="/"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-medium text-gray-400 hover:text-white transition-all"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Ana Səhifə
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    )
-  }
-
-  return <ApplicationForm />
+  return <ApplicationForm registrationEnabled={registrationEnabled} />
 }
