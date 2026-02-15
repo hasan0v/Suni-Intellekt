@@ -53,21 +53,15 @@ interface LineChartProps {
   className?: string
 }
 
-interface LineChartProps {
-  data: ClassPerformanceData[]
-  currentUserAverage: number
-  className?: string
-}
-
 // Simple Line Chart Component
 function ClassPerformanceChart({ data, currentUserAverage, className = '' }: LineChartProps) {
   const [animated, setAnimated] = useState(false)
-  
+
   useEffect(() => {
     const timer = setTimeout(() => setAnimated(true), 100)
     return () => clearTimeout(timer)
   }, [])
-  
+
   if (!data || data.length === 0) {
     return (
       <div className={`p-8 text-center text-gray-500 ${className}`}>
@@ -76,23 +70,23 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
       </div>
     )
   }
-  
+
   const maxGrade = Math.max(...data.map(d => d.averageGrade), 100)
   const minGrade = Math.min(...data.map(d => d.averageGrade), 0)
   const range = maxGrade - minGrade || 1
-  
+
   const chartWidth = 400
   const chartHeight = 200
   const padding = 40
-  
+
   const getX = (index: number) => padding + (index / (data.length - 1)) * (chartWidth - 2 * padding)
   const getY = (grade: number) => chartHeight - padding - ((grade - minGrade) / range) * (chartHeight - 2 * padding)
-  
+
   const pathData = data.map((point, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(point.averageGrade)}`).join(' ')
-  
+
   const currentUserIndex = data.findIndex(d => d.isCurrentUser)
   const currentUserRank = data.find(d => d.isCurrentUser)?.rank || 0
-  
+
   return (
     <div className={`bg-white/70 backdrop-blur-xl rounded-2xl p-6 border border-white/40 ${className}`}>
       <div className="flex items-center justify-between mb-6">
@@ -108,7 +102,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
           <div className="samsung-body text-xs text-samsung-gray-500">Your rank</div>
         </div>
       </div>
-      
+
       <div className="relative">
         <svg
           viewBox={`0 0 ${chartWidth} ${chartHeight}`}
@@ -127,7 +121,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
               <stop offset="100%" stopColor="#1428A0" stopOpacity="0" />
             </linearGradient>
           </defs>
-          
+
           {/* Grid lines */}
           {[0, 25, 50, 75, 100].map(grade => {
             const y = getY(grade)
@@ -144,7 +138,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
               />
             )
           })}
-          
+
           {/* Area under curve */}
           <path
             d={`${pathData} L ${getX(data.length - 1)} ${chartHeight - padding} L ${padding} ${chartHeight - padding} Z`}
@@ -152,7 +146,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
             opacity={animated ? "1" : "0"}
             style={{ transition: 'opacity 1s ease-out' }}
           />
-          
+
           {/* Main line */}
           <path
             d={pathData}
@@ -164,7 +158,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
             strokeDashoffset={animated ? "0" : "1000"}
             style={{ transition: 'stroke-dashoffset 2s ease-out' }}
           />
-          
+
           {/* Data points */}
           {data.map((point, i) => (
             <g key={i}>
@@ -176,7 +170,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
                 stroke={point.isCurrentUser ? "#ffffff" : "none"}
                 strokeWidth={point.isCurrentUser ? "3" : "0"}
                 opacity={animated ? "1" : "0"}
-                style={{ 
+                style={{
                   transition: `opacity 1s ease-out ${i * 0.1}s`,
                   filter: point.isCurrentUser ? 'drop-shadow(0 0 8px rgba(11, 180, 195, 0.5))' : 'none'
                 }}
@@ -196,7 +190,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
               )}
             </g>
           ))}
-          
+
           {/* Current user label with exact grade */}
           {currentUserIndex >= 0 && (
             <g opacity={animated ? "1" : "0"} style={{ transition: 'opacity 1s ease-out 1s' }}>
@@ -226,7 +220,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
               </text>
             </g>
           )}
-          
+
           {/* Y-axis labels */}
           {[0, 25, 50, 75, 100].map(grade => (
             <text
@@ -240,7 +234,7 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
             </text>
           ))}
         </svg>
-        
+
         {/* Legend */}
         <div className="flex items-center justify-center gap-6 mt-4 text-sm">
           <div className="flex items-center gap-2">
@@ -252,12 +246,12 @@ function ClassPerformanceChart({ data, currentUserAverage, className = '' }: Lin
             <span className="samsung-body text-samsung-gray-600">Your Performance</span>
           </div>
         </div>
-        
+
         {/* Privacy Notice */}
         <div className="mt-3 text-xs text-center text-gray-500 bg-gray-50 rounded-lg p-2">
           🔒 Privacy Protected: Other students&apos; names are not visible. This chart shows exact grade positions.
         </div>
-        
+
         {/* Performance insights */}
         <div className="mt-4 grid grid-cols-3 gap-4 text-center">
           <div className="bg-samsung-blue/10 rounded-xl p-3 border border-samsung-blue/20">
@@ -391,7 +385,7 @@ export default function StudentGradesPage() {
             }
           }
         }) || []
-        
+
         setGrades(gradesData)
 
         // Calculate stats
@@ -413,7 +407,7 @@ export default function StudentGradesPage() {
         await fetchClassPerformanceData()
       } catch (error) {
         console.error('Error fetching grades:', error)
-        
+
         // If there are no submissions, show a helpful message
         if (error && typeof error === 'object' && 'code' in error && error.code === 'PGRST116') {
           console.log('No submissions found for this user')
@@ -452,7 +446,7 @@ export default function StudentGradesPage() {
 
         // Sort by rank for proper display
         anonymizedData.sort((a, b) => a.rank - b.rank)
-        
+
         setClassPerformanceData(anonymizedData)
       } catch (error) {
         console.error('Error fetching class performance data:', error)
@@ -588,55 +582,55 @@ export default function StudentGradesPage() {
             </div>
           </div>
           <div className="glass-card group hover:scale-[1.02] transition-all duration-700 hover:shadow-samsung-float p-8 rounded-3xl border-2 border-samsung-gray-100 hover:border-samsung-blue/20">
-              <div className="flex items-center space-x-5">
-                <div className="relative w-20 h-20">
-                  {(() => {
-                    const percent = Math.min(100, Math.max(0, stats.averageGrade))
-                    const r = 32
-                    const c = 2 * Math.PI * r
-                    const offset = c - (percent / 100) * c
-                    return (
-                      <svg className="w-20 h-20" viewBox="0 0 80 80" role="img" aria-label={`Average grade ${percent.toFixed(0)} percent`}>
-                        <defs>
-                          <linearGradient id="avgGrad" x1="0" x2="1" y1="0" y2="1">
-                            <stop offset="0%" stopColor="#1428A0" />
-                            <stop offset="100%" stopColor="#1E3BC4" />
-                          </linearGradient>
-                        </defs>
-                        <g transform="rotate(-90 40 40)">
-                          <circle cx="40" cy="40" r={r} stroke="rgba(20,40,160,0.1)" strokeWidth="8" fill="transparent" />
-                          <circle
-                            cx="40"
-                            cy="40"
-                            r={r}
-                            stroke="url(#avgGrad)"
-                            strokeWidth="8"
-                            strokeLinecap="round"
-                            fill="transparent"
-                            strokeDasharray={c}
-                            strokeDashoffset={offset}
-                            style={{ transition: 'stroke-dashoffset 1s ease-out' }}
-                          />
-                        </g>
-                        <text
-                          x="50%"
-                          y="50%"
-                          dominantBaseline="middle"
-                          textAnchor="middle"
-                          className="fill-samsung-blue samsung-heading text-sm select-none"
-                        >
-                          {percent.toFixed(0)}%
-                        </text>
-                      </svg>
-                    )
-                  })()}
-                </div>
-                <div>
-                  <p className="samsung-body text-sm font-bold text-samsung-gray-600">Average Grade</p>
-                  <p className="text-3xl samsung-heading text-samsung-gray-900">{stats.averageGrade.toFixed(1)}</p>
-                  {/* <p className="samsung-body text-xs text-samsung-gray-500 mt-1">Based on graded submissions</p> */}
-                </div>
+            <div className="flex items-center space-x-5">
+              <div className="relative w-20 h-20">
+                {(() => {
+                  const percent = Math.min(100, Math.max(0, stats.averageGrade))
+                  const r = 32
+                  const c = 2 * Math.PI * r
+                  const offset = c - (percent / 100) * c
+                  return (
+                    <svg className="w-20 h-20" viewBox="0 0 80 80" role="img" aria-label={`Average grade ${percent.toFixed(0)} percent`}>
+                      <defs>
+                        <linearGradient id="avgGrad" x1="0" x2="1" y1="0" y2="1">
+                          <stop offset="0%" stopColor="#1428A0" />
+                          <stop offset="100%" stopColor="#1E3BC4" />
+                        </linearGradient>
+                      </defs>
+                      <g transform="rotate(-90 40 40)">
+                        <circle cx="40" cy="40" r={r} stroke="rgba(20,40,160,0.1)" strokeWidth="8" fill="transparent" />
+                        <circle
+                          cx="40"
+                          cy="40"
+                          r={r}
+                          stroke="url(#avgGrad)"
+                          strokeWidth="8"
+                          strokeLinecap="round"
+                          fill="transparent"
+                          strokeDasharray={c}
+                          strokeDashoffset={offset}
+                          style={{ transition: 'stroke-dashoffset 1s ease-out' }}
+                        />
+                      </g>
+                      <text
+                        x="50%"
+                        y="50%"
+                        dominantBaseline="middle"
+                        textAnchor="middle"
+                        className="fill-samsung-blue samsung-heading text-sm select-none"
+                      >
+                        {percent.toFixed(0)}%
+                      </text>
+                    </svg>
+                  )
+                })()}
               </div>
+              <div>
+                <p className="samsung-body text-sm font-bold text-samsung-gray-600">Average Grade</p>
+                <p className="text-3xl samsung-heading text-samsung-gray-900">{stats.averageGrade.toFixed(1)}</p>
+                {/* <p className="samsung-body text-xs text-samsung-gray-500 mt-1">Based on graded submissions</p> */}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -657,91 +651,90 @@ export default function StudentGradesPage() {
                 <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-indigo-300/30 via-purple-300/30 to-pink-300/30 opacity-0 group-hover:opacity-100 blur-md transition" />
                 <div className="relative rounded-2xl bg-white/65 backdrop-blur-xl border border-white/40 shadow-sm hover:shadow-xl transition-all duration-400 ease-out hover:-translate-y-0.5 hover:bg-white/80">
                   <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex-1 min-w-0">
-                    <div>
-                      {grade.task.topic?.module?.course ? (
-                        <>
-                          <p className="text-lg font-semibold text-gray-900 truncate">
-                            <Link 
-                              href={`/dashboard/courses/${grade.task.topic.module.course.id}`}
-                              className="hover:text-blue-600 transition-colors"
-                            >
-                              {grade.task.topic.module.course.title}
-                            </Link>
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            {grade.task.topic.module.title} › {grade.task.topic.title}
-                          </p>
-                        </>
-                      ) : (
-                        <>
-                          <p className="text-lg font-semibold text-gray-900 truncate">
-                            Assignment Task
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            No course assignment
-                          </p>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <span className={`px-3 py-1 text-xs font-medium rounded-full ${
-                      grade.status === 'graded' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {grade.status === 'graded' ? 'Graded' : 'Pending'}
-                    </span>
-                    {grade.status === 'graded' && (
-                      <span className={`px-3 py-1 text-sm font-bold rounded-full ${getGradeBadgeColor(grade.points)}`}>
-                        {grade.points || 0} points
-                      </span>
-                    )}
-                  </div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex-1 min-w-0">
+                        <div>
+                          {grade.task.topic?.module?.course ? (
+                            <>
+                              <p className="text-lg font-semibold text-gray-900 truncate">
+                                <Link
+                                  href={`/dashboard/courses/${grade.task.topic.module.course.id}`}
+                                  className="hover:text-blue-600 transition-colors"
+                                >
+                                  {grade.task.topic.module.course.title}
+                                </Link>
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {grade.task.topic.module.title} › {grade.task.topic.title}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="text-lg font-semibold text-gray-900 truncate">
+                                Assignment Task
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                No course assignment
+                              </p>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <span className={`px-3 py-1 text-xs font-medium rounded-full ${grade.status === 'graded'
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                          {grade.status === 'graded' ? 'Graded' : 'Pending'}
+                        </span>
+                        {grade.status === 'graded' && (
+                          <span className={`px-3 py-1 text-sm font-bold rounded-full ${getGradeBadgeColor(grade.points)}`}>
+                            {grade.points || 0} points
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <div className="h-px bg-gradient-to-r from-transparent via-indigo-200/60 to-transparent mb-4" />
                     <div className="mb-4">
-                  <p className="text-gray-700 leading-relaxed">
-                    {grade.task.instructions}
-                  </p>
-                </div>
-                
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                  <div className="flex items-center space-x-6">
-                    <span className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Submitted: {new Date(grade.submitted_at).toLocaleDateString()}
-                    </span>
-                    {grade.graded_at && (
-                      <span className="flex items-center">
-                        <CheckCircle className="h-4 w-4 mr-1" />
-                        Graded: {new Date(grade.graded_at).toLocaleDateString()}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                {grade.feedback && (
-                  <div className="mt-6 p-6 bg-gradient-to-br from-samsung-blue/5 to-samsung-cyan/5 rounded-2xl border-2 border-samsung-blue/20">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-xl bg-samsung-blue flex items-center justify-center">
-                        <MessageSquare className="h-4 w-4 text-white" />
-                      </div>
-                      <p className="text-base samsung-heading text-gray-900">
-                        Instructor Feedback
+                      <p className="text-gray-700 leading-relaxed">
+                        {grade.task.instructions}
                       </p>
                     </div>
-                    <div className="pl-10">
-                      <div className="samsung-body text-sm text-gray-700 leading-loose prose prose-sm max-w-none">
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {grade.feedback}
-                        </ReactMarkdown>
+
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                      <div className="flex items-center space-x-6">
+                        <span className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-1" />
+                          Submitted: {new Date(grade.submitted_at).toLocaleDateString()}
+                        </span>
+                        {grade.graded_at && (
+                          <span className="flex items-center">
+                            <CheckCircle className="h-4 w-4 mr-1" />
+                            Graded: {new Date(grade.graded_at).toLocaleDateString()}
+                          </span>
+                        )}
                       </div>
                     </div>
-                  </div>
-                )}
+
+                    {grade.feedback && (
+                      <div className="mt-6 p-6 bg-gradient-to-br from-samsung-blue/5 to-samsung-cyan/5 rounded-2xl border-2 border-samsung-blue/20">
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="w-8 h-8 rounded-xl bg-samsung-blue flex items-center justify-center">
+                            <MessageSquare className="h-4 w-4 text-white" />
+                          </div>
+                          <p className="text-base samsung-heading text-gray-900">
+                            Instructor Feedback
+                          </p>
+                        </div>
+                        <div className="pl-10">
+                          <div className="samsung-body text-sm text-gray-700 leading-loose prose prose-sm max-w-none">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {grade.feedback}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -751,23 +744,23 @@ export default function StudentGradesPage() {
           <div className="relative group text-center py-16 rounded-3xl overflow-hidden">
             <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-indigo-300/30 via-purple-300/30 to-pink-300/30 opacity-70 blur" />
             <div className="relative bg-white/70 backdrop-blur-xl border border-white/40 rounded-3xl max-w-3xl mx-auto shadow-sm p-10">
-            <div className="flex justify-center mb-6">
-              <div className="p-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl text-white">
-                <Star className="h-12 w-12" />
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-2xl text-white">
+                  <Star className="h-12 w-12" />
+                </div>
               </div>
-            </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              No grades yet
-            </h3>
-            <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Complete your assignments to see your grades and feedback from instructors here.
-            </p>
-            <Link 
-              href="/dashboard/courses"
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
-            >
-              Browse Courses
-            </Link>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                No grades yet
+              </h3>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                Complete your assignments to see your grades and feedback from instructors here.
+              </p>
+              <Link
+                href="/dashboard/courses"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105"
+              >
+                Browse Courses
+              </Link>
             </div>
           </div>
         )}

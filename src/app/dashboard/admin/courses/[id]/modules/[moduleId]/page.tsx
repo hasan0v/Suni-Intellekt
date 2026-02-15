@@ -41,8 +41,11 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
   const [newTopic, setNewTopic] = useState({
     title: '',
     colab_link: '',
-    youtubeLinks: [] as string[]
+    youtubeLinks: [] as string[],
+    slideFile: null as File | null,
+    slideUrl: '' as string
   })
+  const [uploadingSlide, setUploadingSlide] = useState(false)
 
   const fetchModuleWithTopics = useCallback(async () => {
     try {
@@ -131,22 +134,54 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
 
     try {
       const nextPosition = (module?.topics.length || 0) + 1
+      let slideUrl = ''
 
-      // Create topic with colab_link instead of content
+      // Upload slide file if provided
+      if (newTopic.slideFile) {
+        setUploadingSlide(true)
+        const fileExt = newTopic.slideFile.name.split('.').pop()
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
+        const filePath = `slides/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('course-materials')
+          .upload(filePath, newTopic.slideFile)
+
+        if (uploadError) throw uploadError
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('course-materials')
+          .getPublicUrl(filePath)
+
+        slideUrl = publicUrl
+        setUploadingSlide(false)
+      }
+
+      // Create topic with colab_link or slide_url
+      const insertData: any = {
+        module_id: moduleId,
+        title: newTopic.title,
+        content: newTopic.colab_link || null, // Store Colab link in content field (optional)
+        position: nextPosition,
+        youtube_links: newTopic.youtubeLinks.length > 0 ? newTopic.youtubeLinks : null
+      }
+
+      // Only add slide_url if we have one
+      // if (slideUrl) {
+      //   insertData.slide_url = slideUrl
+      // }
+
+      console.log('Inserting topic data:', insertData)
+
       const { data: topicData, error: topicError } = await supabase
         .from('topics')
-        .insert({
-          module_id: moduleId,
-          title: newTopic.title,
-          content: newTopic.colab_link, // Store Colab link in content field
-          position: nextPosition,
-          youtube_links: newTopic.youtubeLinks
-        })
+        .insert(insertData)
         .select()
         .single()
 
       if (topicError) {
         console.error('Topic creation error:', topicError)
+        console.error('Topic creation error details:', JSON.stringify(topicError, null, 2))
         throw topicError
       }
 
@@ -165,7 +200,9 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
       setNewTopic({
         title: '',
         colab_link: '',
-        youtubeLinks: []
+        youtubeLinks: [],
+        slideFile: null,
+        slideUrl: ''
       })
       setShowAddTopic(false)
 
@@ -177,17 +214,41 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
     }
   }
 
-  const handleUpdateTopic = async (topicId: string, updates: { title?: string; colab_link?: string; youtubeLinks?: string[] }) => {
+  const handleUpdateTopic = async (topicId: string, updates: { title?: string; colab_link?: string; youtubeLinks?: string[]; slideFile?: File | null; slideUrl?: string }) => {
     console.log('Attempting to update topic:', topicId, updates)
     
     try {
+      let slideUrl = updates.slideUrl || ''
+
+      // Upload new slide file if provided
+      if (updates.slideFile) {
+        setUploadingSlide(true)
+        const fileExt = updates.slideFile.name.split('.').pop()
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`
+        const filePath = `slides/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('course-materials')
+          .upload(filePath, updates.slideFile)
+
+        if (uploadError) throw uploadError
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('course-materials')
+          .getPublicUrl(filePath)
+
+        slideUrl = publicUrl
+        setUploadingSlide(false)
+      }
+
       // Update topic
       const { error: topicError } = await supabase
         .from('topics')
         .update({
           title: updates.title,
-          content: updates.colab_link, // Store Colab link in content field
-          youtube_links: updates.youtubeLinks
+          content: updates.colab_link || null, // Store Colab link in content field (optional)
+          youtube_links: updates.youtubeLinks,
+          ...(slideUrl && { slide_url: slideUrl })
         })
         .eq('id', topicId)
 
@@ -314,7 +375,7 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
                     
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Google Colab Link *
+                        Google Colab Link (Optional)
                       </label>
                       <input
                         type="url"
@@ -322,8 +383,24 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
                         onChange={(e) => setNewTopic(prev => ({ ...prev, colab_link: e.target.value }))}
                         className="block w-full text-gray-900 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         placeholder="https://colab.research.google.com/drive/..."
-                        required
                       />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Slide File (Optional - PDF, PPTX)
+                      </label>
+                      <input
+                        type="file"
+                        accept=".pdf,.pptx,.ppt"
+                        onChange={(e) => setNewTopic(prev => ({ ...prev, slideFile: e.target.files?.[0] || null }))}
+                        className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                      {newTopic.slideFile && (
+                        <p className="mt-2 text-sm text-gray-500">
+                          Selected: {newTopic.slideFile.name}
+                        </p>
+                      )}
                     </div>
 
                     <div>
@@ -343,7 +420,7 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
                       type="button"
                       onClick={() => {
                         setShowAddTopic(false)
-                        setNewTopic({ title: '', colab_link: '', youtubeLinks: [] })
+                        setNewTopic({ title: '', colab_link: '', youtubeLinks: [], slideFile: null, slideUrl: '' })
                       }}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                     >
@@ -351,9 +428,10 @@ function ModuleDetailContent({ id, moduleId }: { id: string; moduleId: string })
                     </button>
                     <button
                       type="submit"
-                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700"
+                      disabled={uploadingSlide}
+                      className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                     >
-                      Add Topic
+                      {uploadingSlide ? 'Uploading...' : 'Add Topic'}
                     </button>
                   </div>
                 </form>
@@ -449,17 +527,18 @@ function TopicEditForm({
   onCancel 
 }: { 
   topic: TopicWithTask
-  onSave: (updates: { title: string; colab_link: string; youtubeLinks: string[] }) => void
+  onSave: (updates: { title: string; colab_link: string; youtubeLinks: string[]; slideFile?: File | null; slideUrl?: string }) => void
   onCancel: () => void
 }) {
   const [title, setTitle] = useState(topic.title)
   const [colab_link, setColab_link] = useState(topic.content || '')
   const [youtubeLinks, setYoutubeLinks] = useState<string[]>(topic.youtube_links || [])
+  const [slideFile, setSlideFile] = useState<File | null>(null)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log('Edit form submitted manually via Save Changes button')
-    onSave({ title, colab_link, youtubeLinks })
+    onSave({ title, colab_link, youtubeLinks, slideFile, slideUrl: (topic as any).slide_url })
   }
 
   return (
@@ -480,7 +559,7 @@ function TopicEditForm({
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Google Colab Link *
+            Google Colab Link (Optional)
           </label>
           <input
             type="url"
@@ -488,8 +567,29 @@ function TopicEditForm({
             onChange={(e) => setColab_link(e.target.value)}
             className="block w-full text-gray-900 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
             placeholder="https://colab.research.google.com/drive/..."
-            required
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Slide File (Optional - PDF, PPTX)
+          </label>
+          <input
+            type="file"
+            accept=".pdf,.pptx,.ppt"
+            onChange={(e) => setSlideFile(e.target.files?.[0] || null)}
+            className="block w-full text-sm text-gray-900 border border-gray-300 rounded-md cursor-pointer focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          />
+          {slideFile && (
+            <p className="mt-2 text-sm text-gray-500">
+              Selected: {slideFile.name}
+            </p>
+          )}
+          {(topic as any).slide_url && !slideFile && (
+            <p className="mt-2 text-sm text-green-600">
+              ✓ Slide file already uploaded
+            </p>
+          )}
         </div>
 
         <div>

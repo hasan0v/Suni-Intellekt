@@ -38,6 +38,43 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
   const [selectedTopic, setSelectedTopic] = useState<TopicWithTask | null>(null)
   const [loading, setLoading] = useState(true)
   const [uploadingFile, setUploadingFile] = useState<string | null>(null)
+  const [fullscreenSlide, setFullscreenSlide] = useState<string | null>(null)
+  const [isBlacklisted, setIsBlacklisted] = useState(false)
+  
+  // Check if user is blacklisted in any class that has this course
+  useEffect(() => {
+    const checkBlacklist = async () => {
+      if (!user || !courseId) return
+      
+      try {
+        // First get class IDs that have this course
+        const { data: classCourses } = await supabase
+          .from('class_courses')
+          .select('class_id')
+          .eq('course_id', courseId)
+        
+        if (!classCourses || classCourses.length === 0) return
+        
+        const classIds = classCourses.map(cc => cc.class_id)
+        
+        // Check if user is blacklisted in any of these classes
+        const { data: enrollments } = await supabase
+          .from('class_enrollments')
+          .select('is_blacklisted')
+          .eq('user_id', user.id)
+          .in('class_id', classIds)
+          .eq('is_blacklisted', true)
+        
+        if (enrollments && enrollments.length > 0) {
+          setIsBlacklisted(true)
+        }
+      } catch (error) {
+        console.error('Error checking blacklist:', error)
+      }
+    }
+    
+    checkBlacklist()
+  }, [user, courseId])
   
   // Step 1: Fetch course and modules as soon as courseId is available (no user dependency)
   useEffect(() => {
@@ -64,6 +101,7 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
           title: string
           content: string
           youtube_links?: string[] | null
+          slide_url?: string | null
           position: number
           module_id: string
           created_at: string
@@ -97,6 +135,7 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
                 title,
                 content,
                 youtube_links,
+                slide_url,
                 position,
                 module_id,
                 created_at,
@@ -135,6 +174,7 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
               position: t.position,
               created_at: t.created_at,
               youtube_links: t.youtube_links ?? undefined,
+              slide_url: t.slide_url ?? undefined,
               tasks: (t.tasks || []).filter(tsk => tsk.is_published !== false).map(task => ({
                 ...task,
                 submission: undefined
@@ -309,6 +349,33 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
     )
   }
 
+  // Show blacklist message if user is blacklisted
+  if (isBlacklisted) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md mx-auto p-8">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-red-100 flex items-center justify-center">
+              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Giriş bloklanıb</h2>
+            <p className="text-gray-600 mb-6">
+              Bu kursa girişiniz müvəqqəti olaraq bloklanıb. Ətraflı məlumat üçün administrasiya ilə əlaqə saxlayın.
+            </p>
+            <Link 
+              href="/dashboard/courses" 
+              className="inline-flex items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition"
+            >
+              ← Kurslara qayıt
+            </Link>
+          </div>
+        </div>
+      </DashboardLayout>
+    )
+  }
+
   return (
     <DashboardLayout>
       <div className="flex h-[calc(100vh-8rem)]">
@@ -441,6 +508,76 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
                               <li>• Run code cells by clicking the play button or pressing Shift+Enter</li>
                               <li>• Feel free to modify and experiment with the code</li>
                             </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Slide Viewer */}
+                {(selectedTopic as any).slide_url && (
+                  <div className="mb-8">
+                    <h2 className="text-lg font-medium text-gray-900 mb-4">
+                      📊 Presentation Slides
+                    </h2>
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6">
+                      <div className="flex items-center space-x-4 mb-4">
+                        <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-900">Course Slides</h3>
+                          <p className="text-sm text-gray-600">View the presentation in fullscreen</p>
+                        </div>
+                      </div>
+                      
+                      {/* PDF/PPTX Embed */}
+                      <div className="bg-white rounded-lg border border-purple-100 overflow-hidden">
+                        <div className="aspect-[16/9] relative">
+                          {(selectedTopic as any).slide_url.toLowerCase().endsWith('.pdf') ? (
+                            <iframe
+                              src={(selectedTopic as any).slide_url}
+                              className="w-full h-full"
+                              title="Course Slides"
+                            />
+                          ) : (
+                            <iframe
+                              src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent((selectedTopic as any).slide_url)}`}
+                              className="w-full h-full"
+                              title="Course Slides"
+                            />
+                          )}
+                        </div>
+                        
+                        <div className="p-4 bg-purple-50 border-t border-purple-100 flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <button
+                              onClick={() => setFullscreenSlide((selectedTopic as any).slide_url)}
+                              className="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                            >
+                              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                              </svg>
+                              Fullscreen
+                            </button>
+                            <a
+                              href={(selectedTopic as any).slide_url}
+                              download
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center px-3 py-2 border border-purple-300 text-purple-700 font-medium rounded-lg hover:bg-purple-50 transition-colors"
+                            >
+                              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                              Download
+                            </a>
+                          </div>
+                          <div className="text-xs text-purple-600">
+                            {(selectedTopic as any).slide_url.toLowerCase().endsWith('.pdf') ? 'PDF' : 'PowerPoint'}
                           </div>
                         </div>
                       </div>
@@ -669,6 +806,39 @@ function StudentCourseContent({ courseId }: { courseId: string }) {
           )}
         </div>
       </div>
+
+      {/* Fullscreen Slide Modal */}
+      {fullscreenSlide && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+          onClick={() => setFullscreenSlide(null)}
+        >
+          <button
+            onClick={() => setFullscreenSlide(null)}
+            className="absolute top-4 right-4 z-50 p-2 bg-white/10 hover:bg-white/20 rounded-lg text-white transition-colors"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <div className="w-full h-full p-8" onClick={(e) => e.stopPropagation()}>
+            {fullscreenSlide.toLowerCase().endsWith('.pdf') ? (
+              <iframe
+                src={fullscreenSlide}
+                className="w-full h-full rounded-lg"
+                title="Fullscreen Slides"
+              />
+            ) : (
+              <iframe
+                src={`https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fullscreenSlide)}`}
+                className="w-full h-full rounded-lg"
+                title="Fullscreen Slides"
+              />
+            )}
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   )
 }

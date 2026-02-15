@@ -138,10 +138,25 @@ export default function RootLayout({
   return (
     <html lang="az">
       <head>
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-817YD3KLTK"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-817YD3KLTK');
+          `}
+        </Script>
+
         {/* DNS prefetch for performance */}
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//api.supabase.co" />
+        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
         
         {/* Preconnect for faster loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />

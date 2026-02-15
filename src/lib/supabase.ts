@@ -63,6 +63,7 @@ export interface Topic {
   position: number
   created_at: string
   youtube_links?: string[]
+  slide_url?: string
 }
 
 export interface Task {
@@ -115,6 +116,7 @@ export interface ClassEnrollment {
   user_id: string
   status: 'active' | 'completed' | 'dropped'
   study_mode: 'offline' | 'online' | 'self_study'
+  is_blacklisted?: boolean
   enrolled_at: string
   updated_at: string
 }

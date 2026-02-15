@@ -15,6 +15,7 @@ interface Student {
   full_name: string
   profile_image_url?: string
   study_mode?: StudyMode
+  is_blacklisted?: boolean
 }
 
 interface AttendanceRecord {
@@ -56,6 +57,13 @@ interface Topic {
   course_id?: string // derived from module's course
 }
 
+// Full attendance data for table view
+interface FullAttendanceData {
+  [studentId: string]: {
+    [lessonKey: string]: 'present' | 'absent' | 'excused' | null
+  }
+}
+
 export default function ClassAttendancePage() {
   const params = useParams()
   const router = useRouter()
@@ -84,6 +92,13 @@ export default function ClassAttendancePage() {
   const [deleting, setDeleting] = useState(false)
   const [studyModeFilter, setStudyModeFilter] = useState<'all' | StudyMode>('all')
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  
+  // Table view state
+  const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards')
+  const [fullAttendanceData, setFullAttendanceData] = useState<FullAttendanceData>({})
+  const [tableStudyModeFilter, setTableStudyModeFilter] = useState<'all' | StudyMode>('all')
+  const [showBlacklistSection, setShowBlacklistSection] = useState(false)
+  const [togglingBlacklist, setTogglingBlacklist] = useState<string | null>(null)
 
   useEffect(() => {
     if (profile?.role !== 'admin') {
@@ -96,6 +111,14 @@ export default function ClassAttendancePage() {
     fetchCourses().then(() => fetchLessons())
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [classId, profile])
+
+  // Fetch full attendance data for table view
+  useEffect(() => {
+    if (viewMode === 'table' && students.length > 0 && lessons.length > 0) {
+      fetchFullAttendanceData()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewMode, students.length, lessons.length])
 
   useEffect(() => {
     if (selectedDate && lessonNumber && students.length > 0) {
@@ -262,10 +285,10 @@ export default function ClassAttendancePage() {
   const fetchStudents = async () => {
     setLoading(true)
     try {
-      // First, get enrolled user IDs with study_mode
+      // First, get enrolled user IDs with study_mode and blacklist status
       const { data: enrollments, error: enrollError } = await supabase
         .from('class_enrollments')
-        .select('user_id, study_mode')
+        .select('user_id, study_mode, is_blacklisted')
         .eq('class_id', classId)
         .eq('status', 'active')
 
@@ -284,10 +307,13 @@ export default function ClassAttendancePage() {
 
       const userIds = enrollments.map(e => e.user_id)
       
-      // Create a map of user_id to study_mode
-      const studyModeMap = new Map<string, StudyMode>()
+      // Create a map of user_id to study_mode and blacklist status
+      const enrollmentMap = new Map<string, { study_mode: StudyMode, is_blacklisted: boolean }>()
       enrollments.forEach(e => {
-        studyModeMap.set(e.user_id, (e.study_mode as StudyMode) || 'offline')
+        enrollmentMap.set(e.user_id, {
+          study_mode: (e.study_mode as StudyMode) || 'offline',
+          is_blacklisted: e.is_blacklisted || false
+        })
       })
 
       // Then, get user profiles
@@ -304,10 +330,11 @@ export default function ClassAttendancePage() {
         return
       }
 
-      // Merge profiles with study_mode and sort by study_mode
+      // Merge profiles with study_mode and blacklist status
       const studentsWithMode: Student[] = (profiles || []).map(p => ({
         ...p,
-        study_mode: studyModeMap.get(p.id) || 'offline'
+        study_mode: enrollmentMap.get(p.id)?.study_mode || 'offline',
+        is_blacklisted: enrollmentMap.get(p.id)?.is_blacklisted || false
       }))
 
       // Sort: offline first, then online, then self_study
@@ -356,6 +383,35 @@ export default function ClassAttendancePage() {
         if (data[0].lesson_title) setLessonTitle(data[0].lesson_title)
         if (data[0].topic_id) setSelectedTopicId(data[0].topic_id)
       }
+    }
+  }
+
+  // Fetch all attendance data for table view
+  const fetchFullAttendanceData = async () => {
+    const { data, error } = await supabase
+      .from('class_attendance')
+      .select('student_id, lesson_date, lesson_number, status')
+      .eq('class_id', classId)
+
+    if (error) {
+      console.error('Error fetching full attendance:', error)
+      return
+    }
+
+    if (data) {
+      const attendanceMap: FullAttendanceData = {}
+      
+      data.forEach(record => {
+        const lessonKey = `${record.lesson_date}-${record.lesson_number}`
+        
+        if (!attendanceMap[record.student_id]) {
+          attendanceMap[record.student_id] = {}
+        }
+        
+        attendanceMap[record.student_id][lessonKey] = record.status
+      })
+      
+      setFullAttendanceData(attendanceMap)
     }
   }
 
@@ -432,6 +488,10 @@ export default function ClassAttendancePage() {
 
       setMessage({ type: 'success', text: hasAttendance ? 'Davamiyyət uğurla yadda saxlanıldı!' : 'Dərs uğurla yaradıldı!' })
       await fetchLessons(topics)
+      // Refresh table data if in table view
+      if (viewMode === 'table') {
+        await fetchFullAttendanceData()
+      }
       setShowLessonModal(false)
       setTimeout(() => setMessage(null), 3000)
     } catch (error) {
@@ -469,6 +529,10 @@ export default function ClassAttendancePage() {
       }
       
       fetchLessons(topics)
+      // Refresh table data if in table view
+      if (viewMode === 'table') {
+        fetchFullAttendanceData()
+      }
       setTimeout(() => setMessage(null), 3000)
     } catch (error) {
       console.error('Error deleting lesson:', error)
@@ -495,6 +559,39 @@ export default function ClassAttendancePage() {
     setLessonTitle(lesson.lesson_title || '')
     setSelectedTopicId(lesson.topic_id || '')
     setShowLessonModal(true)
+  }
+
+  // Toggle blacklist status for a student
+  const toggleBlacklist = async (studentId: string, currentStatus: boolean) => {
+    setTogglingBlacklist(studentId)
+    
+    try {
+      const { error } = await supabase
+        .from('class_enrollments')
+        .update({ is_blacklisted: !currentStatus })
+        .eq('class_id', classId)
+        .eq('user_id', studentId)
+
+      if (error) throw error
+
+      // Update local state
+      setStudents(prev => prev.map(s => 
+        s.id === studentId ? { ...s, is_blacklisted: !currentStatus } : s
+      ))
+
+      setMessage({ 
+        type: 'success', 
+        text: !currentStatus 
+          ? 'Tələbə qara siyahıya əlavə edildi. Materiallara girişi bloklandı.' 
+          : 'Tələbə qara siyahıdan çıxarıldı.'
+      })
+      setTimeout(() => setMessage(null), 3000)
+    } catch (error) {
+      console.error('Error toggling blacklist:', error)
+      setMessage({ type: 'error', text: 'Xəta baş verdi. Yenidən cəhd edin.' })
+    } finally {
+      setTogglingBlacklist(null)
+    }
   }
 
   const getStats = () => {
@@ -549,6 +646,76 @@ export default function ClassAttendancePage() {
   const selectedTopic = topics.find(t => t.id === selectedTopicId)
   const selectedCourse = selectedTopic ? courses.find(c => c.id === selectedTopic.course_id) : null
 
+  // Sort lessons by date and number for table view
+  const sortedLessons = [...lessons].sort((a, b) => {
+    const dateCompare = new Date(a.lesson_date).getTime() - new Date(b.lesson_date).getTime()
+    if (dateCompare !== 0) return dateCompare
+    return a.lesson_number - b.lesson_number
+  })
+
+  // Calculate student attendance stats for table view
+  const getStudentStats = (studentId: string) => {
+    const studentAttendance = fullAttendanceData[studentId] || {}
+    let present = 0, absent = 0, excused = 0
+    
+    Object.values(studentAttendance).forEach(status => {
+      if (status === 'present') present++
+      else if (status === 'absent') absent++
+      else if (status === 'excused') excused++
+    })
+    
+    const total = present + absent + excused
+    const percentage = total > 0 ? Math.round((present / total) * 100) : 0
+    
+    return { present, absent, excused, total, percentage }
+  }
+
+  // Get status color for table cell
+  const getStatusColor = (status: 'present' | 'absent' | 'excused' | null) => {
+    switch (status) {
+      case 'present':
+        return 'bg-green-500'
+      case 'absent':
+        return 'bg-red-500'
+      case 'excused':
+        return 'bg-yellow-500'
+      default:
+        return 'bg-gray-200'
+    }
+  }
+
+  const getStatusIcon = (status: 'present' | 'absent' | 'excused' | null) => {
+    switch (status) {
+      case 'present':
+        return '✓'
+      case 'absent':
+        return '✗'
+      case 'excused':
+        return '!'
+      default:
+        return '-'
+    }
+  }
+
+  // Filter students for table view by study mode
+  const tableFilteredStudents = students.filter(student => {
+    if (tableStudyModeFilter === 'all') return true
+    return (student.study_mode || 'offline') === tableStudyModeFilter
+  })
+
+  // Get blacklisted students
+  const blacklistedStudents = students.filter(s => s.is_blacklisted)
+
+  // Get study mode counts for table view
+  const getTableStudyModeStats = () => {
+    const offline = students.filter(s => (s.study_mode || 'offline') === 'offline' && !s.is_blacklisted).length
+    const online = students.filter(s => s.study_mode === 'online' && !s.is_blacklisted).length
+    const selfStudy = students.filter(s => s.study_mode === 'self_study' && !s.is_blacklisted).length
+    return { offline, online, selfStudy }
+  }
+
+  const tableStudyModeStats = getTableStudyModeStats()
+
   return (
     <AuthGate requiredRole="admin">
       <DashboardLayout>
@@ -592,15 +759,50 @@ export default function ClassAttendancePage() {
                 <h2 className="text-xl samsung-heading text-gray-900">Dərslər</h2>
                 <p className="text-sm text-gray-600 samsung-body mt-1">{lessons.length} dərs yaradılıb</p>
               </div>
-              <button
-                onClick={openNewLessonModal}
-                className="px-5 py-2.5 bg-samsung-blue hover:bg-samsung-blue-dark text-white rounded-xl samsung-body font-semibold transition shadow-lg flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Yeni Dərs Yarat
-              </button>
+              <div className="flex items-center gap-3">
+                {/* View Mode Toggle */}
+                <div className="flex items-center bg-gray-100 rounded-xl p-1">
+                  <button
+                    onClick={() => setViewMode('cards')}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                      viewMode === 'cards'
+                        ? 'bg-white text-samsung-blue shadow'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                      </svg>
+                      Kartlar
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                      viewMode === 'table'
+                        ? 'bg-white text-samsung-blue shadow'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Cədvəl
+                    </span>
+                  </button>
+                </div>
+                <button
+                  onClick={openNewLessonModal}
+                  className="px-5 py-2.5 bg-samsung-blue hover:bg-samsung-blue-dark text-white rounded-xl samsung-body font-semibold transition shadow-lg flex items-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                  Yeni Dərs Yarat
+                </button>
+              </div>
             </div>
 
             {lessons.length === 0 ? (
@@ -621,6 +823,274 @@ export default function ClassAttendancePage() {
                   </svg>
                   İlk Dərsi Yarat
                 </button>
+              </div>
+            ) : viewMode === 'table' ? (
+              /* Table View */
+              <div className="overflow-x-auto">
+                {/* Study Mode Filter for Table */}
+                <div className="px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-sm font-semibold text-gray-700 mr-2">Filtr:</span>
+                    <button
+                      onClick={() => setTableStudyModeFilter('all')}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
+                        tableStudyModeFilter === 'all'
+                          ? 'bg-samsung-blue text-white shadow-lg'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      }`}
+                    >
+                      Hamısı ({students.filter(s => !s.is_blacklisted).length})
+                    </button>
+                    <button
+                      onClick={() => setTableStudyModeFilter('offline')}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
+                        tableStudyModeFilter === 'offline'
+                          ? 'bg-green-500 text-white shadow-lg'
+                          : 'bg-green-50 text-green-700 hover:bg-green-100'
+                      }`}
+                    >
+                      🏫 Əyani ({tableStudyModeStats.offline})
+                    </button>
+                    <button
+                      onClick={() => setTableStudyModeFilter('online')}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
+                        tableStudyModeFilter === 'online'
+                          ? 'bg-blue-500 text-white shadow-lg'
+                          : 'bg-blue-50 text-blue-700 hover:bg-blue-100'
+                      }`}
+                    >
+                      💻 Online ({tableStudyModeStats.online})
+                    </button>
+                    <button
+                      onClick={() => setTableStudyModeFilter('self_study')}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
+                        tableStudyModeFilter === 'self_study'
+                          ? 'bg-purple-500 text-white shadow-lg'
+                          : 'bg-purple-50 text-purple-700 hover:bg-purple-100'
+                      }`}
+                    >
+                      📚 Sərbəst ({tableStudyModeStats.selfStudy})
+                    </button>
+                  </div>
+                  
+                  {/* Blacklist Toggle Button */}
+                  <button
+                    onClick={() => setShowBlacklistSection(!showBlacklistSection)}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-2 ${
+                      showBlacklistSection
+                        ? 'bg-red-500 text-white shadow-lg'
+                        : blacklistedStudents.length > 0
+                          ? 'bg-red-50 text-red-700 hover:bg-red-100 border-2 border-red-200'
+                          : 'bg-gray-50 text-gray-500 hover:bg-gray-100'
+                    }`}
+                  >
+                    🚫 Qara Siyahı ({blacklistedStudents.length})
+                  </button>
+                </div>
+
+                {/* Blacklisted Students Section */}
+                {showBlacklistSection && blacklistedStudents.length > 0 && (
+                  <div className="px-6 py-4 bg-red-50 border-b-2 border-red-200">
+                    <h3 className="text-lg font-semibold text-red-800 mb-3 flex items-center gap-2">
+                      🚫 Qara Siyahıdakı Tələbələr
+                      <span className="text-sm font-normal text-red-600">
+                        (Bu tələbələr materiallara daxil ola bilmir)
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {blacklistedStudents.map(student => (
+                        <div 
+                          key={student.id}
+                          className="flex items-center justify-between bg-white p-3 rounded-xl border-2 border-red-200"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-red-500 text-white rounded-full flex items-center justify-center font-bold">
+                              {student.full_name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900">{student.full_name}</p>
+                              <span className={`text-xs px-2 py-0.5 rounded ${
+                                student.study_mode === 'online' ? 'bg-blue-100 text-blue-700' :
+                                student.study_mode === 'self_study' ? 'bg-purple-100 text-purple-700' :
+                                'bg-green-100 text-green-700'
+                              }`}>
+                                {student.study_mode === 'online' ? '💻 Online' : 
+                                 student.study_mode === 'self_study' ? '📚 Sərbəst' : '🏫 Əyani'}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => toggleBlacklist(student.id, true)}
+                            disabled={togglingBlacklist === student.id}
+                            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm font-semibold transition disabled:opacity-50 flex items-center gap-1"
+                          >
+                            {togglingBlacklist === student.id ? (
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            ) : (
+                              <>✓ Çıxar</>
+                            )}
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {showBlacklistSection && blacklistedStudents.length === 0 && (
+                  <div className="px-6 py-8 bg-gray-50 border-b border-gray-200 text-center">
+                    <div className="text-4xl mb-2">✅</div>
+                    <p className="text-gray-600">Qara siyahıda heç bir tələbə yoxdur</p>
+                  </div>
+                )}
+
+                <table className="w-full">
+                  <thead>
+                    <tr className="bg-gray-50">
+                      <th className="sticky left-0 bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-900 border-b-2 border-gray-200 min-w-[250px] z-10">
+                        Tələbə
+                      </th>
+                      {sortedLessons.map((lesson) => (
+                        <th 
+                          key={`${lesson.lesson_date}-${lesson.lesson_number}`}
+                          className="px-2 py-3 text-center text-xs font-semibold text-gray-700 border-b-2 border-gray-200 min-w-[60px] cursor-pointer hover:bg-gray-100 transition"
+                          onClick={() => openEditLessonModal(lesson)}
+                          title={`${lesson.lesson_title || 'Dərs'} - ${new Date(lesson.lesson_date).toLocaleDateString('az-AZ')}`}
+                        >
+                          <div className="flex flex-col items-center gap-1">
+                            <span className="text-samsung-blue font-bold">#{lesson.lesson_number}</span>
+                            <span className="text-[10px] text-gray-500">
+                              {new Date(lesson.lesson_date).toLocaleDateString('az-AZ', { day: '2-digit', month: '2-digit' })}
+                            </span>
+                          </div>
+                        </th>
+                      ))}
+                      <th className="px-4 py-3 text-center text-sm font-semibold text-gray-900 border-b-2 border-gray-200 min-w-[100px] bg-gray-100">
+                        Statistika
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tableFilteredStudents.filter(s => !s.is_blacklisted).map((student, index) => {
+                      const studentStats = getStudentStats(student.id)
+                      
+                      return (
+                        <tr 
+                          key={student.id} 
+                          className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'} hover:bg-blue-50/50 transition`}
+                        >
+                          {/* Student Name - Sticky */}
+                          <td className={`sticky left-0 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} px-4 py-3 border-b border-gray-100 z-10`}>
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="w-8 h-8 bg-samsung-blue text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                                  {student.full_name.charAt(0).toUpperCase()}
+                                </div>
+                                <div className="min-w-0">
+                                  <p className="font-semibold text-gray-900 text-sm truncate">{student.full_name}</p>
+                                  {student.study_mode && (
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded ${
+                                      student.study_mode === 'online' ? 'bg-blue-100 text-blue-700' :
+                                      student.study_mode === 'self_study' ? 'bg-purple-100 text-purple-700' :
+                                      'bg-green-100 text-green-700'
+                                    }`}>
+                                      {student.study_mode === 'online' ? '💻' : student.study_mode === 'self_study' ? '📚' : '🏫'}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              {/* Blacklist Toggle */}
+                              <button
+                                onClick={() => toggleBlacklist(student.id, false)}
+                                disabled={togglingBlacklist === student.id}
+                                className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition flex-shrink-0"
+                                title="Qara siyahıya əlavə et"
+                              >
+                                {togglingBlacklist === student.id ? (
+                                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                  </svg>
+                                )}
+                              </button>
+                            </div>
+                          </td>
+                          
+                          {/* Attendance Cells */}
+                          {sortedLessons.map((lesson) => {
+                            const lessonKey = `${lesson.lesson_date}-${lesson.lesson_number}`
+                            const status = fullAttendanceData[student.id]?.[lessonKey] || null
+                            
+                            return (
+                              <td 
+                                key={lessonKey}
+                                className="px-2 py-3 text-center border-b border-gray-100"
+                              >
+                                <div 
+                                  className={`w-8 h-8 mx-auto rounded-lg flex items-center justify-center text-white text-sm font-bold ${getStatusColor(status)} ${
+                                    status ? 'shadow-sm' : ''
+                                  }`}
+                                  title={
+                                    status === 'present' ? 'İştirak etdi' :
+                                    status === 'absent' ? 'Qayıb' :
+                                    status === 'excused' ? 'Üzrlü' : 'Qeyd olunmayıb'
+                                  }
+                                >
+                                  {getStatusIcon(status)}
+                                </div>
+                              </td>
+                            )
+                          })}
+                          
+                          {/* Stats Column */}
+                          <td className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+                            <div className="flex flex-col items-center gap-1">
+                              <div className={`text-lg font-bold ${
+                                studentStats.percentage >= 80 ? 'text-green-600' :
+                                studentStats.percentage >= 60 ? 'text-yellow-600' :
+                                'text-red-600'
+                              }`}>
+                                {studentStats.percentage}%
+                              </div>
+                              <div className="flex items-center gap-1 text-[10px]">
+                                <span className="text-green-600">{studentStats.present}</span>
+                                <span className="text-gray-400">/</span>
+                                <span className="text-red-600">{studentStats.absent}</span>
+                                <span className="text-gray-400">/</span>
+                                <span className="text-yellow-600">{studentStats.excused}</span>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+                
+                {/* Legend */}
+                <div className="px-6 py-4 border-t-2 border-gray-100 bg-gray-50 flex items-center justify-between">
+                  <div className="flex items-center gap-6 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">✓</div>
+                      <span className="text-gray-700">İştirak</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-red-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">✗</div>
+                      <span className="text-gray-700">Qayıb</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-yellow-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">!</div>
+                      <span className="text-gray-700">Üzrlü</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-xs font-bold">-</div>
+                      <span className="text-gray-700">Qeyd olunmayıb</span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Dərs başlığına klikləyərək redaktə edə bilərsiniz
+                  </p>
+                </div>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
