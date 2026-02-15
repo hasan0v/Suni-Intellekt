@@ -110,24 +110,64 @@ export async function gradeSubmission(params: {
 
   // Try to parse as notebook
   let notebookText = submissionContent
+  let hasUnrunCells = false
+  let totalCodeCells = 0
+  let runCodeCells = 0
   try {
     const parsed = typeof submissionContent === 'string' ? JSON.parse(submissionContent) : submissionContent
     if (parsed.cells && Array.isArray(parsed.cells)) {
+      // Analyze execution state of cells
+      for (const cell of parsed.cells) {
+        if (cell.cell_type === 'code') {
+          totalCodeCells++
+          const hasOutput = cell.outputs && cell.outputs.length > 0
+          const hasExecutionCount = cell.execution_count !== null && cell.execution_count !== undefined
+          if (hasOutput || hasExecutionCount) {
+            runCodeCells++
+          }
+        }
+      }
+      hasUnrunCells = runCodeCells < totalCodeCells
+
       // Convert notebook cells to readable text
-      notebookText = parsed.cells.map((cell: { cell_type: string; source: string[] | string; outputs?: Array<{ text?: string[]; data?: Record<string, string[]> }> }, i: number) => {
+      notebookText = parsed.cells.map((cell: {
+        cell_type: string;
+        source: string[] | string;
+        execution_count?: number | null;
+        outputs?: Array<{ text?: string[]; output_type?: string; ename?: string; evalue?: string; data?: Record<string, string[]> }>
+      }, i: number) => {
         const source = Array.isArray(cell.source) ? cell.source.join('') : cell.source
-        const outputs = cell.outputs?.map((o: { text?: string[]; data?: Record<string, string[]> }) => {
+        if (!source || source.trim() === '') return null
+
+        if (cell.cell_type === 'markdown') {
+          return `[Cell ${i + 1} - markdown]\n${source}`
+        }
+
+        // Code cell - check if it was executed
+        const wasRun = (cell.outputs && cell.outputs.length > 0) ||
+          (cell.execution_count !== null && cell.execution_count !== undefined)
+
+        const outputs = cell.outputs?.map((o) => {
+          if (o.output_type === 'error') return `[Error: ${o.ename}: ${o.evalue}]`
           if (o.text) return Array.isArray(o.text) ? o.text.join('') : o.text
           if (o.data && o.data['text/plain']) return Array.isArray(o.data['text/plain']) ? o.data['text/plain'].join('') : o.data['text/plain']
           return ''
         }).filter(Boolean).join('\n') || ''
 
-        return `[Cell ${i + 1} - ${cell.cell_type}]\n${source}${outputs ? `\n[Output]\n${outputs}` : ''}`
-      }).join('\n\n---\n\n')
+        const runStatus = wasRun ? '✅ Run' : '⚠️ Not Run'
+        const execNum = cell.execution_count ? ` [${cell.execution_count}]` : ''
+
+        return `[Cell ${i + 1} - code${execNum} | ${runStatus}]\n${source}${outputs ? `\n[Output]\n${outputs}` : ''}`
+      }).filter(Boolean).join('\n\n---\n\n')
     }
   } catch {
     // Not JSON / not a notebook - use raw text
   }
+
+  // Build execution context note for the AI
+  const executionNote = hasUnrunCells
+    ? `\n\n⚠️ QEYD: Bu notebookda ${totalCodeCells} kod hüceyrəsindən ${totalCodeCells - runCodeCells} tanəsi RUN EDİLMƏYİB (icra olunmayıb). Output-lar yoxdur, amma kodun yazılışını, məntiqini və düzgünlüyünü təhlil edərək qiymətləndir. Kodun nə etdiyini oxuyaraq başa düş və doğru olub-olmadığını müəyyən et. Run olunmamaq özlüyündə cəza səbəbi DEYİL - əsas odur ki, kod düzgün yazılıb.`
+    : ''
 
   const systemPrompt = `You are an expert automated grading engine for an LMS (Learning Management System). 
 You grade student submissions with precision, consistency, and objectivity.
@@ -139,6 +179,16 @@ GRADING RULES:
 3. Final score = rounded mean of all task scores, capped at max_score (${maxScore})
 4. Be fair but strict — reward good work, penalize errors proportionally
 5. Always provide specific, actionable feedback
+
+CRITICAL - CODE WITHOUT OUTPUT (NOT RUN CELLS):
+- If notebook cells are NOT RUN (no output/execution), you MUST still evaluate the code by READING and ANALYZING the code logic
+- Mentally trace through the code: determine what it would produce if executed
+- Check for syntax errors, logic errors, correct use of functions, proper variable naming
+- A cell not being run is NOT a penalty by itself — the code quality and correctness is what matters
+- Grade the CODE AS WRITTEN: if the logic is correct and would produce correct output, give full credit
+- Only penalize if the code itself contains actual errors (wrong logic, syntax issues, missing parts)
+- For Python: check indentation, correct use of built-in functions, proper data types, control flow
+- If code would raise an exception when run (e.g., ZeroDivisionError, NameError), note it as an error
 
 FEEDBACK FORMAT (Markdown):
 **Yekun bal: {score}/${maxScore}**
@@ -178,6 +228,7 @@ The score must be a realistic integer between 0 and ${maxScore}.`
 **Task**: ${taskTitle}
 **Instructions**: ${taskInstructions}
 **Max Score**: ${maxScore}
+**Execution Status**: ${hasUnrunCells ? `${runCodeCells}/${totalCodeCells} code cells run — evaluate unrun cells by reading code logic` : `${runCodeCells}/${totalCodeCells} code cells run`}${executionNote}
 
 **Submission Content**:
 ${notebookText.substring(0, 15000)}`
